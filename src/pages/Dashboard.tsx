@@ -14,6 +14,7 @@ import { AIAssistant } from "@/components/dashboard/AIAssistant";
 import { IntelligenceSettings } from "@/components/dashboard/IntelligenceSettings";
 import { DisruptionScheduler } from "@/components/dashboard/DisruptionScheduler";
 import { IntelligenceFeed } from "@/components/dashboard/IntelligenceFeed";
+import { CampaignReporting } from "@/components/dashboard/CampaignReporting";
 import { Loader2 } from "lucide-react";
 
 const Dashboard = () => {
@@ -70,6 +71,8 @@ const Dashboard = () => {
         return <AgentProfile user={user} />;
       case "settings":
         return <IntelligenceSettings />;
+      case "reporting":
+        return <CampaignReporting />;
       default:
         return (
           <div className="space-y-8">

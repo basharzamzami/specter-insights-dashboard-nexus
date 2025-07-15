@@ -1,27 +1,127 @@
-import { useState } from "react";
-import { Settings, Shield, Users, Key, Zap, Clock, Bell, Database } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useUser } from "@clerk/clerk-react";
+import { Settings, Shield, Users, Key, Zap, Clock, Bell, Database, Upload, Trash2, Edit, Plus } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { useToast } from "@/hooks/use-toast";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
 export const IntelligenceSettings = () => {
-  const { toast } = useToast();
+  const { user } = useUser();
   const [aggressiveMode, setAggressiveMode] = useState(false);
   const [stealthMode, setStealthMode] = useState(true);
   const [realTimeAlerts, setRealTimeAlerts] = useState(true);
   const [autoResponse, setAutoResponse] = useState(false);
+  const [personas, setPersonas] = useState<any[]>([]);
+  const [isPersonaDialogOpen, setIsPersonaDialogOpen] = useState(false);
+  const [newPersona, setNewPersona] = useState({
+    name: "",
+    platform: "",
+    voice_tone: "",
+    scripts: {}
+  });
 
-  const handleSaveSettings = () => {
-    toast({
-      title: "Settings Updated",
-      description: "Your intelligence configuration has been saved.",
-    });
+  useEffect(() => {
+    loadUserSettings();
+    loadPersonas();
+  }, [user]);
+
+  const loadUserSettings = async () => {
+    if (!user) return;
+    
+    const { data } = await supabase
+      .from('user_settings')
+      .select('*')
+      .eq('user_id', user.id)
+      .single();
+
+    if (data) {
+      setAggressiveMode(data.aggressive_mode);
+      setStealthMode(data.stealth_mode);
+      const notifications = data.notifications as any;
+      setRealTimeAlerts(notifications?.real_time_alerts ?? true);
+      setAutoResponse(notifications?.auto_response ?? false);
+    }
+  };
+
+  const loadPersonas = async () => {
+    if (!user) return;
+    
+    const { data } = await supabase
+      .from('personas')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (data) setPersonas(data);
+  };
+
+  const handleSaveSettings = async () => {
+    if (!user) return;
+
+    const settings = {
+      user_id: user.id,
+      aggressive_mode: aggressiveMode,
+      stealth_mode: stealthMode,
+      notifications: {
+        real_time_alerts: realTimeAlerts,
+        auto_response: autoResponse
+      }
+    };
+
+    const { error } = await supabase
+      .from('user_settings')
+      .upsert(settings);
+
+    if (error) {
+      toast.error("Failed to save settings");
+    } else {
+      toast.success("Settings Updated", {
+        description: "Your intelligence configuration has been saved."
+      });
+    }
+  };
+
+  const handleCreatePersona = async () => {
+    if (!user || !newPersona.name || !newPersona.platform) return;
+
+    const { error } = await supabase
+      .from('personas')
+      .insert([{
+        ...newPersona,
+        created_by: user.id
+      }]);
+
+    if (error) {
+      toast.error("Failed to create persona");
+    } else {
+      toast.success("Persona created successfully");
+      setIsPersonaDialogOpen(false);
+      setNewPersona({ name: "", platform: "", voice_tone: "", scripts: {} });
+      loadPersonas();
+    }
+  };
+
+  const handleDeletePersona = async (id: string) => {
+    const { error } = await supabase
+      .from('personas')
+      .delete()
+      .eq('id', id);
+
+    if (error) {
+      toast.error("Failed to delete persona");
+    } else {
+      toast.success("Persona deleted");
+      loadPersonas();
+    }
   };
 
   return (
@@ -165,37 +265,118 @@ export const IntelligenceSettings = () => {
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid gap-4">
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
-                      <Users className="h-5 w-5 text-primary" />
+                {personas.map((persona) => (
+                  <div key={persona.id} className="flex items-center justify-between p-4 border rounded-lg">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-primary/20 rounded-full flex items-center justify-center">
+                        <Users className="h-5 w-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="font-medium">{persona.name}</p>
+                        <p className="text-sm text-muted-foreground">{persona.platform}</p>
+                        <p className="text-xs text-muted-foreground">{persona.voice_tone}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="font-medium">Alpha Operative</p>
-                      <p className="text-sm text-muted-foreground">LinkedIn, Twitter, Industry Forums</p>
+                    <div className="flex gap-2">
+                      <Button variant="outline" size="sm">
+                        <Edit className="h-3 w-3" />
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        size="sm"
+                        onClick={() => handleDeletePersona(persona.id)}
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </Button>
                     </div>
                   </div>
-                  <Button variant="outline" size="sm">Edit</Button>
-                </div>
+                ))}
 
-                <div className="flex items-center justify-between p-4 border rounded-lg">
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-secondary/20 rounded-full flex items-center justify-center">
-                      <Users className="h-5 w-5 text-secondary" />
-                    </div>
-                    <div>
-                      <p className="font-medium">Market Analyst</p>
-                      <p className="text-sm text-muted-foreground">Reddit, Discord, Slack Communities</p>
-                    </div>
+                {personas.length === 0 && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <Users className="h-12 w-12 mx-auto mb-4 opacity-50" />
+                    <p>No personas created yet</p>
+                    <p className="text-sm">Create your first operational persona below</p>
                   </div>
-                  <Button variant="outline" size="sm">Edit</Button>
-                </div>
+                )}
               </div>
 
-              <Button className="w-full">
-                <Users className="h-4 w-4 mr-2" />
-                Create New Persona
-              </Button>
+              <Dialog open={isPersonaDialogOpen} onOpenChange={setIsPersonaDialogOpen}>
+                <DialogTrigger asChild>
+                  <Button className="w-full">
+                    <Plus className="h-4 w-4 mr-2" />
+                    Create New Persona
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Create Strategic Persona</DialogTitle>
+                    <DialogDescription>
+                      Design a persona for specific platforms and operational tactics
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4">
+                    <div>
+                      <Label>Persona Name</Label>
+                      <Input 
+                        value={newPersona.name}
+                        onChange={(e) => setNewPersona(prev => ({ ...prev, name: e.target.value }))}
+                        placeholder="e.g. Alpha Operative, Market Analyst"
+                      />
+                    </div>
+                    <div>
+                      <Label>Primary Platform</Label>
+                      <Select 
+                        value={newPersona.platform}
+                        onValueChange={(value) => setNewPersona(prev => ({ ...prev, platform: value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select platform..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="LinkedIn">LinkedIn</SelectItem>
+                          <SelectItem value="Twitter/X">Twitter/X</SelectItem>
+                          <SelectItem value="Reddit">Reddit</SelectItem>
+                          <SelectItem value="Discord">Discord</SelectItem>
+                          <SelectItem value="Facebook">Facebook</SelectItem>
+                          <SelectItem value="Industry Forums">Industry Forums</SelectItem>
+                          <SelectItem value="Review Sites">Review Sites</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label>Voice Tone</Label>
+                      <Select 
+                        value={newPersona.voice_tone}
+                        onValueChange={(value) => setNewPersona(prev => ({ ...prev, voice_tone: value }))}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select tone..." />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Professional">Professional</SelectItem>
+                          <SelectItem value="Casual">Casual</SelectItem>
+                          <SelectItem value="Authoritative">Authoritative</SelectItem>
+                          <SelectItem value="Concerned Customer">Concerned Customer</SelectItem>
+                          <SelectItem value="Industry Expert">Industry Expert</SelectItem>
+                          <SelectItem value="Skeptical">Skeptical</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="flex gap-3 pt-4">
+                      <Button onClick={handleCreatePersona} className="flex-1">
+                        Create Persona
+                      </Button>
+                      <Button 
+                        variant="outline" 
+                        onClick={() => setIsPersonaDialogOpen(false)}
+                      >
+                        Cancel
+                      </Button>
+                    </div>
+                  </div>
+                </DialogContent>
+              </Dialog>
             </CardContent>
           </Card>
         </TabsContent>

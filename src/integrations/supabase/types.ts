@@ -14,6 +14,79 @@ export type Database = {
   }
   public: {
     Tables: {
+      action_logs: {
+        Row: {
+          action_type: string
+          details: Json | null
+          id: string
+          target_id: string | null
+          target_type: string | null
+          timestamp: string | null
+          triggered_by: string | null
+        }
+        Insert: {
+          action_type: string
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_type?: string | null
+          timestamp?: string | null
+          triggered_by?: string | null
+        }
+        Update: {
+          action_type?: string
+          details?: Json | null
+          id?: string
+          target_id?: string | null
+          target_type?: string | null
+          timestamp?: string | null
+          triggered_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "action_logs_triggered_by_fkey"
+            columns: ["triggered_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      ask_specter_logs: {
+        Row: {
+          ai_response: string | null
+          context: Json | null
+          id: string
+          prompt: string
+          timestamp: string | null
+          user_id: string | null
+        }
+        Insert: {
+          ai_response?: string | null
+          context?: Json | null
+          id?: string
+          prompt: string
+          timestamp?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          ai_response?: string | null
+          context?: Json | null
+          id?: string
+          prompt?: string
+          timestamp?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "ask_specter_logs_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campaign_posts: {
         Row: {
           campaign_id: string | null
@@ -48,6 +121,112 @@ export type Database = {
             columns: ["campaign_id"]
             isOneToOne: false
             referencedRelation: "marketing_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      campaigns: {
+        Row: {
+          actions: Json | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          objective: string | null
+          scheduled_date: string | null
+          status: string | null
+          target_company: string
+          type: string
+          updated_at: string | null
+        }
+        Insert: {
+          actions?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          objective?: string | null
+          scheduled_date?: string | null
+          status?: string | null
+          target_company: string
+          type: string
+          updated_at?: string | null
+        }
+        Update: {
+          actions?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          objective?: string | null
+          scheduled_date?: string | null
+          status?: string | null
+          target_company?: string
+          type?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaigns_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      competitor_profiles: {
+        Row: {
+          ad_activity: Json | null
+          company_name: string
+          created_at: string | null
+          created_by: string | null
+          customer_complaints: Json | null
+          estimated_ad_spend: number | null
+          id: string
+          sentiment_score: number | null
+          seo_score: number | null
+          social_sentiment: Json | null
+          top_keywords: string[] | null
+          updated_at: string | null
+          vulnerabilities: string[] | null
+          website: string | null
+        }
+        Insert: {
+          ad_activity?: Json | null
+          company_name: string
+          created_at?: string | null
+          created_by?: string | null
+          customer_complaints?: Json | null
+          estimated_ad_spend?: number | null
+          id?: string
+          sentiment_score?: number | null
+          seo_score?: number | null
+          social_sentiment?: Json | null
+          top_keywords?: string[] | null
+          updated_at?: string | null
+          vulnerabilities?: string[] | null
+          website?: string | null
+        }
+        Update: {
+          ad_activity?: Json | null
+          company_name?: string
+          created_at?: string | null
+          created_by?: string | null
+          customer_complaints?: Json | null
+          estimated_ad_spend?: number | null
+          id?: string
+          sentiment_score?: number | null
+          seo_score?: number | null
+          social_sentiment?: Json | null
+          top_keywords?: string[] | null
+          updated_at?: string | null
+          vulnerabilities?: string[] | null
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "competitor_profiles_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
             referencedColumns: ["id"]
           },
         ]
@@ -157,6 +336,47 @@ export type Database = {
           },
         ]
       }
+      personas: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          created_by: string | null
+          id: string
+          name: string
+          platform: string | null
+          scripts: Json | null
+          voice_tone: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          name: string
+          platform?: string | null
+          scripts?: Json | null
+          voice_tone?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          created_by?: string | null
+          id?: string
+          name?: string
+          platform?: string | null
+          scripts?: Json | null
+          voice_tone?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "personas_created_by_fkey"
+            columns: ["created_by"]
+            isOneToOne: false
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       sentiment_analysis: {
         Row: {
           analyzed_at: string | null
@@ -221,11 +441,53 @@ export type Database = {
           },
         ]
       }
+      user_settings: {
+        Row: {
+          aggressive_mode: boolean | null
+          created_at: string | null
+          id: string
+          integrations: Json | null
+          notifications: Json | null
+          stealth_mode: boolean | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          aggressive_mode?: boolean | null
+          created_at?: string | null
+          id?: string
+          integrations?: Json | null
+          notifications?: Json | null
+          stealth_mode?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          aggressive_mode?: boolean | null
+          created_at?: string | null
+          id?: string
+          integrations?: Json | null
+          notifications?: Json | null
+          stealth_mode?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_settings_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "users"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       users: {
         Row: {
           created_at: string | null
           email: string
           id: string
+          name: string | null
           role: string | null
           status: string | null
         }
@@ -233,6 +495,7 @@ export type Database = {
           created_at?: string | null
           email: string
           id?: string
+          name?: string | null
           role?: string | null
           status?: string | null
         }
@@ -240,6 +503,7 @@ export type Database = {
           created_at?: string | null
           email?: string
           id?: string
+          name?: string | null
           role?: string | null
           status?: string | null
         }
