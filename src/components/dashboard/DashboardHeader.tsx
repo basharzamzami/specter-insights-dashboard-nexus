@@ -1,9 +1,15 @@
-import { UserButton, useUser } from "@clerk/clerk-react";
-import { Bell, Settings } from "lucide-react";
+import { UserButton } from "@clerk/clerk-react";
+import { Bell, Settings, Bot } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 
-export const DashboardHeader = () => {
-  const { user } = useUser();
+interface DashboardHeaderProps {
+  user: any;
+  onAIToggle: () => void;
+  isAIOpen: boolean;
+}
+
+export const DashboardHeader = ({ user, onAIToggle, isAIOpen }: DashboardHeaderProps) => {
 
   return (
     <header className="bg-card border-b border-border px-6 py-4">
@@ -20,6 +26,17 @@ export const DashboardHeader = () => {
         </div>
 
         <div className="flex items-center space-x-4">
+          <Button 
+            variant={isAIOpen ? "default" : "ghost"}
+            size="sm"
+            onClick={onAIToggle}
+            className={isAIOpen ? "btn-glow" : ""}
+          >
+            <Bot className="h-4 w-4 mr-2" />
+            Ask Specter
+            {!isAIOpen && <Badge variant="secondary" className="ml-2 text-xs">AI</Badge>}
+          </Button>
+          
           <Button variant="ghost" size="sm" className="relative">
             <Bell className="h-5 w-5" />
             <span className="absolute -top-1 -right-1 h-3 w-3 bg-destructive rounded-full"></span>

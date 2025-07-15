@@ -20,9 +20,10 @@ interface SidebarItem {
 }
 
 const sidebarItems: SidebarItem[] = [
-  { name: "Competitor Feed", icon: Target, key: "competitors" },
-  { name: "Campaign Scheduler", icon: Calendar, key: "campaigns" },
-  { name: "Analytics", icon: BarChart3, key: "analytics" },
+  { name: "Command Center", icon: BarChart3, key: "overview" },
+  { name: "Competitor Intel", icon: Target, key: "competitors" },
+  { name: "Campaign Control", icon: Calendar, key: "campaigns" },
+  { name: "Performance Ops", icon: Activity, key: "analytics" },
   { name: "Activity Logs", icon: Activity, key: "activity" },
 ];
 
