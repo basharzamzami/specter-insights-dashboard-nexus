@@ -1,10 +1,11 @@
 import { SignIn, SignUp, useUser } from "@clerk/clerk-react";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
   const { isSignedIn } = useUser();
   const navigate = useNavigate();
+  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
 
   useEffect(() => {
     if (isSignedIn) {
@@ -13,45 +14,73 @@ const Auth = () => {
   }, [isSignedIn, navigate]);
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
+    <div className="min-h-screen bg-gradient-subtle flex items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold text-foreground mb-2">
-            Specter Net
-          </h1>
+        <div className="text-center space-y-4">
+          <div className="inline-flex items-center space-x-2">
+            <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center">
+              <span className="text-white font-bold text-lg">S</span>
+            </div>
+            <h1 className="text-3xl font-bold bg-gradient-primary bg-clip-text text-transparent">
+              Specter Net
+            </h1>
+          </div>
           <p className="text-muted-foreground">
             Business Intelligence Dashboard
           </p>
         </div>
         
-        <div className="space-y-4">
-          <div className="flex flex-col items-center space-y-4">
+        <div className="bg-card border border-border rounded-lg p-6 shadow-soft">
+          <div className="flex space-x-2 mb-6">
+            <button
+              onClick={() => setMode('signin')}
+              className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
+                mode === 'signin' 
+                  ? 'bg-primary text-primary-foreground shadow-glow' 
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Sign In
+            </button>
+            <button
+              onClick={() => setMode('signup')}
+              className={`flex-1 py-2 px-4 rounded-lg font-medium transition-all ${
+                mode === 'signup' 
+                  ? 'bg-primary text-primary-foreground shadow-glow' 
+                  : 'text-muted-foreground hover:text-foreground'
+              }`}
+            >
+              Sign Up
+            </button>
+          </div>
+          
+          {mode === 'signin' ? (
             <SignIn 
               fallbackRedirectUrl="/"
               appearance={{
                 elements: {
-                  card: "shadow-lg",
-                  headerTitle: "text-foreground",
-                  headerSubtitle: "text-muted-foreground",
+                  card: "shadow-none border-0",
+                  headerTitle: "hidden",
+                  headerSubtitle: "hidden",
+                  socialButtonsBlockButton: "bg-secondary hover:bg-accent",
+                  formButtonPrimary: "bg-primary hover:bg-primary/90",
                 }
               }}
             />
-            <div className="text-center">
-              <p className="text-sm text-muted-foreground">
-                Don't have an account?
-              </p>
-              <SignUp 
-                fallbackRedirectUrl="/"
-                appearance={{
-                  elements: {
-                    card: "shadow-lg",
-                    headerTitle: "text-foreground",
-                    headerSubtitle: "text-muted-foreground",
-                  }
-                }}
-              />
-            </div>
-          </div>
+          ) : (
+            <SignUp 
+              fallbackRedirectUrl="/"
+              appearance={{
+                elements: {
+                  card: "shadow-none border-0",
+                  headerTitle: "hidden", 
+                  headerSubtitle: "hidden",
+                  socialButtonsBlockButton: "bg-secondary hover:bg-accent",
+                  formButtonPrimary: "bg-primary hover:bg-primary/90",
+                }
+              }}
+            />
+          )}
         </div>
       </div>
     </div>
