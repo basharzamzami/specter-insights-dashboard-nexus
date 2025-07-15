@@ -1,7 +1,8 @@
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
-import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/dashboard/AppSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { WelcomeBanner } from "@/components/dashboard/WelcomeBanner";
 import { CompetitorAnalysis } from "@/components/dashboard/CompetitorAnalysis";
@@ -15,7 +16,7 @@ import { IntelligenceSettings } from "@/components/dashboard/IntelligenceSetting
 import { DisruptionScheduler } from "@/components/dashboard/DisruptionScheduler";
 import { IntelligenceFeed } from "@/components/dashboard/IntelligenceFeed";
 import { CampaignReporting } from "@/components/dashboard/CampaignReporting";
-import { Loader2 } from "lucide-react";
+import { Loader2, Bell } from "lucide-react";
 
 const Dashboard = () => {
   const { isLoaded, isSignedIn, user } = useUser();
@@ -90,25 +91,57 @@ const Dashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
-      <DashboardSidebar activeView={activeView} onViewChange={setActiveView} />
-      
-      <div className="flex-1 flex flex-col">
-        <DashboardHeader 
-          user={user} 
-          onAIToggle={() => setIsAIOpen(!isAIOpen)}
-          isAIOpen={isAIOpen}
-        />
+    <SidebarProvider defaultOpen>
+      <div className="min-h-screen w-full flex bg-background">
+        <AppSidebar activeView={activeView} onViewChange={setActiveView} />
         
-        <main className="flex-1 p-6 overflow-auto">
-          <div className="max-w-7xl mx-auto">
-            {renderActiveView()}
-          </div>
-        </main>
-      </div>
+        <div className="flex-1 flex flex-col">
+          {/* Enhanced Header with Sidebar Trigger */}
+          <header className="h-16 border-b border-border/50 bg-card/50 backdrop-blur-sm flex items-center justify-between px-6">
+            <div className="flex items-center space-x-4">
+              <SidebarTrigger className="hover:bg-accent hover:text-accent-foreground transition-colors" />
+              <div className="flex items-center space-x-2">
+                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                <span className="text-sm text-muted-foreground">All systems operational</span>
+              </div>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <div className="relative">
+                <Bell className="h-5 w-5 text-muted-foreground hover:text-foreground cursor-pointer transition-colors" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
+              </div>
+              
+              <button
+                onClick={() => setIsAIOpen(!isAIOpen)}
+                className="px-3 py-1 text-sm bg-primary/10 text-primary rounded-full hover:bg-primary/20 transition-colors"
+              >
+                Ask Specter
+              </button>
+              
+              <div className="flex items-center space-x-2">
+                <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
+                  <span className="text-xs font-bold text-white">
+                    {user?.firstName?.charAt(0) || user?.emailAddresses?.[0]?.emailAddress?.charAt(0) || "U"}
+                  </span>
+                </div>
+                <span className="text-sm font-medium">
+                  {user?.firstName || user?.emailAddresses?.[0]?.emailAddress?.split('@')[0] || "Agent"}
+                </span>
+              </div>
+            </div>
+          </header>
+          
+          <main className="flex-1 p-6 overflow-auto animate-fade-in">
+            <div className="max-w-7xl mx-auto">
+              {renderActiveView()}
+            </div>
+          </main>
+        </div>
 
-      <AIAssistant isOpen={isAIOpen} onClose={() => setIsAIOpen(false)} />
-    </div>
+        <AIAssistant isOpen={isAIOpen} onClose={() => setIsAIOpen(false)} />
+      </div>
+    </SidebarProvider>
   );
 };
 

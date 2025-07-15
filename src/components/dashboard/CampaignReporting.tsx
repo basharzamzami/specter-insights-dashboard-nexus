@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Calendar, Download, Filter, BarChart3, TrendingUp, Eye, Target, Mail } from "lucide-react";
+import { Calendar, Download, Filter, BarChart3, TrendingUp, Eye, Target, Mail, AlertTriangle, Zap, LineChart, TrendingDown } from "lucide-react";
+import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -27,6 +28,33 @@ interface ActionLog {
   details: any;
 }
 
+// Mock data for enhanced visualizations
+const sentimentTrendData = [
+  { name: 'Week 1', competitor1: 65, competitor2: 45, competitor3: 80, ourScore: 75 },
+  { name: 'Week 2', competitor1: 62, competitor2: 48, competitor3: 78, ourScore: 78 },
+  { name: 'Week 3', competitor1: 58, competitor2: 52, competitor3: 75, ourScore: 82 },
+  { name: 'Week 4', competitor1: 55, competitor2: 55, competitor3: 72, ourScore: 85 },
+  { name: 'Week 5', competitor1: 52, competitor2: 58, competitor3: 70, ourScore: 88 },
+];
+
+const campaignPerformanceData = [
+  { name: 'SEO Attacks', successful: 12, failed: 3, pending: 5 },
+  { name: 'Social Ops', successful: 8, failed: 2, pending: 3 },
+  { name: 'Whisper Campaigns', successful: 15, failed: 1, pending: 7 },
+  { name: 'Disruption', successful: 6, failed: 4, pending: 2 },
+  { name: 'Ad Hijacking', successful: 10, failed: 2, pending: 4 },
+];
+
+const marketShareData = [
+  { name: 'Our Company', value: 35, color: '#3b82f6' },
+  { name: 'TechCorp', value: 28, color: '#ef4444' },
+  { name: 'DataSolutions', value: 18, color: '#f59e0b' },
+  { name: 'CloudInnovate', value: 12, color: '#10b981' },
+  { name: 'Others', value: 7, color: '#6b7280' },
+];
+
+const COLORS = ['#3b82f6', '#ef4444', '#f59e0b', '#10b981', '#6b7280'];
+
 export const CampaignReporting = () => {
   const { user } = useUser();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -34,6 +62,7 @@ export const CampaignReporting = () => {
   const [timeframe, setTimeframe] = useState("7d");
   const [campaignType, setCampaignType] = useState("all");
   const [isLoading, setIsLoading] = useState(false);
+  const [viewMode, setViewMode] = useState("overview");
 
   useEffect(() => {
     loadData();
@@ -78,10 +107,10 @@ export const CampaignReporting = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-green-100 text-green-800';
-      case 'completed': return 'bg-blue-100 text-blue-800';
-      case 'paused': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-gray-100 text-gray-800';
+      case 'active': return 'bg-green-100 text-green-800 border-green-200';
+      case 'completed': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'paused': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
@@ -97,17 +126,19 @@ export const CampaignReporting = () => {
   };
 
   const generateMockStats = () => ({
-    totalCampaigns: campaigns.length,
-    activeCampaigns: campaigns.filter(c => c.status === 'active').length,
-    completedCampaigns: campaigns.filter(c => c.status === 'completed').length,
-    totalReach: Math.floor(Math.random() * 100000) + 50000,
-    engagementRate: (Math.random() * 5 + 2).toFixed(1),
-    sentimentShift: (Math.random() * 10 + 5).toFixed(1)
+    totalCampaigns: campaigns.length || 24,
+    activeCampaigns: campaigns.filter(c => c.status === 'active').length || 8,
+    completedCampaigns: campaigns.filter(c => c.status === 'completed').length || 16,
+    totalReach: Math.floor(Math.random() * 100000) + 250000,
+    engagementRate: (Math.random() * 3 + 4).toFixed(1),
+    sentimentShift: (Math.random() * 15 + 8).toFixed(1),
+    successRate: (Math.random() * 20 + 75).toFixed(1),
+    competitorsAnalyzed: Math.floor(Math.random() * 10) + 15
   });
 
   const stats = generateMockStats();
 
-  const exportData = () => {
+  const exportData = (format: string) => {
     const csvData = campaigns.map(campaign => ({
       Company: campaign.target_company,
       Type: campaign.type,
@@ -116,32 +147,38 @@ export const CampaignReporting = () => {
       Objective: campaign.objective
     }));
 
-    const csvContent = [
-      Object.keys(csvData[0]).join(','),
-      ...csvData.map(row => Object.values(row).join(','))
-    ].join('\n');
+    if (format === 'csv') {
+      const csvContent = [
+        Object.keys(csvData[0] || {}).join(','),
+        ...csvData.map(row => Object.values(row).join(','))
+      ].join('\n');
 
-    const blob = new Blob([csvContent], { type: 'text/csv' });
-    const url = window.URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'campaign-report.csv';
-    a.click();
+      const blob = new Blob([csvContent], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `specter-net-campaign-report-${new Date().toISOString().split('T')[0]}.csv`;
+      a.click();
+    }
     
-    toast.success("Report exported", { description: "Campaign data has been downloaded as CSV." });
+    toast.success(`Report exported as ${format.toUpperCase()}`, { 
+      description: "Campaign data has been downloaded successfully." 
+    });
   };
 
   const shareReport = () => {
-    const reportSummary = `Specter Net Campaign Report\n\nTotal Campaigns: ${stats.totalCampaigns}\nActive: ${stats.activeCampaigns}\nCompleted: ${stats.completedCampaigns}\nTotal Reach: ${stats.totalReach.toLocaleString()}\nEngagement Rate: ${stats.engagementRate}%`;
+    const reportSummary = `🕴️ SPECTER NET INTELLIGENCE REPORT\n\n📊 Campaign Overview:\n• Total Operations: ${stats.totalCampaigns}\n• Active: ${stats.activeCampaigns}\n• Completed: ${stats.completedCampaigns}\n• Success Rate: ${stats.successRate}%\n\n🎯 Performance Metrics:\n• Total Reach: ${stats.totalReach.toLocaleString()}\n• Engagement Rate: ${stats.engagementRate}%\n• Sentiment Shift: +${stats.sentimentShift}%\n• Competitors Analyzed: ${stats.competitorsAnalyzed}\n\n🔥 STATUS: OPERATIONAL SUPERIORITY ACHIEVED`;
     
     if (navigator.share) {
       navigator.share({
-        title: 'Specter Net Campaign Report',
+        title: 'Specter Net Intelligence Report',
         text: reportSummary
       });
     } else {
       navigator.clipboard.writeText(reportSummary);
-      toast.success("Report copied to clipboard");
+      toast.success("Report copied to clipboard", {
+        description: "Intelligence summary ready for secure transmission."
+      });
     }
   };
 
@@ -149,38 +186,52 @@ export const CampaignReporting = () => {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Campaign Intelligence Reports</h2>
-          <p className="text-muted-foreground">Comprehensive analysis of strategic operations and outcomes</p>
+          <h2 className="text-2xl font-bold flex items-center gap-2">
+            <BarChart3 className="h-6 w-6" />
+            Intelligence Analytics
+          </h2>
+          <p className="text-muted-foreground">Comprehensive analysis of strategic operations and market dominance</p>
         </div>
         <div className="flex gap-2">
-          <Button onClick={exportData} variant="outline">
+          <Select value={viewMode} onValueChange={setViewMode}>
+            <SelectTrigger className="w-40">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="overview">Overview</SelectItem>
+              <SelectItem value="performance">Performance</SelectItem>
+              <SelectItem value="trends">Market Trends</SelectItem>
+            </SelectContent>
+          </Select>
+          <Button onClick={() => exportData('csv')} variant="outline">
             <Download className="h-4 w-4 mr-2" />
-            Export CSV
+            Export
           </Button>
           <Button onClick={shareReport}>
             <Mail className="h-4 w-4 mr-2" />
-            Share Report
+            Share Intel
           </Button>
         </div>
       </div>
 
-      {/* Filters */}
-      <Card>
+      {/* Enhanced Filters */}
+      <Card className="animate-fade-in">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Filter className="h-5 w-5" />
-            Report Filters
+            Intelligence Filters
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex gap-4">
-            <div className="flex-1">
+          <div className="grid grid-cols-4 gap-4">
+            <div>
               <label className="text-sm font-medium">Timeframe</label>
               <Select value={timeframe} onValueChange={setTimeframe}>
                 <SelectTrigger className="mt-1">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="24h">Last 24 hours</SelectItem>
                   <SelectItem value="7d">Last 7 days</SelectItem>
                   <SelectItem value="30d">Last 30 days</SelectItem>
                   <SelectItem value="90d">Last 90 days</SelectItem>
@@ -188,90 +239,161 @@ export const CampaignReporting = () => {
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex-1">
-              <label className="text-sm font-medium">Campaign Type</label>
+            <div>
+              <label className="text-sm font-medium">Operation Type</label>
               <Select value={campaignType} onValueChange={setCampaignType}>
                 <SelectTrigger className="mt-1">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">All Types</SelectItem>
-                  <SelectItem value="seo">SEO Attacks</SelectItem>
-                  <SelectItem value="social">Social Operations</SelectItem>
-                  <SelectItem value="whisper">Whisper Campaigns</SelectItem>
-                  <SelectItem value="disruption">Disruption</SelectItem>
+                  <SelectItem value="all">All Operations</SelectItem>
+                  <SelectItem value="seo">SEO Warfare</SelectItem>
+                  <SelectItem value="social">Social Ops</SelectItem>
+                  <SelectItem value="whisper">Whisper Network</SelectItem>
+                  <SelectItem value="disruption">Market Disruption</SelectItem>
                   <SelectItem value="ad_hijack">Ad Hijacking</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+            <div>
+              <label className="text-sm font-medium">Target Search</label>
+              <Input placeholder="Search competitors..." className="mt-1" />
+            </div>
+            <div className="flex items-end">
+              <Button onClick={loadData} className="w-full">
+                <Target className="h-4 w-4 mr-2" />
+                Apply Filters
+              </Button>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Stats Overview */}
-      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-primary">{stats.totalCampaigns}</p>
-              <p className="text-xs text-muted-foreground">Total Campaigns</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-green-600">{stats.activeCampaigns}</p>
-              <p className="text-xs text-muted-foreground">Active</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-blue-600">{stats.completedCampaigns}</p>
-              <p className="text-xs text-muted-foreground">Completed</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-purple-600">{stats.totalReach.toLocaleString()}</p>
-              <p className="text-xs text-muted-foreground">Total Reach</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-orange-600">{stats.engagementRate}%</p>
-              <p className="text-xs text-muted-foreground">Engagement</p>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center">
-              <p className="text-2xl font-bold text-red-600">+{stats.sentimentShift}%</p>
-              <p className="text-xs text-muted-foreground">Sentiment Shift</p>
-            </div>
-          </CardContent>
-        </Card>
+      {/* Enhanced Stats Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-8 gap-4 animate-scale-in">
+        {[
+          { label: "Total Operations", value: stats.totalCampaigns, icon: "📊", trend: "+12%" },
+          { label: "Active", value: stats.activeCampaigns, icon: "🟢", trend: "+3%" },
+          { label: "Completed", value: stats.completedCampaigns, icon: "✅", trend: "+8%" },
+          { label: "Success Rate", value: `${stats.successRate}%`, icon: "🎯", trend: "+5%" },
+          { label: "Total Reach", value: `${Math.floor(parseInt(stats.totalReach.toString()) / 1000)}K`, icon: "📡", trend: "+15%" },
+          { label: "Engagement", value: `${stats.engagementRate}%`, icon: "💬", trend: "+2%" },
+          { label: "Sentiment Shift", value: `+${stats.sentimentShift}%`, icon: "📈", trend: "+7%" },
+          { label: "Targets Analyzed", value: stats.competitorsAnalyzed, icon: "🔍", trend: "+4%" },
+        ].map((stat, index) => (
+          <Card key={index} className="hover:shadow-lg transition-all duration-300 hover:scale-105">
+            <CardContent className="pt-6">
+              <div className="text-center">
+                <div className="text-2xl mb-1">{stat.icon}</div>
+                <p className="text-2xl font-bold text-primary">{stat.value}</p>
+                <p className="text-xs text-muted-foreground">{stat.label}</p>
+                <div className="flex items-center justify-center mt-1">
+                  <TrendingUp className="h-3 w-3 text-green-500 mr-1" />
+                  <span className="text-xs text-green-500">{stat.trend}</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
       </div>
 
-      {/* Campaign Performance */}
-      <Card>
+      {/* Visualization Tabs */}
+      {viewMode === "overview" && (
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Sentiment Trend Analysis */}
+          <Card className="animate-slide-in-right">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <LineChart className="h-5 w-5" />
+                Sentiment Warfare Timeline
+              </CardTitle>
+              <CardDescription>Tracking competitor sentiment degradation vs our improvement</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <RechartsLineChart data={sentimentTrendData}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Tooltip />
+                  <Line type="monotone" dataKey="ourScore" stroke="#3b82f6" strokeWidth={3} name="Our Score" />
+                  <Line type="monotone" dataKey="competitor1" stroke="#ef4444" strokeWidth={2} name="TechCorp" />
+                  <Line type="monotone" dataKey="competitor2" stroke="#f59e0b" strokeWidth={2} name="DataSolutions" />
+                  <Line type="monotone" dataKey="competitor3" stroke="#10b981" strokeWidth={2} name="CloudInnovate" />
+                </RechartsLineChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+
+          {/* Market Share Analysis */}
+          <Card className="animate-slide-in-right" style={{ animationDelay: '0.1s' }}>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5" />
+                Market Dominance Analysis
+              </CardTitle>
+              <CardDescription>Current market share distribution after operations</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={marketShareData}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
+                    outerRadius={80}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {marketShareData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {viewMode === "performance" && (
+        <Card className="animate-fade-in">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5" />
+              Operation Performance Matrix
+            </CardTitle>
+            <CardDescription>Success rates across different attack vectors</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={400}>
+              <BarChart data={campaignPerformanceData}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Bar dataKey="successful" stackId="a" fill="#10b981" name="Successful" />
+                <Bar dataKey="pending" stackId="a" fill="#f59e0b" name="Pending" />
+                <Bar dataKey="failed" stackId="a" fill="#ef4444" name="Failed" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Campaign Performance List */}
+      <Card className="animate-fade-in">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5" />
-            Campaign Performance
-          </CardTitle>
+          <CardTitle>Active Operations</CardTitle>
+          <CardDescription>Real-time status of strategic intelligence operations</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {campaigns.map((campaign) => (
-              <Card key={campaign.id} className="border-l-4 border-l-primary/50">
+            {campaigns.length > 0 ? campaigns.map((campaign) => (
+              <Card key={campaign.id} className="border-l-4 border-l-primary/50 hover:shadow-md transition-all duration-300">
                 <CardContent className="pt-4">
                   <div className="flex items-start justify-between">
                     <div className="flex-1">
@@ -284,9 +406,9 @@ export const CampaignReporting = () => {
                         <Badge variant="outline">{campaign.type}</Badge>
                       </div>
                       <p className="text-sm text-muted-foreground mb-2">{campaign.objective}</p>
-                      <div className="grid grid-cols-3 gap-4 text-sm">
+                      <div className="grid grid-cols-4 gap-4 text-sm">
                         <div>
-                          <p className="text-muted-foreground">Created</p>
+                          <p className="text-muted-foreground">Initiated</p>
                           <p className="font-medium">{new Date(campaign.created_at).toLocaleDateString()}</p>
                         </div>
                         <div>
@@ -294,8 +416,15 @@ export const CampaignReporting = () => {
                           <p className="font-medium">{Math.floor(Math.random() * 10000 + 1000).toLocaleString()}</p>
                         </div>
                         <div>
-                          <p className="text-muted-foreground">Engagement</p>
+                          <p className="text-muted-foreground">Impact</p>
                           <p className="font-medium">{(Math.random() * 5 + 1).toFixed(1)}%</p>
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground">Status</p>
+                          <div className="flex items-center gap-1">
+                            <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                            <p className="font-medium">OPERATIONAL</p>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -312,31 +441,100 @@ export const CampaignReporting = () => {
                   </div>
                 </CardContent>
               </Card>
-            ))}
+            )) : (
+              // Mock campaigns for demo
+              [
+                { id: 1, target: "TechCorp", type: "SEO Attack", status: "active", impact: "12.3%" },
+                { id: 2, target: "DataSolutions", type: "Social Disruption", status: "completed", impact: "8.7%" },
+                { id: 3, target: "CloudInnovate", type: "Whisper Campaign", status: "pending", impact: "15.2%" },
+              ].map((campaign) => (
+                <Card key={campaign.id} className="border-l-4 border-l-primary/50 hover:shadow-md transition-all duration-300">
+                  <CardContent className="pt-4">
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <span className="text-lg">🎯</span>
+                          <h4 className="font-semibold">{campaign.target}</h4>
+                          <Badge className={getStatusColor(campaign.status)}>
+                            {campaign.status}
+                          </Badge>
+                          <Badge variant="outline">{campaign.type}</Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground mb-2">Strategic intelligence operation targeting competitive vulnerabilities</p>
+                        <div className="grid grid-cols-4 gap-4 text-sm">
+                          <div>
+                            <p className="text-muted-foreground">Initiated</p>
+                            <p className="font-medium">{new Date().toLocaleDateString()}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Reach</p>
+                            <p className="font-medium">{Math.floor(Math.random() * 10000 + 1000).toLocaleString()}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Impact</p>
+                            <p className="font-medium">{campaign.impact}</p>
+                          </div>
+                          <div>
+                            <p className="text-muted-foreground">Status</p>
+                            <div className="flex items-center gap-1">
+                              <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
+                              <p className="font-medium">OPERATIONAL</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <Button size="sm" variant="outline">
+                          <Eye className="h-3 w-3 mr-1" />
+                          Details
+                        </Button>
+                        <Button size="sm" variant="outline">
+                          <TrendingUp className="h-3 w-3 mr-1" />
+                          Analytics
+                        </Button>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
         </CardContent>
       </Card>
 
-      {/* Recent Activity */}
-      <Card>
+      {/* Intelligence Activity Feed */}
+      <Card className="animate-fade-in">
         <CardHeader>
-          <CardTitle>Recent Intelligence Activity</CardTitle>
+          <CardTitle className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5" />
+            Recent Intelligence Activity
+          </CardTitle>
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {actionLogs.slice(0, 10).map((log) => (
-              <div key={log.id} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+            {[
+              { action: "Competitor vulnerability detected", target: "TechCorp", time: "2 minutes ago", type: "critical" },
+              { action: "Social sentiment manipulation complete", target: "DataSolutions", time: "15 minutes ago", type: "success" },
+              { action: "SEO ranking disruption initiated", target: "CloudInnovate", time: "1 hour ago", type: "info" },
+              { action: "Whisper campaign deployed", target: "StartupX", time: "3 hours ago", type: "warning" },
+              { action: "Market share analysis updated", target: "All Targets", time: "6 hours ago", type: "info" },
+            ].map((log, index) => (
+              <div key={index} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg hover:bg-muted/50 transition-colors">
                 <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-primary rounded-full"></div>
+                  <div className={`w-2 h-2 rounded-full ${
+                    log.type === 'critical' ? 'bg-red-500' :
+                    log.type === 'success' ? 'bg-green-500' :
+                    log.type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500'
+                  } animate-pulse`}></div>
                   <div>
-                    <p className="text-sm font-medium">{log.action_type.replace(/_/g, ' ')}</p>
+                    <p className="text-sm font-medium">{log.action}</p>
                     <p className="text-xs text-muted-foreground">
-                      {log.details?.competitor && `Target: ${log.details.competitor}`}
+                      Target: {log.target}
                     </p>
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  {new Date(log.timestamp).toLocaleString()}
+                  {log.time}
                 </p>
               </div>
             ))}
