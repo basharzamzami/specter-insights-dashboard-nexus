@@ -8,7 +8,10 @@ import {
   User,
   Settings,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Zap,
+  Clock,
+  Rss
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -20,16 +23,18 @@ interface SidebarItem {
 }
 
 const sidebarItems: SidebarItem[] = [
-  { name: "Command Center", icon: BarChart3, key: "overview" },
-  { name: "Competitor Intel", icon: Target, key: "competitors" },
-  { name: "Campaign Control", icon: Calendar, key: "campaigns" },
-  { name: "Performance Ops", icon: Activity, key: "analytics" },
-  { name: "Activity Logs", icon: Activity, key: "activity" },
+  { name: "Mission Control", icon: Zap, key: "overview" },
+  { name: "Target Analysis", icon: Target, key: "competitors" },
+  { name: "Operations", icon: Calendar, key: "campaigns" },
+  { name: "Disruption Schedule", icon: Clock, key: "scheduler" },
+  { name: "Intel Feed", icon: Rss, key: "intelligence" },
+  { name: "Performance", icon: BarChart3, key: "analytics" },
+  { name: "Activity Log", icon: Activity, key: "activity" },
 ];
 
 const bottomItems: SidebarItem[] = [
-  { name: "Profile", icon: User, key: "profile" },
-  { name: "Settings", icon: Settings, key: "settings" },
+  { name: "Agent Profile", icon: User, key: "profile" },
+  { name: "Control Center", icon: Settings, key: "settings" },
 ];
 
 interface DashboardSidebarProps {

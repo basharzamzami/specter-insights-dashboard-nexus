@@ -1,1 +1,4 @@
 project_id = "gifzytiilztglnvescqg"
+
+[functions.ask-specter]
+verify_jwt = false

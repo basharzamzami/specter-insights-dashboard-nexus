@@ -1,10 +1,11 @@
 import { useState, useRef, useEffect } from "react";
-import { Bot, Send, X, Lightbulb, Target, TrendingUp, MessageSquare } from "lucide-react";
+import { Bot, Send, X, Lightbulb, Target, TrendingUp, MessageSquare, Loader2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Message {
   id: string;
@@ -57,22 +58,45 @@ export const AIAssistant = ({ isOpen, onClose }: AIAssistantProps) => {
     };
 
     setMessages(prev => [...prev, userMessage]);
+    const currentInput = inputValue;
     setInputValue("");
     setIsTyping(true);
 
-    // Simulate AI response
-    setTimeout(() => {
+    try {
+      // Call our Supabase Edge Function for AI response
+      const { data, error } = await supabase.functions.invoke('ask-specter', {
+        body: {
+          message: currentInput,
+          context: "Strategic intelligence consultation for competitive analysis and market operations"
+        }
+      });
+
+      if (error) throw error;
+
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
-        type: "assistant", 
-        content: getAIResponse(inputValue),
+        type: "assistant",
+        content: data.response || getAIResponse(currentInput),
         timestamp: new Date(),
-        suggestions: getSuggestions(inputValue)
+        suggestions: data.suggestions || getSuggestions(currentInput)
       };
       
       setMessages(prev => [...prev, assistantMessage]);
+    } catch (error) {
+      console.error('AI Assistant error:', error);
+      // Fallback to mock response
+      const assistantMessage: Message = {
+        id: (Date.now() + 1).toString(),
+        type: "assistant",
+        content: getAIResponse(currentInput),
+        timestamp: new Date(),
+        suggestions: getSuggestions(currentInput)
+      };
+      
+      setMessages(prev => [...prev, assistantMessage]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
   const getAIResponse = (input: string): string => {
@@ -189,9 +213,9 @@ export const AIAssistant = ({ isOpen, onClose }: AIAssistantProps) => {
             <div className="flex justify-start">
               <div className="flex items-center space-x-2 mb-2">
                 <div className="p-1 bg-primary/10 rounded-full">
-                  <Bot className="h-3 w-3 text-primary" />
+                  <Loader2 className="h-3 w-3 text-primary animate-spin" />
                 </div>
-                <span className="text-xs text-muted-foreground">Specter is typing...</span>
+                <span className="text-xs text-muted-foreground">Specter is analyzing intelligence...</span>
               </div>
             </div>
           )}

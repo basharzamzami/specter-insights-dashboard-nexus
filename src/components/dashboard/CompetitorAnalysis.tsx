@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { Search, Loader2, TrendingUp, TrendingDown, Minus, ExternalLink } from "lucide-react";
+import { Search, Loader2, TrendingUp, TrendingDown, Minus, ExternalLink, Target, Zap, Shield, DollarSign } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { useToast } from "@/hooks/use-toast";
 
 interface SentimentData {
   id: string;
@@ -13,6 +15,18 @@ interface SentimentData {
   keyTopics: string[];
   recommendation: string;
   lastUpdated: string;
+  vulnerabilities: string[];
+  estimatedAdSpend: string;
+  topKeywords: string[];
+}
+
+interface ActionItem {
+  id: string;
+  title: string;
+  description: string;
+  type: "seo" | "ads" | "social" | "content";
+  difficulty: "easy" | "medium" | "hard";
+  impact: "low" | "medium" | "high";
 }
 
 const mockSentimentData: SentimentData[] = [
@@ -23,7 +37,10 @@ const mockSentimentData: SentimentData[] = [
     sentimentScore: 0.75,
     keyTopics: ["Innovation", "Customer Service", "Pricing"],
     recommendation: "Focus on highlighting superior customer support and competitive pricing strategies.",
-    lastUpdated: "2 hours ago"
+    lastUpdated: "2 hours ago",
+    vulnerabilities: ["Slow customer support response", "High pricing tier", "Limited integration options"],
+    estimatedAdSpend: "$45K/month",
+    topKeywords: ["enterprise software", "business automation", "cloud solutions"]
   },
   {
     id: "2", 
@@ -32,7 +49,10 @@ const mockSentimentData: SentimentData[] = [
     sentimentScore: 0.45,
     keyTopics: ["Product Quality", "Support Issues", "Reliability"],
     recommendation: "Opportunity to capitalize on their support challenges. Emphasize reliability and responsiveness.",
-    lastUpdated: "4 hours ago"
+    lastUpdated: "4 hours ago",
+    vulnerabilities: ["Frequent downtime", "Poor documentation", "Outdated UI design"],
+    estimatedAdSpend: "$28K/month",
+    topKeywords: ["data analytics", "reporting tools", "business intelligence"]
   },
   {
     id: "3",
@@ -41,7 +61,45 @@ const mockSentimentData: SentimentData[] = [
     sentimentScore: 0.85,
     keyTopics: ["AI Features", "Integration", "User Experience"],
     recommendation: "Strong competitor. Consider enhancing AI capabilities and improving user experience design.",
-    lastUpdated: "6 hours ago"
+    lastUpdated: "6 hours ago",
+    vulnerabilities: ["High learning curve", "Expensive enterprise tier", "Limited mobile access"],
+    estimatedAdSpend: "$67K/month",
+    topKeywords: ["AI automation", "machine learning", "predictive analytics"]
+  }
+];
+
+const getActionItems = (competitor: SentimentData): ActionItem[] => [
+  {
+    id: "1",
+    title: "Exploit SEO Weakness",
+    description: `Target their underperforming keywords: ${competitor.topKeywords.join(", ")}`,
+    type: "seo",
+    difficulty: "medium",
+    impact: "high"
+  },
+  {
+    id: "2", 
+    title: "Launch Counter-Campaign",
+    description: "Create ads highlighting their vulnerabilities while showcasing our strengths",
+    type: "ads",
+    difficulty: "easy",
+    impact: "medium"
+  },
+  {
+    id: "3",
+    title: "Social Sentiment Attack",
+    description: "Amplify customer complaints and position ourselves as the reliable alternative",
+    type: "social",
+    difficulty: "hard",
+    impact: "high"
+  },
+  {
+    id: "4",
+    title: "Content Hijacking",
+    description: "Create superior content targeting their main topics and keywords",
+    type: "content",
+    difficulty: "medium",
+    impact: "medium"
   }
 ];
 
@@ -49,6 +107,9 @@ export const CompetitorAnalysis = () => {
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [sentimentData, setSentimentData] = useState<SentimentData[]>(mockSentimentData);
+  const [selectedCompetitor, setSelectedCompetitor] = useState<SentimentData | null>(null);
+  const [isActionDialogOpen, setIsActionDialogOpen] = useState(false);
+  const { toast } = useToast();
 
   const handleAnalyze = async () => {
     if (!inputValue.trim()) return;
@@ -64,7 +125,10 @@ export const CompetitorAnalysis = () => {
         sentimentScore: Math.random(),
         keyTopics: ["Brand Perception", "Market Position", "Customer Feedback"],
         recommendation: "New competitor analysis complete. Monitor their marketing strategies and customer engagement.",
-        lastUpdated: "Just now"
+        lastUpdated: "Just now",
+        vulnerabilities: ["Market research pending", "Analysis in progress", "Data collection active"],
+        estimatedAdSpend: "Calculating...",
+        topKeywords: ["analysis pending", "data gathering", "initial scan"]
       };
       
       setSentimentData(prev => [newData, ...prev]);
@@ -89,6 +153,37 @@ export const CompetitorAnalysis = () => {
     if (score >= 0.7) return "Positive";
     if (score >= 0.4) return "Neutral";
     return "Negative";
+  };
+
+  const handleTakeAction = (competitor: SentimentData) => {
+    setSelectedCompetitor(competitor);
+    setIsActionDialogOpen(true);
+  };
+
+  const executeAction = (action: ActionItem) => {
+    toast({
+      title: "Action Initiated",
+      description: `${action.title} has been launched against ${selectedCompetitor?.name}`,
+    });
+    setIsActionDialogOpen(false);
+  };
+
+  const getDifficultyColor = (difficulty: string) => {
+    switch (difficulty) {
+      case "easy": return "success";
+      case "medium": return "warning"; 
+      case "hard": return "destructive";
+      default: return "secondary";
+    }
+  };
+
+  const getImpactColor = (impact: string) => {
+    switch (impact) {
+      case "low": return "secondary";
+      case "medium": return "warning";
+      case "high": return "destructive";
+      default: return "secondary";
+    }
   };
 
   return (
@@ -209,11 +304,109 @@ export const CompetitorAnalysis = () => {
                     {data.recommendation}
                   </p>
                 </div>
+
+                {/* Intelligence Profile */}
+                <div className="grid grid-cols-2 gap-4 p-4 bg-muted/50 rounded-lg">
+                  <div>
+                    <h5 className="text-xs font-medium text-muted-foreground mb-2">TOP VULNERABILITIES</h5>
+                    <div className="space-y-1">
+                      {data.vulnerabilities.slice(0, 2).map((vuln, i) => (
+                        <p key={i} className="text-xs text-destructive">• {vuln}</p>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <h5 className="text-xs font-medium text-muted-foreground mb-2">AD SPEND</h5>
+                    <p className="text-sm font-bold text-primary">{data.estimatedAdSpend}</p>
+                    <h5 className="text-xs font-medium text-muted-foreground mb-1 mt-2">TOP KEYWORDS</h5>
+                    <p className="text-xs">{data.topKeywords.slice(0, 2).join(", ")}</p>
+                  </div>
+                </div>
+
+                {/* Action Button */}
+                <Button 
+                  onClick={() => handleTakeAction(data)}
+                  className="w-full btn-glow"
+                >
+                  <Target className="h-4 w-4 mr-2" />
+                  Launch Strategic Action
+                </Button>
               </div>
             </CardContent>
           </Card>
         ))}
       </div>
+
+      {/* Action Dialog */}
+      <Dialog open={isActionDialogOpen} onOpenChange={setIsActionDialogOpen}>
+        <DialogContent className="sm:max-w-[600px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Zap className="h-5 w-5 text-primary" />
+              Strategic Actions - {selectedCompetitor?.name}
+            </DialogTitle>
+            <DialogDescription>
+              Select and execute targeted operations to disrupt competitor advantages
+            </DialogDescription>
+          </DialogHeader>
+          
+          {selectedCompetitor && (
+            <div className="space-y-4">
+              {/* Intelligence Summary */}
+              <Card className="bg-muted/30">
+                <CardContent className="pt-4">
+                  <div className="grid grid-cols-3 gap-4 text-center">
+                    <div>
+                      <p className="text-2xl font-bold text-destructive">{selectedCompetitor.vulnerabilities.length}</p>
+                      <p className="text-xs text-muted-foreground">Vulnerabilities</p>
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-primary">{selectedCompetitor.estimatedAdSpend}</p>
+                      <p className="text-xs text-muted-foreground">Monthly Ad Spend</p>
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-warning">{(selectedCompetitor.sentimentScore * 100).toFixed(0)}%</p>
+                      <p className="text-xs text-muted-foreground">Sentiment Score</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Action Cards */}
+              <div className="grid gap-3">
+                {getActionItems(selectedCompetitor).map((action) => (
+                  <Card key={action.id} className="hover:shadow-md transition-shadow cursor-pointer">
+                    <CardContent className="pt-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2 mb-2">
+                            <h4 className="font-semibold">{action.title}</h4>
+                            <Badge variant={getDifficultyColor(action.difficulty) as any} className="text-xs">
+                              {action.difficulty}
+                            </Badge>
+                            <Badge variant={getImpactColor(action.impact) as any} className="text-xs">
+                              {action.impact} impact
+                            </Badge>
+                          </div>
+                          <p className="text-sm text-muted-foreground">{action.description}</p>
+                        </div>
+                        <Button 
+                          size="sm" 
+                          onClick={() => executeAction(action)}
+                          className="ml-4"
+                        >
+                          <Zap className="h-3 w-3 mr-1" />
+                          Execute
+                        </Button>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

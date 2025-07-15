@@ -11,6 +11,9 @@ import { PerformanceOps } from "@/components/dashboard/PerformanceOps";
 import { AgentProfile } from "@/components/dashboard/AgentProfile";
 import { NotificationCenter } from "@/components/dashboard/NotificationCenter";
 import { AIAssistant } from "@/components/dashboard/AIAssistant";
+import { IntelligenceSettings } from "@/components/dashboard/IntelligenceSettings";
+import { DisruptionScheduler } from "@/components/dashboard/DisruptionScheduler";
+import { IntelligenceFeed } from "@/components/dashboard/IntelligenceFeed";
 import { Loader2 } from "lucide-react";
 
 const Dashboard = () => {
@@ -45,7 +48,7 @@ const Dashboard = () => {
             <div className="grid lg:grid-cols-2 gap-6">
               <CompetitorAnalysis />
               <div className="space-y-6">
-                <CampaignScheduler />
+                <DisruptionScheduler />
                 <NotificationCenter />
               </div>
             </div>
@@ -55,6 +58,10 @@ const Dashboard = () => {
         return <CompetitorAnalysis />;
       case "campaigns":
         return <CampaignScheduler />;
+      case "scheduler":
+        return <DisruptionScheduler />;
+      case "intelligence":
+        return <IntelligenceFeed />;
       case "analytics":
         return <PerformanceOps />;
       case "activity":
@@ -62,12 +69,18 @@ const Dashboard = () => {
       case "profile":
         return <AgentProfile user={user} />;
       case "settings":
-        return <AgentProfile user={user} />;
+        return <IntelligenceSettings />;
       default:
         return (
           <div className="space-y-8">
             <WelcomeBanner user={user} />
-            <CompetitorAnalysis />
+            <div className="grid lg:grid-cols-2 gap-6">
+              <CompetitorAnalysis />
+              <div className="space-y-6">
+                <DisruptionScheduler />
+                <IntelligenceFeed />
+              </div>
+            </div>
           </div>
         );
     }
