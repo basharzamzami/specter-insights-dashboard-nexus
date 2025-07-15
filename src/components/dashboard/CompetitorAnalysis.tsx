@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import { useUser } from "@clerk/clerk-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -47,6 +48,7 @@ interface CampaignForm {
 }
 
 export const CompetitorAnalysis = () => {
+  const navigate = useNavigate();
   const { user } = useUser();
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -380,7 +382,8 @@ export const CompetitorAnalysis = () => {
         {competitors.map((competitor, index) => (
           <Card 
             key={competitor.id} 
-            className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary/50"
+            className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary/50 cursor-pointer"
+            onClick={() => navigate(`/competitor/${competitor.id}`)}
           >
             <CardHeader>
               <div className="flex items-center justify-between">
@@ -451,13 +454,29 @@ export const CompetitorAnalysis = () => {
                 </div>
 
                 {/* Action Button */}
-                <Button 
-                  onClick={() => handleTakeAction(competitor)}
-                  className="w-full bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white"
-                >
-                  <Crosshair className="h-4 w-4 mr-2" />
-                  Launch Strategic Operations
-                </Button>
+                <div className="flex space-x-2">
+                  <Button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      navigate(`/competitor/${competitor.id}`);
+                    }}
+                    variant="outline"
+                    className="flex-1"
+                  >
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Details
+                  </Button>
+                  <Button 
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleTakeAction(competitor);
+                    }}
+                    className="flex-1 bg-gradient-to-r from-red-600 to-orange-600 hover:from-red-700 hover:to-orange-700 text-white"
+                  >
+                    <Crosshair className="h-4 w-4 mr-2" />
+                    Launch Attack
+                  </Button>
+                </div>
               </div>
             </CardContent>
           </Card>
