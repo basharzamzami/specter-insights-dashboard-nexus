@@ -42,15 +42,7 @@ export type Database = {
           timestamp?: string | null
           triggered_by?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "action_logs_triggered_by_fkey"
-            columns: ["triggered_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       ask_specter_logs: {
         Row: {
@@ -77,15 +69,7 @@ export type Database = {
           timestamp?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "ask_specter_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       campaign_posts: {
         Row: {
@@ -162,15 +146,7 @@ export type Database = {
           type?: string
           updated_at?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "campaigns_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       competitor_profiles: {
         Row: {
@@ -221,15 +197,7 @@ export type Database = {
           vulnerabilities?: string[] | null
           website?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "competitor_profiles_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       competitors: {
         Row: {
@@ -253,15 +221,7 @@ export type Database = {
           name?: string
           website?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "competitors_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       data_sources: {
         Row: {
@@ -326,15 +286,7 @@ export type Database = {
           scheduled_start?: string | null
           status?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "marketing_campaigns_client_id_fkey"
-            columns: ["client_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       personas: {
         Row: {
@@ -367,15 +319,7 @@ export type Database = {
           scripts?: Json | null
           voice_tone?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "personas_created_by_fkey"
-            columns: ["created_by"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       sentiment_analysis: {
         Row: {
@@ -431,15 +375,7 @@ export type Database = {
           id?: string
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_activity_logs_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: false
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       user_settings: {
         Row: {
@@ -472,15 +408,7 @@ export type Database = {
           updated_at?: string | null
           user_id?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "user_settings_user_id_fkey"
-            columns: ["user_id"]
-            isOneToOne: true
-            referencedRelation: "users"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
       }
       users: {
         Row: {
