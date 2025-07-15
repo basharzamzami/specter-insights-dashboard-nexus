@@ -101,18 +101,8 @@ export const CompetitorAnalysis = () => {
     setIsLoading(true);
     
     try {
-      // Enhanced AI analysis via OpenAI
-      const response = await supabase.functions.invoke('ask-specter', {
-        body: {
-          message: `Analyze competitor: ${inputValue}. Provide a comprehensive intelligence report including vulnerabilities, sentiment analysis, SEO gaps, ad spend estimates, and strategic opportunities.`,
-          context: 'competitor_analysis'
-        }
-      });
-
-      if (response.error) throw response.error;
-
-      // Generate realistic competitor data based on AI analysis
-      const analysisData = generateCompetitorProfile(inputValue, response.data?.response);
+      // Generate realistic competitor data
+      const analysisData = generateCompetitorProfile(inputValue);
       
       const { data, error } = await supabase
         .from('competitor_profiles')
