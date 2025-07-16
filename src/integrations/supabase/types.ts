@@ -44,6 +44,95 @@ export type Database = {
         }
         Relationships: []
       }
+      analytics_events: {
+        Row: {
+          created_at: string
+          event_data: Json
+          event_type: string
+          id: string
+          ip_address: unknown | null
+          session_id: string | null
+          source: string | null
+          user_agent: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_data?: Json
+          event_type: string
+          id?: string
+          ip_address?: unknown | null
+          session_id?: string | null
+          source?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_data?: Json
+          event_type?: string
+          id?: string
+          ip_address?: unknown | null
+          session_id?: string | null
+          source?: string | null
+          user_agent?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      appointments: {
+        Row: {
+          contact_id: string | null
+          created_at: string
+          description: string | null
+          end_time: string
+          id: string
+          location: string | null
+          meeting_link: string | null
+          start_time: string
+          status: string | null
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          contact_id?: string | null
+          created_at?: string
+          description?: string | null
+          end_time: string
+          id?: string
+          location?: string | null
+          meeting_link?: string | null
+          start_time: string
+          status?: string | null
+          title: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          contact_id?: string | null
+          created_at?: string
+          description?: string | null
+          end_time?: string
+          id?: string
+          location?: string | null
+          meeting_link?: string | null
+          start_time?: string
+          status?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "appointments_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       ask_specter_logs: {
         Row: {
           ai_response: string | null
@@ -223,6 +312,63 @@ export type Database = {
         }
         Relationships: []
       }
+      contacts: {
+        Row: {
+          company: string | null
+          created_at: string
+          email: string | null
+          first_name: string | null
+          id: string
+          job_title: string | null
+          last_contacted_at: string | null
+          last_name: string | null
+          lead_score: number | null
+          lead_source: string | null
+          lead_status: string | null
+          notes: string | null
+          phone: string | null
+          tags: string[] | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          job_title?: string | null
+          last_contacted_at?: string | null
+          last_name?: string | null
+          lead_score?: number | null
+          lead_source?: string | null
+          lead_status?: string | null
+          notes?: string | null
+          phone?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          company?: string | null
+          created_at?: string
+          email?: string | null
+          first_name?: string | null
+          id?: string
+          job_title?: string | null
+          last_contacted_at?: string | null
+          last_name?: string | null
+          lead_score?: number | null
+          lead_source?: string | null
+          lead_status?: string | null
+          notes?: string | null
+          phone?: string | null
+          tags?: string[] | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       data_sources: {
         Row: {
           competitor_id: string | null
@@ -254,6 +400,304 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      deals: {
+        Row: {
+          actual_close_date: string | null
+          contact_id: string | null
+          created_at: string
+          description: string | null
+          expected_close_date: string | null
+          id: string
+          pipeline_id: string | null
+          probability: number | null
+          stage: string
+          status: string | null
+          title: string
+          updated_at: string
+          user_id: string | null
+          value: number | null
+        }
+        Insert: {
+          actual_close_date?: string | null
+          contact_id?: string | null
+          created_at?: string
+          description?: string | null
+          expected_close_date?: string | null
+          id?: string
+          pipeline_id?: string | null
+          probability?: number | null
+          stage: string
+          status?: string | null
+          title: string
+          updated_at?: string
+          user_id?: string | null
+          value?: number | null
+        }
+        Update: {
+          actual_close_date?: string | null
+          contact_id?: string | null
+          created_at?: string
+          description?: string | null
+          expected_close_date?: string | null
+          id?: string
+          pipeline_id?: string | null
+          probability?: number | null
+          stage?: string
+          status?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string | null
+          value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deals_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deals_pipeline_id_fkey"
+            columns: ["pipeline_id"]
+            isOneToOne: false
+            referencedRelation: "pipelines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_campaigns: {
+        Row: {
+          clicked_count: number | null
+          content: string
+          created_at: string
+          id: string
+          name: string
+          opened_count: number | null
+          recipient_count: number | null
+          scheduled_at: string | null
+          sent_at: string | null
+          sent_count: number | null
+          status: string | null
+          subject: string
+          template_id: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          clicked_count?: number | null
+          content: string
+          created_at?: string
+          id?: string
+          name: string
+          opened_count?: number | null
+          recipient_count?: number | null
+          scheduled_at?: string | null
+          sent_at?: string | null
+          sent_count?: number | null
+          status?: string | null
+          subject: string
+          template_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          clicked_count?: number | null
+          content?: string
+          created_at?: string
+          id?: string
+          name?: string
+          opened_count?: number | null
+          recipient_count?: number | null
+          scheduled_at?: string | null
+          sent_at?: string | null
+          sent_count?: number | null
+          status?: string | null
+          subject?: string
+          template_id?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_campaigns_template_id_fkey"
+            columns: ["template_id"]
+            isOneToOne: false
+            referencedRelation: "email_templates"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      email_templates: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          is_active: boolean | null
+          name: string
+          subject: string
+          template_type: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          subject: string
+          template_type?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          subject?: string
+          template_type?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      form_submissions: {
+        Row: {
+          contact_id: string | null
+          created_at: string
+          data: Json
+          form_id: string | null
+          id: string
+          ip_address: unknown | null
+          source_url: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          contact_id?: string | null
+          created_at?: string
+          data?: Json
+          form_id?: string | null
+          id?: string
+          ip_address?: unknown | null
+          source_url?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          contact_id?: string | null
+          created_at?: string
+          data?: Json
+          form_id?: string | null
+          id?: string
+          ip_address?: unknown | null
+          source_url?: string | null
+          user_agent?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_submissions_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "form_submissions_form_id_fkey"
+            columns: ["form_id"]
+            isOneToOne: false
+            referencedRelation: "forms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      forms: {
+        Row: {
+          created_at: string
+          fields: Json
+          id: string
+          is_active: boolean | null
+          landing_page_id: string | null
+          name: string
+          submissions: number | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          fields?: Json
+          id?: string
+          is_active?: boolean | null
+          landing_page_id?: string | null
+          name: string
+          submissions?: number | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          fields?: Json
+          id?: string
+          is_active?: boolean | null
+          landing_page_id?: string | null
+          name?: string
+          submissions?: number | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "forms_landing_page_id_fkey"
+            columns: ["landing_page_id"]
+            isOneToOne: false
+            referencedRelation: "landing_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      landing_pages: {
+        Row: {
+          content: Json
+          conversions: number | null
+          created_at: string
+          id: string
+          is_published: boolean | null
+          name: string
+          slug: string
+          title: string | null
+          updated_at: string
+          user_id: string | null
+          views: number | null
+        }
+        Insert: {
+          content?: Json
+          conversions?: number | null
+          created_at?: string
+          id?: string
+          is_published?: boolean | null
+          name: string
+          slug: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string | null
+          views?: number | null
+        }
+        Update: {
+          content?: Json
+          conversions?: number | null
+          created_at?: string
+          id?: string
+          is_published?: boolean | null
+          name?: string
+          slug?: string
+          title?: string | null
+          updated_at?: string
+          user_id?: string | null
+          views?: number | null
+        }
+        Relationships: []
       }
       marketing_campaigns: {
         Row: {
@@ -321,6 +765,36 @@ export type Database = {
         }
         Relationships: []
       }
+      pipelines: {
+        Row: {
+          created_at: string
+          id: string
+          is_active: boolean | null
+          name: string
+          stages: Json
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          stages?: Json
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          stages?: Json
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       sentiment_analysis: {
         Row: {
           analyzed_at: string | null
@@ -349,6 +823,108 @@ export type Database = {
             columns: ["data_source_id"]
             isOneToOne: false
             referencedRelation: "data_sources"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      social_posts: {
+        Row: {
+          content: string
+          created_at: string
+          engagement_metrics: Json | null
+          id: string
+          media_urls: string[] | null
+          platform: string
+          published_at: string | null
+          scheduled_at: string | null
+          status: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          engagement_metrics?: Json | null
+          id?: string
+          media_urls?: string[] | null
+          platform: string
+          published_at?: string | null
+          scheduled_at?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          engagement_metrics?: Json | null
+          id?: string
+          media_urls?: string[] | null
+          platform?: string
+          published_at?: string | null
+          scheduled_at?: string | null
+          status?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      tasks: {
+        Row: {
+          completed_at: string | null
+          contact_id: string | null
+          created_at: string
+          deal_id: string | null
+          description: string | null
+          due_date: string | null
+          id: string
+          priority: string | null
+          status: string | null
+          title: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          contact_id?: string | null
+          created_at?: string
+          deal_id?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: string | null
+          status?: string | null
+          title: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          contact_id?: string | null
+          created_at?: string
+          deal_id?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string
+          priority?: string | null
+          status?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "deals"
             referencedColumns: ["id"]
           },
         ]
@@ -434,6 +1010,48 @@ export type Database = {
           name?: string | null
           role?: string | null
           status?: string | null
+        }
+        Relationships: []
+      }
+      workflows: {
+        Row: {
+          actions: Json
+          created_at: string
+          description: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+          runs_count: number | null
+          trigger_config: Json
+          trigger_type: string
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          actions?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+          runs_count?: number | null
+          trigger_config?: Json
+          trigger_type: string
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          actions?: Json
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          runs_count?: number | null
+          trigger_config?: Json
+          trigger_type?: string
+          updated_at?: string
+          user_id?: string | null
         }
         Relationships: []
       }
