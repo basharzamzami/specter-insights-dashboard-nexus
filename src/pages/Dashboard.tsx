@@ -16,6 +16,12 @@ import { IntelligenceSettings } from "@/components/dashboard/IntelligenceSetting
 import { DisruptionScheduler } from "@/components/dashboard/DisruptionScheduler";
 import { IntelligenceFeed } from "@/components/dashboard/IntelligenceFeed";
 import { CampaignReporting } from "@/components/dashboard/CampaignReporting";
+import { SalesPipeline } from "@/components/dashboard/SalesPipeline";
+import { LeadsManager } from "@/components/dashboard/LeadsManager";
+import { TaskManager } from "@/components/dashboard/TaskManager";
+import { EmailMarketing } from "@/components/dashboard/EmailMarketing";
+import { SocialMediaManager } from "@/components/dashboard/SocialMediaManager";
+import { CalendarScheduler } from "@/components/dashboard/CalendarScheduler";
 import { Loader2, Bell } from "lucide-react";
 
 const Dashboard = () => {
@@ -74,6 +80,18 @@ const Dashboard = () => {
         return <IntelligenceSettings />;
       case "reporting":
         return <CampaignReporting />;
+      case "sales":
+        return <SalesPipeline />;
+      case "leads":
+        return <LeadsManager />;
+      case "tasks":
+        return <TaskManager />;
+      case "email":
+        return <EmailMarketing />;
+      case "social":
+        return <SocialMediaManager />;
+      case "calendar":
+        return <CalendarScheduler />;
       default:
         return (
           <div className="space-y-8">

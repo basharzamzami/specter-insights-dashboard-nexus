@@ -12,7 +12,12 @@ import {
   Rss,
   FileText,
   Home,
-  Shield
+  Shield,
+  DollarSign,
+  Users,
+  CheckSquare,
+  Mail,
+  Share2
 } from "lucide-react";
 import {
   Sidebar,
@@ -41,6 +46,9 @@ const mainItems: SidebarItem[] = [
   { name: "Mission Control", icon: Home, key: "overview" },
   { name: "Target Analysis", icon: Target, key: "competitors", badge: "AI" },
   { name: "Operations", icon: Calendar, key: "campaigns" },
+  { name: "Sales Pipeline", icon: DollarSign, key: "sales" },
+  { name: "Leads Manager", icon: Users, key: "leads" },
+  { name: "Task Manager", icon: CheckSquare, key: "tasks" },
   { name: "Disruption Schedule", icon: Clock, key: "scheduler" },
   { name: "Intel Feed", icon: Rss, key: "intelligence", badge: "LIVE" },
 ];
@@ -49,6 +57,9 @@ const analyticsItems: SidebarItem[] = [
   { name: "Performance", icon: BarChart3, key: "analytics" },
   { name: "Campaign Reports", icon: FileText, key: "reporting" },
   { name: "Activity Log", icon: Activity, key: "activity" },
+  { name: "Email Marketing", icon: Mail, key: "email" },
+  { name: "Social Media", icon: Share2, key: "social" },
+  { name: "Calendar", icon: Calendar, key: "calendar" },
 ];
 
 const systemItems: SidebarItem[] = [
