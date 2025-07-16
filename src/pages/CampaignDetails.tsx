@@ -111,6 +111,16 @@ export default function CampaignDetails() {
     if (!campaign) return;
     
     try {
+      // For demo campaigns, just update locally
+      if (campaign.id.startsWith('demo-')) {
+        setCampaign(prev => ({ ...prev, status: newStatus }));
+        toast.success(`Campaign ${newStatus}`, {
+          description: `Operation status updated successfully.`
+        });
+        return;
+      }
+
+      // For real campaigns, update in database
       const { error } = await supabase
         .from('campaigns')
         .update({ status: newStatus })
