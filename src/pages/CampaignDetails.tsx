@@ -56,29 +56,49 @@ const mockTacticPerformance = [
 ];
 
 export default function CampaignDetails() {
-  const { id } = useParams();
   const navigate = useNavigate();
   const { user } = useUser();
   const [campaign, setCampaign] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState("overview");
 
+  // Get campaign name from URL params
+  const urlParams = new URLSearchParams(window.location.search);
+  const campaignName = urlParams.get('name');
+
   useEffect(() => {
     loadCampaignDetails();
-  }, [id]);
+  }, [campaignName]);
 
   const loadCampaignDetails = async () => {
-    if (!id) return;
+    if (!campaignName) {
+      // Create mock campaign data based on name for demo purposes
+      const mockCampaign = {
+        id: 'demo-' + campaignName?.toLowerCase().replace(/\s+/g, '-'),
+        target_company: campaignName,
+        type: 'brand_awareness',
+        status: 'active',
+        objective: `Strategic campaign to enhance ${campaignName} market position and competitive advantage.`,
+        created_at: new Date().toISOString(),
+        created_by: user?.id || 'demo-user'
+      };
+      setCampaign(mockCampaign);
+      setLoading(false);
+      return;
+    }
     
     try {
-      const { data, error } = await supabase
-        .from('campaigns')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) throw error;
-      setCampaign(data);
+      // For demo, create a mock campaign since we don't have real data
+      const mockCampaign = {
+        id: 'demo-' + campaignName.toLowerCase().replace(/\s+/g, '-'),
+        target_company: campaignName,
+        type: 'brand_awareness',
+        status: 'active',
+        objective: `Strategic campaign to enhance ${campaignName} market position and competitive advantage.`,
+        created_at: new Date().toISOString(),
+        created_by: user?.id || 'demo-user'
+      };
+      setCampaign(mockCampaign);
     } catch (error) {
       console.error('Error loading campaign:', error);
       toast.error("Failed to load campaign details");

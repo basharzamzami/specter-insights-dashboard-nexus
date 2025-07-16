@@ -23,7 +23,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/competitor/:id" element={<CompetitorDetails />} />
           <Route path="/campaigns/new" element={<CampaignBuilder />} />
-          <Route path="/campaigns/:id" element={<CampaignDetails />} />
+          <Route path="/campaign-details" element={<CampaignDetails />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
