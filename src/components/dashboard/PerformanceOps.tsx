@@ -47,6 +47,80 @@ const competitorShare = [
 export const PerformanceOps = () => {
   const [activeTab, setActiveTab] = useState("traffic");
 
+  const handleExportReport = () => {
+    // Create comprehensive report data
+    const reportData = {
+      generatedAt: new Date().toISOString(),
+      reportType: "Performance Operations Report",
+      summary: {
+        trafficGrowth: "+47%",
+        keywordsWon: 156,
+        marketShare: "35%",
+        revenueImpact: "$2.1M"
+      },
+      trafficAnalysis: trafficData,
+      keywordPerformance: keywordData,
+      competitorAnalysis: competitorShare,
+      recommendations: [
+        "Focus on AI automation keywords showing 25% higher conversion",
+        "Expand content strategy around business intelligence topics",
+        "Monitor TechCorp's recent product launches for positioning opportunities",
+        "Investigate CloudInnovate's pricing strategy changes",
+        "Optimize for emerging data analytics search terms"
+      ]
+    };
+
+    // Convert to CSV format for easy analysis
+    const csvContent = generateCSVReport(reportData);
+    
+    // Create and download file
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `performance-report-${new Date().toISOString().split('T')[0]}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
+  const generateCSVReport = (data: any) => {
+    let csv = "Performance Operations Report\n";
+    csv += `Generated: ${new Date(data.generatedAt).toLocaleDateString()}\n\n`;
+    
+    csv += "EXECUTIVE SUMMARY\n";
+    csv += `Traffic Growth,${data.summary.trafficGrowth}\n`;
+    csv += `Keywords Won,${data.summary.keywordsWon}\n`;
+    csv += `Market Share,${data.summary.marketShare}\n`;
+    csv += `Revenue Impact,${data.summary.revenueImpact}\n\n`;
+    
+    csv += "TRAFFIC ANALYSIS\n";
+    csv += "Month,Organic Traffic,Competitor Avg,Growth Shift\n";
+    data.trafficAnalysis.forEach((item: any) => {
+      csv += `${item.month},${item.organic},${item.competitor},${item.shift}\n`;
+    });
+    
+    csv += "\nKEYWORD PERFORMANCE\n";
+    csv += "Keyword,Rank,Change,Monthly Searches\n";
+    data.keywordPerformance.forEach((item: any) => {
+      csv += `${item.keyword},${item.rank},${item.change},${item.traffic}\n`;
+    });
+    
+    csv += "\nCOMPETITOR MARKET SHARE\n";
+    csv += "Company,Market Share %\n";
+    data.competitorAnalysis.forEach((item: any) => {
+      csv += `${item.name},${item.value}%\n`;
+    });
+    
+    csv += "\nSTRATEGIC RECOMMENDATIONS\n";
+    data.recommendations.forEach((rec: string, index: number) => {
+      csv += `${index + 1}. ${rec}\n`;
+    });
+    
+    return csv;
+  };
+
   const getRankBadge = (rank: number) => {
     if (rank <= 3) return "bg-success/10 text-success border-success/20";
     if (rank <= 6) return "bg-warning/10 text-warning border-warning/20";
@@ -66,7 +140,7 @@ export const PerformanceOps = () => {
           <h2 className="text-2xl font-bold">Performance Operations</h2>
           <p className="text-muted-foreground">Track your competitive advantage and market position</p>
         </div>
-        <Button variant="outline" className="btn-glow">
+        <Button variant="outline" className="btn-glow" onClick={handleExportReport}>
           <Eye className="h-4 w-4 mr-2" />
           Export Report
         </Button>
