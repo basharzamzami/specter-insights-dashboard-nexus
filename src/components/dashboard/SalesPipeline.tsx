@@ -73,8 +73,16 @@ export function SalesPipeline() {
         .single();
 
       if (pipelineData) {
-        setPipeline(pipelineData as Pipeline);
-        setNewDeal(prev => ({ ...prev, stage: (pipelineData.stages as any)[0]?.name || '' }));
+        const pipeline: Pipeline = {
+          ...pipelineData,
+          stages: pipelineData.stages as Array<{
+            id: string;
+            name: string;
+            order: number;
+          }>
+        };
+        setPipeline(pipeline);
+        setNewDeal(prev => ({ ...prev, stage: pipeline.stages[0]?.name || '' }));
       }
 
       // Fetch deals with contact info
