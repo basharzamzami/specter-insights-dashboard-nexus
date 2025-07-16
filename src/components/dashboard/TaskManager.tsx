@@ -13,6 +13,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Plus, Calendar, Clock, User, AlertCircle, CheckCircle, Circle, Filter, BarChart3, Target, Activity, TrendingUp } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { populateWithDemoData, demoTasks } from '@/utils/demoData';
 
 interface Task {
   id: string;
@@ -77,17 +78,24 @@ export function TaskManager() {
 
   const fetchData = async () => {
     try {
-      const [tasksResponse, contactsResponse, dealsResponse] = await Promise.all([
-        supabase.from('tasks').select(`
-          *,
-          contact:contacts(first_name, last_name, company),
-          deal:deals(title, value)
-        `).order('created_at', { ascending: false }),
+      const [contactsResponse, dealsResponse] = await Promise.all([
         supabase.from('contacts').select('id, first_name, last_name, company').order('first_name'),
         supabase.from('deals').select('id, title, value').order('title')
       ]);
 
-      setTasks(tasksResponse.data || []);
+      // Fetch tasks with demo data fallback
+      const fetchTasks = async () => {
+        const { data } = await supabase.from('tasks').select(`
+          *,
+          contact:contacts(first_name, last_name, company),
+          deal:deals(title, value)
+        `).order('created_at', { ascending: false });
+        return data || [];
+      };
+
+      const tasksData = await populateWithDemoData(fetchTasks, demoTasks, 8);
+      
+      setTasks(tasksData);
       setContacts(contactsResponse.data || []);
       setDeals(dealsResponse.data || []);
     } catch (error) {

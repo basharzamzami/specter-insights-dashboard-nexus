@@ -139,18 +139,45 @@ export const CampaignReporting = () => {
   const stats = generateMockStats();
 
   const exportData = (format: string) => {
-    const csvData = campaigns.map(campaign => ({
+    // Create demo data if no campaigns exist
+    const exportCampaigns = campaigns.length > 0 ? campaigns : [
+      {
+        target_company: "TechCorp Industries",
+        type: "seo",
+        status: "active",
+        created_at: new Date().toISOString(),
+        objective: "Disrupt their search rankings for key terms"
+      },
+      {
+        target_company: "DataSolutions Inc",
+        type: "social",
+        status: "completed",
+        created_at: new Date(Date.now() - 86400000).toISOString(),
+        objective: "Social media sentiment manipulation"
+      },
+      {
+        target_company: "CloudInnovate",
+        type: "whisper",
+        status: "paused",
+        created_at: new Date(Date.now() - 172800000).toISOString(),
+        objective: "Spread doubt about their new product launch"
+      }
+    ];
+
+    const csvData = exportCampaigns.map(campaign => ({
       Company: campaign.target_company,
       Type: campaign.type,
       Status: campaign.status,
       Created: new Date(campaign.created_at).toLocaleDateString(),
-      Objective: campaign.objective
+      Objective: campaign.objective || "Strategic intelligence operation"
     }));
 
     if (format === 'csv') {
       const csvContent = [
-        Object.keys(csvData[0] || {}).join(','),
-        ...csvData.map(row => Object.values(row).join(','))
+        Object.keys(csvData[0]).join(','),
+        ...csvData.map(row => Object.values(row).map(value => 
+          typeof value === 'string' && value.includes(',') ? `"${value}"` : value
+        ).join(','))
       ].join('\n');
 
       const blob = new Blob([csvContent], { type: 'text/csv' });
@@ -158,7 +185,10 @@ export const CampaignReporting = () => {
       const a = document.createElement('a');
       a.href = url;
       a.download = `specter-net-campaign-report-${new Date().toISOString().split('T')[0]}.csv`;
+      document.body.appendChild(a);
       a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
     }
     
     toast.success(`Report exported as ${format.toUpperCase()}`, { 

@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { useToast } from "@/hooks/use-toast";
 
 interface IntelligenceItem {
   id: string;
@@ -93,6 +94,7 @@ const mockIntelligence: IntelligenceItem[] = [
 ];
 
 export const IntelligenceFeed = () => {
+  const { toast } = useToast();
   const [intelligence, setIntelligence] = useState<IntelligenceItem[]>(mockIntelligence);
   const [filter, setFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
@@ -220,18 +222,42 @@ export const IntelligenceFeed = () => {
                   
                   <div className="flex items-center justify-between">
                     <div className="flex gap-2">
-                      <Button size="sm" variant="outline">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => {
+                          toast({
+                            title: "Analysis Initiated",
+                            description: "Analysis initiated for " + item.title,
+                          });
+                        }}
+                      >
                         <TrendingUp className="h-3 w-3 mr-1" />
                         Analyze Impact
                       </Button>
-                      <Button size="sm" variant="outline">
+                      <Button 
+                        size="sm" 
+                        variant="outline"
+                        onClick={() => {
+                          toast({
+                            title: "Counter-Strategy Created",
+                            description: "Counter-strategy created for " + item.competitor,
+                          });
+                        }}
+                      >
                         <Users className="h-3 w-3 mr-1" />
                         Create Counter-Strategy
                       </Button>
                     </div>
                     
                     {item.url && (
-                      <Button size="sm" variant="ghost">
+                      <Button 
+                        size="sm" 
+                        variant="ghost"
+                        onClick={() => {
+                          window.open(item.url, '_blank');
+                        }}
+                      >
                         <ExternalLink className="h-3 w-3 mr-1" />
                         View Source
                       </Button>
@@ -260,11 +286,29 @@ export const IntelligenceFeed = () => {
               </CardHeader>
               <CardContent>
                 <div className="flex gap-2">
-                  <Button size="sm" className="btn-glow">
+                  <Button 
+                    size="sm" 
+                    className="btn-glow"
+                    onClick={() => {
+                      toast({
+                        title: "Response Activated",
+                        description: "Response protocol activated",
+                      });
+                    }}
+                  >
                     <Briefcase className="h-3 w-3 mr-1" />
                     Execute Response
                   </Button>
-                  <Button size="sm" variant="outline">
+                  <Button 
+                    size="sm" 
+                    variant="outline"
+                    onClick={() => {
+                      toast({
+                        title: "Monitoring Enabled",
+                        description: "Situation monitoring enabled",
+                      });
+                    }}
+                  >
                     Monitor Situation
                   </Button>
                 </div>
@@ -284,7 +328,18 @@ export const IntelligenceFeed = () => {
                       <p className="font-medium">{trend}</p>
                       <p className="text-sm text-muted-foreground">Analysis available in 2 hours</p>
                     </div>
-                    <Button size="sm" variant="outline">Track</Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline"
+                      onClick={() => {
+                        toast({
+                          title: "Tracking Activated",
+                          description: "Trend tracking activated",
+                        });
+                      }}
+                    >
+                      Track
+                    </Button>
                   </div>
                 </CardContent>
               </Card>

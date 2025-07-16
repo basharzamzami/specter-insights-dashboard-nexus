@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Plus, Calendar, Clock, MapPin, Video, User, Phone, TrendingUp, BarChart3, Users, Target } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
+import { populateWithDemoData, demoAppointments } from '@/utils/demoData';
 
 interface Appointment {
   id: string;
@@ -64,15 +65,22 @@ export function CalendarScheduler() {
 
   const fetchData = async () => {
     try {
-      const [appointmentsResponse, contactsResponse] = await Promise.all([
-        supabase.from('appointments').select(`
-          *,
-          contact:contacts(first_name, last_name, email, phone, company)
-        `).order('start_time', { ascending: true }),
+      const [contactsResponse] = await Promise.all([
         supabase.from('contacts').select('id, first_name, last_name, email, phone, company').order('first_name')
       ]);
 
-      setAppointments(appointmentsResponse.data || []);
+      // Fetch appointments with demo data fallback
+      const fetchAppointments = async () => {
+        const { data } = await supabase.from('appointments').select(`
+          *,
+          contact:contacts(first_name, last_name, email, phone, company)
+        `).order('start_time', { ascending: true });
+        return data || [];
+      };
+
+      const appointmentsData = await populateWithDemoData(fetchAppointments, demoAppointments, 6);
+      
+      setAppointments(appointmentsData);
       setContacts(contactsResponse.data || []);
     } catch (error) {
       console.error('Error fetching data:', error);

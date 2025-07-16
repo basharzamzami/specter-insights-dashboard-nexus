@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Plus, Mail, Send, Eye, MousePointer, Users, Calendar, BarChart3, TrendingUp } from 'lucide-react';
+import { populateWithDemoData, demoEmailCampaigns } from '@/utils/demoData';
 
 interface EmailTemplate {
   id: string;
@@ -75,13 +76,21 @@ export function EmailMarketing() {
 
   const fetchData = async () => {
     try {
-      const [templatesResponse, campaignsResponse] = await Promise.all([
-        supabase.from('email_templates').select('*').order('created_at', { ascending: false }),
-        supabase.from('email_campaigns').select('*').order('created_at', { ascending: false })
+      const [templatesResponse] = await Promise.all([
+        supabase.from('email_templates').select('*').order('created_at', { ascending: false })
       ]);
 
+      // Fetch campaigns with demo data fallback
+      const fetchCampaigns = async () => {
+        const { data, error } = await supabase.from('email_campaigns').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+        return data || [];
+      };
+
+      const campaignsData = await populateWithDemoData(fetchCampaigns, demoEmailCampaigns, 5);
+
       setTemplates(templatesResponse.data || []);
-      setCampaigns(campaignsResponse.data || []);
+      setCampaigns(campaignsData);
     } catch (error) {
       console.error('Error fetching data:', error);
       toast({

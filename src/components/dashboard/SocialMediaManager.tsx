@@ -12,6 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Plus, Search, Calendar, MoreHorizontal, TrendingUp, Users, Heart, Share2, Eye, BarChart3, Target, Share, MessageCircle } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
+import { populateWithDemoData, demoSocialPosts } from '@/utils/demoData';
 
 interface SocialPost {
   id: string;
@@ -72,13 +73,18 @@ export function SocialMediaManager() {
 
   const fetchPosts = async () => {
     try {
-      const { data, error } = await supabase
-        .from('social_posts')
-        .select('*')
-        .order('created_at', { ascending: false });
+      const fetchRealPosts = async () => {
+        const { data, error } = await supabase
+          .from('social_posts')
+          .select('*')
+          .order('created_at', { ascending: false });
 
-      if (error) throw error;
-      setPosts((data || []) as SocialPost[]);
+        if (error) throw error;
+        return data || [];
+      };
+
+      const postsData = await populateWithDemoData(fetchRealPosts, demoSocialPosts, 6);
+      setPosts(postsData as SocialPost[]);
     } catch (error) {
       console.error('Error fetching posts:', error);
       toast({
