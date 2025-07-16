@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Calendar, Plus, Play, Pause, Edit } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { Calendar, Plus, Play, Pause, Edit, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -53,6 +54,7 @@ export const CampaignScheduler = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const getStatusColor = (status: Campaign['status']) => {
     switch (status) {
@@ -95,6 +97,10 @@ export const CampaignScheduler = () => {
       description: `Opening post scheduling interface for "${campaign.name}" campaign.`,
     });
     // In a real app, this would open a post scheduling interface
+  };
+
+  const handleViewDetails = (campaign: Campaign) => {
+    navigate(`/campaign-details?name=${encodeURIComponent(campaign.name)}`);
   };
 
   return (
@@ -163,6 +169,15 @@ export const CampaignScheduler = () => {
               </div>
               
               <div className="flex space-x-2 mt-4">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex-1"
+                  onClick={() => handleViewDetails(campaign)}
+                >
+                  <Eye className="h-4 w-4 mr-2" />
+                  View Details
+                </Button>
                 <Button 
                   variant="outline" 
                   size="sm" 
