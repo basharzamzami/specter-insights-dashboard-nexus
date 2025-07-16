@@ -121,6 +121,30 @@ export const WelcomeBanner = ({ user }: WelcomeBannerProps) => {
               <Button 
                 variant="secondary" 
                 className="bg-white/20 border-white/30 text-white hover:bg-white/30"
+                onClick={() => {
+                  const reportData = {
+                    generatedAt: new Date().toISOString(),
+                    reportType: "Executive Summary Report",
+                    summary: {
+                      revenueImpact: "$2.1M",
+                      campaignsActive: 12,
+                      threatsNeutralized: 8,
+                      marketShare: "35%"
+                    }
+                  };
+                  
+                  const csvContent = `Executive Summary Report\nGenerated: ${new Date().toLocaleDateString()}\n\nRevenue Impact,${reportData.summary.revenueImpact}\nActive Campaigns,${reportData.summary.campaignsActive}\nThreats Neutralized,${reportData.summary.threatsNeutralized}\nMarket Share,${reportData.summary.marketShare}`;
+                  
+                  const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+                  const link = document.createElement('a');
+                  const url = URL.createObjectURL(blob);
+                  link.setAttribute('href', url);
+                  link.setAttribute('download', `executive-summary-${new Date().toISOString().split('T')[0]}.csv`);
+                  link.style.visibility = 'hidden';
+                  document.body.appendChild(link);
+                  link.click();
+                  document.body.removeChild(link);
+                }}
               >
                 <Eye className="h-4 w-4 mr-2" />
                 Export Report

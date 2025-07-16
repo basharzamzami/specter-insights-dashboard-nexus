@@ -11,6 +11,7 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
 import { Plus, Calendar, Clock, User, AlertCircle, CheckCircle, Circle, Filter, BarChart3, Target, Activity, TrendingUp } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { populateWithDemoData, demoTasks } from '@/utils/demoData';
@@ -45,6 +46,7 @@ export function TaskManager() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { getUser, isSignedIn } = useClerkSupabaseAuth();
 
   const [newTask, setNewTask] = useState({
     title: '',
@@ -128,7 +130,7 @@ export function TaskManager() {
     e.preventDefault();
     
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await getUser();
       if (!user) throw new Error('Not authenticated');
 
       const taskData = {

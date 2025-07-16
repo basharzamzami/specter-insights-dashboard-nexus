@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
 import { Plus, Search, Calendar, MoreHorizontal, TrendingUp, Users, Heart, Share2, Eye, BarChart3, Target, Share, MessageCircle } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 import { populateWithDemoData, demoSocialPosts } from '@/utils/demoData';
@@ -39,6 +40,7 @@ export function SocialMediaManager() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { getUser, isSignedIn } = useClerkSupabaseAuth();
 
   const [newPost, setNewPost] = useState({
     platform: 'twitter',
@@ -115,7 +117,7 @@ export function SocialMediaManager() {
     e.preventDefault();
     
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await getUser();
       if (!user) throw new Error('Not authenticated');
 
       const postData = {

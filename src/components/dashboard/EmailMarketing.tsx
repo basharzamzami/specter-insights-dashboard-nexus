@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
 import { Plus, Mail, Send, Eye, MousePointer, Users, Calendar, BarChart3, TrendingUp } from 'lucide-react';
 import { populateWithDemoData, demoEmailCampaigns } from '@/utils/demoData';
 
@@ -46,6 +47,7 @@ export function EmailMarketing() {
   const [isCampaignDialogOpen, setIsCampaignDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { getUser, isSignedIn } = useClerkSupabaseAuth();
 
   const [newTemplate, setNewTemplate] = useState({
     name: '',
@@ -107,7 +109,7 @@ export function EmailMarketing() {
     e.preventDefault();
     
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await getUser();
       if (!user) throw new Error('Not authenticated');
 
       const { error } = await supabase
@@ -138,7 +140,7 @@ export function EmailMarketing() {
     e.preventDefault();
     
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await getUser();
       if (!user) throw new Error('Not authenticated');
 
       // Get contact count for recipient_count
