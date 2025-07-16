@@ -11,7 +11,8 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Calendar, Clock, User, AlertCircle, CheckCircle, Circle, Filter } from 'lucide-react';
+import { Plus, Calendar, Clock, User, AlertCircle, CheckCircle, Circle, Filter, BarChart3, Target, Activity, TrendingUp } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 
 interface Task {
   id: string;
@@ -160,6 +161,53 @@ export function TaskManager() {
       });
     }
   };
+
+  // Dummy analytics data
+  const taskCompletionTrend = [
+    { week: 'Week 1', completed: 24, pending: 18, overdue: 3 },
+    { week: 'Week 2', completed: 31, pending: 15, overdue: 2 },
+    { week: 'Week 3', completed: 28, pending: 22, overdue: 5 },
+    { week: 'Week 4', completed: 35, pending: 12, overdue: 1 },
+    { week: 'Week 5', completed: 42, pending: 16, overdue: 4 },
+    { week: 'Week 6', completed: 38, pending: 14, overdue: 2 }
+  ];
+
+  const priorityDistribution = [
+    { name: 'High', value: 25, color: '#ef4444', count: 12 },
+    { name: 'Medium', value: 45, color: '#f59e0b', count: 22 },
+    { name: 'Low', value: 30, color: '#10b981', count: 15 }
+  ];
+
+  const productivityStats = [
+    {
+      title: "Total Tasks",
+      value: filteredTasks.length.toString(),
+      icon: Activity,
+      color: "text-blue-600",
+      trend: "+8 this week"
+    },
+    {
+      title: "Completed",
+      value: filteredTasks.filter(t => t.status === 'completed').length.toString(),
+      icon: CheckCircle,
+      color: "text-green-600",
+      trend: "+15 this week"
+    },
+    {
+      title: "Completion Rate",
+      value: `${Math.round((filteredTasks.filter(t => t.status === 'completed').length / filteredTasks.length) * 100 || 0)}%`,
+      icon: Target,
+      color: "text-purple-600",
+      trend: "+5% vs last week"
+    },
+    {
+      title: "Avg. Daily Tasks",
+      value: "6.2",
+      icon: TrendingUp,
+      color: "text-orange-600",
+      trend: "+1.2 vs last month"
+    }
+  ];
 
   const updateTaskStatus = async (taskId: string, newStatus: string) => {
     try {
@@ -359,19 +407,104 @@ export function TaskManager() {
         </Dialog>
       </div>
 
-      {/* Stats */}
+      {/* Task Statistics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, index) => (
-          <Card key={index}>
-            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-2xl font-bold">{stat.value}</div>
-              <p className="text-xs text-muted-foreground">{stat.change}</p>
-            </CardContent>
-          </Card>
-        ))}
+        {productivityStats.map((stat, index) => {
+          const Icon = stat.icon;
+          return (
+            <Card key={index}>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">{stat.title}</CardTitle>
+                <Icon className={`h-4 w-4 ${stat.color}`} />
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">{stat.value}</div>
+                <p className="text-xs text-muted-foreground">{stat.trend}</p>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </div>
+
+      {/* Productivity Analytics */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <BarChart3 className="h-5 w-5" />
+              <span>Task Completion Trend</span>
+            </CardTitle>
+            <CardDescription>Weekly task completion patterns</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={taskCompletionTrend}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                <XAxis dataKey="week" className="fill-muted-foreground" fontSize={12} />
+                <YAxis className="fill-muted-foreground" fontSize={12} />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "6px"
+                  }}
+                />
+                <Bar dataKey="completed" fill="#10b981" stackId="a" />
+                <Bar dataKey="pending" fill="#f59e0b" stackId="a" />
+                <Bar dataKey="overdue" fill="#ef4444" stackId="a" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Target className="h-5 w-5" />
+              <span>Priority Distribution</span>
+            </CardTitle>
+            <CardDescription>Tasks breakdown by priority level</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid md:grid-cols-2 gap-6">
+              <ResponsiveContainer width="100%" height={200}>
+                <PieChart>
+                  <Pie
+                    data={priorityDistribution}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={40}
+                    outerRadius={80}
+                    paddingAngle={5}
+                    dataKey="value"
+                  >
+                    {priorityDistribution.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+              <div className="space-y-3">
+                {priorityDistribution.map((item, index) => (
+                  <div key={item.name} className="flex items-center justify-between">
+                    <div className="flex items-center space-x-2">
+                      <div 
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <span className="font-medium">{item.name}</span>
+                    </div>
+                    <div className="text-right">
+                      <div className="font-bold">{item.count}</div>
+                      <div className="text-xs text-muted-foreground">{item.value}%</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Filters */}

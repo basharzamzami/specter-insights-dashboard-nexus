@@ -10,6 +10,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { Plus, DollarSign, Calendar, User, Percent, Target, TrendingUp, BarChart } from 'lucide-react';
+import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 interface Deal {
   id: string;
@@ -242,6 +243,24 @@ export function SalesPipeline() {
     }
   ];
 
+  // Dummy analytics data
+  const salesTrendData = [
+    { month: 'Jan', deals: 45, value: 125000, conversion: 12 },
+    { month: 'Feb', deals: 52, value: 147000, conversion: 15 },
+    { month: 'Mar', deals: 38, value: 98000, conversion: 10 },
+    { month: 'Apr', deals: 67, value: 189000, conversion: 18 },
+    { month: 'May', deals: 71, value: 203000, conversion: 22 },
+    { month: 'Jun', deals: 84, value: 245000, conversion: 28 }
+  ];
+
+  const stageDistribution = [
+    { name: 'Prospecting', value: 35, color: '#8b5cf6' },
+    { name: 'Qualification', value: 25, color: '#06b6d4' },
+    { name: 'Proposal', value: 20, color: '#10b981' },
+    { name: 'Negotiation', value: 15, color: '#f59e0b' },
+    { name: 'Closed Won', value: 5, color: '#ef4444' }
+  ];
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -388,6 +407,84 @@ export function SalesPipeline() {
             </Card>
           );
         })}
+      </div>
+
+      {/* Sales Analytics Dashboard */}
+      <div className="grid lg:grid-cols-2 gap-6 mb-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <TrendingUp className="h-5 w-5" />
+              <span>Sales Trend</span>
+            </CardTitle>
+            <CardDescription>Monthly performance overview</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart data={salesTrendData}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                <XAxis dataKey="month" className="fill-muted-foreground" fontSize={12} />
+                <YAxis className="fill-muted-foreground" fontSize={12} />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "6px"
+                  }}
+                />
+                <Area 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke="hsl(var(--primary))" 
+                  fill="hsl(var(--primary))"
+                  fillOpacity={0.2}
+                  strokeWidth={2}
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <BarChart className="h-5 w-5" />
+              <span>Pipeline Distribution</span>
+            </CardTitle>
+            <CardDescription>Deals by stage breakdown</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <PieChart>
+                <Pie
+                  data={stageDistribution}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={120}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {stageDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="mt-4 grid grid-cols-2 gap-2">
+              {stageDistribution.map((item, index) => (
+                <div key={item.name} className="flex items-center space-x-2 text-sm">
+                  <div 
+                    className="w-3 h-3 rounded-full"
+                    style={{ backgroundColor: item.color }}
+                  />
+                  <span>{item.name}: {item.value}%</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Pipeline Stages */}

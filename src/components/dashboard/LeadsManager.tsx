@@ -10,7 +10,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Search, Phone, Mail, Building, Calendar, MoreHorizontal, Star, TrendingUp, Users, Target } from 'lucide-react';
+import { Plus, Search, Phone, Mail, Building, Calendar, MoreHorizontal, Star, TrendingUp, Users, Target, BarChart3, UserCheck } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 
 interface Contact {
   id: string;
@@ -161,6 +162,64 @@ export function LeadsManager() {
       });
     }
   };
+
+  // Dummy analytics data
+  const leadSourceData = [
+    { source: 'Website', leads: 45, conversion: 23 },
+    { source: 'Social Media', leads: 32, conversion: 18 },
+    { source: 'Email Campaign', leads: 28, conversion: 35 },
+    { source: 'Referral', leads: 22, conversion: 41 },
+    { source: 'Cold Outreach', leads: 15, conversion: 12 },
+    { source: 'Events', leads: 12, conversion: 28 }
+  ];
+
+  const conversionTrendData = [
+    { month: 'Jan', leads: 124, qualified: 78, converted: 23 },
+    { month: 'Feb', leads: 142, qualified: 89, converted: 31 },
+    { month: 'Mar', leads: 118, qualified: 72, converted: 18 },
+    { month: 'Apr', leads: 156, qualified: 102, converted: 38 },
+    { month: 'May', leads: 178, qualified: 125, converted: 45 },
+    { month: 'Jun', leads: 195, qualified: 142, converted: 52 }
+  ];
+
+  const statusDistribution = [
+    { name: 'New', value: 35, color: '#8b5cf6', count: 68 },
+    { name: 'Qualified', value: 28, color: '#06b6d4', count: 54 },
+    { name: 'Nurturing', value: 22, color: '#10b981', count: 42 },
+    { name: 'Converted', value: 10, color: '#f59e0b', count: 19 },
+    { name: 'Lost', value: 5, color: '#ef4444', count: 12 }
+  ];
+
+  const leadStats = [
+    {
+      title: "Total Leads",
+      value: filteredContacts.length.toString(),
+      icon: Users,
+      color: "text-blue-600",
+      trend: "+12 this week"
+    },
+    {
+      title: "Qualified Leads",
+      value: filteredContacts.filter(c => c.lead_status === 'qualified').length.toString(),
+      icon: UserCheck,
+      color: "text-green-600",
+      trend: "+8 this week"
+    },
+    {
+      title: "Conversion Rate",
+      value: "26.7%",
+      icon: Target,
+      color: "text-purple-600",
+      trend: "+3.2% vs last month"
+    },
+    {
+      title: "Avg. Lead Score",
+      value: Math.round(filteredContacts.reduce((acc, c) => acc + c.lead_score, 0) / filteredContacts.length || 0).toString(),
+      icon: TrendingUp,
+      color: "text-orange-600",
+      trend: "+5 points"
+    }
+  ];
 
   const updateContactStatus = async (contactId: string, newStatus: string) => {
     try {
@@ -383,9 +442,9 @@ export function LeadsManager() {
         </Dialog>
       </div>
 
-      {/* Stats */}
+      {/* Lead Statistics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, index) => {
+        {leadStats.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <Card key={index}>
@@ -395,14 +454,122 @@ export function LeadsManager() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground">
-                  <span className="text-green-600">{stat.change}</span> from last month
-                </p>
+                <p className="text-xs text-muted-foreground">{stat.trend}</p>
               </CardContent>
             </Card>
           );
         })}
       </div>
+
+      {/* Analytics Dashboard */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <BarChart3 className="h-5 w-5" />
+              <span>Lead Sources</span>
+            </CardTitle>
+            <CardDescription>Lead generation by source and conversion rates</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={leadSourceData}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                <XAxis dataKey="source" className="fill-muted-foreground" fontSize={12} />
+                <YAxis className="fill-muted-foreground" fontSize={12} />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "6px"
+                  }}
+                />
+                <Bar dataKey="leads" fill="hsl(var(--primary))" />
+                <Bar dataKey="conversion" fill="hsl(var(--secondary))" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <TrendingUp className="h-5 w-5" />
+              <span>Conversion Funnel</span>
+            </CardTitle>
+            <CardDescription>Lead progression over time</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={conversionTrendData}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                <XAxis dataKey="month" className="fill-muted-foreground" fontSize={12} />
+                <YAxis className="fill-muted-foreground" fontSize={12} />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "6px"
+                  }}
+                />
+                <Line type="monotone" dataKey="leads" stroke="hsl(var(--primary))" strokeWidth={2} />
+                <Line type="monotone" dataKey="qualified" stroke="hsl(var(--secondary))" strokeWidth={2} />
+                <Line type="monotone" dataKey="converted" stroke="#10b981" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Lead Status Distribution */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center space-x-2">
+            <Target className="h-5 w-5" />
+            <span>Lead Status Distribution</span>
+          </CardTitle>
+          <CardDescription>Current lead pipeline breakdown</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="grid md:grid-cols-2 gap-6">
+            <ResponsiveContainer width="100%" height={250}>
+              <PieChart>
+                <Pie
+                  data={statusDistribution}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={60}
+                  outerRadius={100}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {statusDistribution.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="space-y-4">
+              {statusDistribution.map((item, index) => (
+                <div key={item.name} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                  <div className="flex items-center space-x-3">
+                    <div 
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: item.color }}
+                    />
+                    <span className="font-medium">{item.name}</span>
+                  </div>
+                  <div className="text-right">
+                    <div className="font-bold">{item.count} leads</div>
+                    <div className="text-sm text-muted-foreground">{item.value}%</div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Filters */}
       <div className="flex gap-4 items-center">
