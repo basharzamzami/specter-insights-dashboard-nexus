@@ -24,12 +24,14 @@ import { SocialMediaManager } from "@/components/dashboard/SocialMediaManager";
 import { CalendarScheduler } from "@/components/dashboard/CalendarScheduler";
 import { OperationsManager } from "@/components/dashboard/OperationsManager";
 import { Loader2, Bell } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const Dashboard = () => {
   const { isLoaded, isSignedIn, user } = useUser();
   const navigate = useNavigate();
   const [activeView, setActiveView] = useState("overview");
   const [isAIOpen, setIsAIOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
 
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
@@ -129,7 +131,10 @@ const Dashboard = () => {
             
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <Bell className="h-5 w-5 text-muted-foreground hover:text-foreground cursor-pointer transition-colors" />
+                <Bell 
+                  className="h-5 w-5 text-muted-foreground hover:text-foreground cursor-pointer transition-colors" 
+                  onClick={() => setIsNotificationsOpen(true)}
+                />
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-pulse"></div>
               </div>
               
@@ -162,6 +167,16 @@ const Dashboard = () => {
 
         <AIAssistant isOpen={isAIOpen} onClose={() => setIsAIOpen(false)} />
       </div>
+
+      {/* Notifications Dialog */}
+      <Dialog open={isNotificationsOpen} onOpenChange={setIsNotificationsOpen}>
+        <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Intelligence Command Center</DialogTitle>
+          </DialogHeader>
+          <NotificationCenter />
+        </DialogContent>
+      </Dialog>
     </SidebarProvider>
   );
 };

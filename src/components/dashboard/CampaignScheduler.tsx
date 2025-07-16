@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { CampaignForm } from "./CampaignForm";
+import { useToast } from "@/hooks/use-toast";
 
 interface Campaign {
   id: string;
@@ -49,6 +50,9 @@ const mockCampaigns: Campaign[] = [
 export const CampaignScheduler = () => {
   const [campaigns, setCampaigns] = useState<Campaign[]>(mockCampaigns);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
+  const { toast } = useToast();
 
   const getStatusColor = (status: Campaign['status']) => {
     switch (status) {
@@ -78,6 +82,19 @@ export const CampaignScheduler = () => {
     };
     setCampaigns(prev => [newCampaign, ...prev]);
     setIsDialogOpen(false);
+  };
+
+  const handleEditCampaign = (campaign: Campaign) => {
+    setSelectedCampaign(campaign);
+    setIsEditDialogOpen(true);
+  };
+
+  const handleSchedulePosts = (campaign: Campaign) => {
+    toast({
+      title: "Post Scheduler Opened",
+      description: `Opening post scheduling interface for "${campaign.name}" campaign.`,
+    });
+    // In a real app, this would open a post scheduling interface
   };
 
   return (
@@ -146,11 +163,21 @@ export const CampaignScheduler = () => {
               </div>
               
               <div className="flex space-x-2 mt-4">
-                <Button variant="outline" size="sm" className="flex-1">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex-1"
+                  onClick={() => handleEditCampaign(campaign)}
+                >
                   <Edit className="h-4 w-4 mr-2" />
                   Edit
                 </Button>
-                <Button variant="outline" size="sm" className="flex-1">
+                <Button 
+                  variant="outline" 
+                  size="sm" 
+                  className="flex-1"
+                  onClick={() => handleSchedulePosts(campaign)}
+                >
                   <Calendar className="h-4 w-4 mr-2" />
                   Schedule Posts
                 </Button>
@@ -159,6 +186,42 @@ export const CampaignScheduler = () => {
           </Card>
         ))}
       </div>
+
+      {/* Edit Campaign Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Edit Campaign: {selectedCampaign?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <p className="text-muted-foreground">
+              Campaign editing interface would go here. For now, showing campaign details:
+            </p>
+            {selectedCampaign && (
+              <div className="space-y-2">
+                <p><strong>Name:</strong> {selectedCampaign.name}</p>
+                <p><strong>Description:</strong> {selectedCampaign.description}</p>
+                <p><strong>Status:</strong> {selectedCampaign.status}</p>
+                <p><strong>Posts:</strong> {selectedCampaign.posts}</p>
+              </div>
+            )}
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button onClick={() => {
+                toast({
+                  title: "Campaign Updated",
+                  description: "Campaign changes have been saved successfully.",
+                });
+                setIsEditDialogOpen(false);
+              }}>
+                Save Changes
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

@@ -7,9 +7,10 @@ interface DashboardHeaderProps {
   user: any;
   onAIToggle: () => void;
   isAIOpen: boolean;
+  onNotificationsClick?: () => void;
 }
 
-export const DashboardHeader = ({ user, onAIToggle, isAIOpen }: DashboardHeaderProps) => {
+export const DashboardHeader = ({ user, onAIToggle, isAIOpen, onNotificationsClick }: DashboardHeaderProps) => {
 
   return (
     <header className="bg-card border-b border-border px-6 py-4">
@@ -37,9 +38,14 @@ export const DashboardHeader = ({ user, onAIToggle, isAIOpen }: DashboardHeaderP
             {!isAIOpen && <Badge variant="secondary" className="ml-2 text-xs">AI</Badge>}
           </Button>
           
-          <Button variant="ghost" size="sm" className="relative">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            className="relative" 
+            onClick={onNotificationsClick}
+          >
             <Bell className="h-5 w-5" />
-            <span className="absolute -top-1 -right-1 h-3 w-3 bg-destructive rounded-full"></span>
+            <span className="absolute -top-1 -right-1 h-3 w-3 bg-destructive rounded-full animate-pulse"></span>
           </Button>
           
           <Button variant="ghost" size="sm">

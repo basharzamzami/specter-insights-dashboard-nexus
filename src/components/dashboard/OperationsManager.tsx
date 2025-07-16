@@ -83,6 +83,7 @@ export const OperationsManager = () => {
   ]);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);
   const [selectedOperation, setSelectedOperation] = useState<Operation | null>(null);
   const [editForm, setEditForm] = useState<{
     title: string;
@@ -205,7 +206,7 @@ export const OperationsManager = () => {
           <h2 className="text-2xl font-bold">Operations Manager</h2>
           <p className="text-muted-foreground">Manage content editing and scheduling operations</p>
         </div>
-        <Button className="btn-glow">
+        <Button className="btn-glow" onClick={() => setIsAnalyticsOpen(true)}>
           <TrendingUp className="h-4 w-4 mr-2" />
           View Analytics
         </Button>
@@ -407,6 +408,133 @@ export const OperationsManager = () => {
               <Button onClick={handleSaveOperation}>
                 Save Changes
               </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Analytics Dialog */}
+      <Dialog open={isAnalyticsOpen} onOpenChange={setIsAnalyticsOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <BarChart3 className="h-5 w-5" />
+              Operations Analytics Dashboard
+            </DialogTitle>
+          </DialogHeader>
+          <div className="space-y-6">
+            {/* Analytics Stats */}
+            <div className="grid grid-cols-4 gap-4">
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-blue-600">94%</div>
+                    <p className="text-sm text-muted-foreground">Success Rate</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-green-600">2.4h</div>
+                    <p className="text-sm text-muted-foreground">Avg. Completion</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-purple-600">127</div>
+                    <p className="text-sm text-muted-foreground">This Month</p>
+                  </div>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardContent className="pt-6">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-orange-600">$47K</div>
+                    <p className="text-sm text-muted-foreground">Revenue Impact</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Mock Analytics Charts */}
+            <div className="grid grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Operation Types Performance</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Content Editing</span>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-24 bg-gray-200 rounded-full h-2">
+                          <div className="bg-blue-600 h-2 rounded-full" style={{ width: '87%' }}></div>
+                        </div>
+                        <span className="text-sm font-medium">87%</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Post Scheduling</span>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-24 bg-gray-200 rounded-full h-2">
+                          <div className="bg-green-600 h-2 rounded-full" style={{ width: '92%' }}></div>
+                        </div>
+                        <span className="text-sm font-medium">92%</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Campaign Management</span>
+                      <div className="flex items-center space-x-2">
+                        <div className="w-24 bg-gray-200 rounded-full h-2">
+                          <div className="bg-purple-600 h-2 rounded-full" style={{ width: '78%' }}></div>
+                        </div>
+                        <span className="text-sm font-medium">78%</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="text-lg">Team Performance</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Sarah Chen</span>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm font-medium">23 ops</span>
+                        <span className="text-xs text-green-600">↑15%</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Mike Rodriguez</span>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm font-medium">19 ops</span>
+                        <span className="text-xs text-green-600">↑8%</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">Emily Foster</span>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm font-medium">17 ops</span>
+                        <span className="text-xs text-blue-600">→3%</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm">David Kim</span>
+                      <div className="flex items-center space-x-2">
+                        <span className="text-sm font-medium">21 ops</span>
+                        <span className="text-xs text-green-600">↑12%</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </DialogContent>
