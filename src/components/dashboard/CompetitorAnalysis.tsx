@@ -58,7 +58,7 @@ export const CompetitorAnalysis = () => {
   const [isCampaignDialogOpen, setIsCampaignDialogOpen] = useState(false);
   const [selectedAction, setSelectedAction] = useState<ActionItem | null>(null);
   const [campaignForm, setCampaignForm] = useState<CampaignForm>({
-    type: "",
+    type: "seo",
     objective: "",
     scheduledDate: "",
     actions: {}
@@ -289,7 +289,7 @@ export const CompetitorAnalysis = () => {
       });
 
       setIsCampaignDialogOpen(false);
-      setCampaignForm({ type: "", objective: "", scheduledDate: "", actions: {} });
+      setCampaignForm({ type: "seo", objective: "", scheduledDate: "", actions: {} });
       
     } catch (error) {
       console.error('Campaign creation error:', error);

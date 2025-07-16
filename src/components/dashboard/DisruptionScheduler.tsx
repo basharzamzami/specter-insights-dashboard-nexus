@@ -60,7 +60,10 @@ const mockOperations: DisruptionOperation[] = [
 
 export const DisruptionScheduler = () => {
   const [operations, setOperations] = useState<DisruptionOperation[]>(mockOperations);
-  const [newOperation, setNewOperation] = useState<Partial<DisruptionOperation>>({});
+  const [newOperation, setNewOperation] = useState<Partial<DisruptionOperation>>({
+    type: 'seo',
+    priority: 'medium'
+  });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
 
@@ -108,7 +111,10 @@ export const DisruptionScheduler = () => {
     };
 
     setOperations(prev => [operation, ...prev]);
-    setNewOperation({});
+    setNewOperation({
+      type: 'seo',
+      priority: 'medium'
+    });
     setIsDialogOpen(false);
     
     toast({

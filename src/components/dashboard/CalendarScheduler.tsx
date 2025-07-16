@@ -47,7 +47,7 @@ export function CalendarScheduler() {
     end_time: '',
     location: '',
     meeting_link: '',
-    contact_id: ''
+    contact_id: 'none'
   });
 
   const appointmentStatuses = [
@@ -96,7 +96,7 @@ export function CalendarScheduler() {
       const appointmentData = {
         ...newAppointment,
         user_id: user.id,
-        contact_id: newAppointment.contact_id || null
+        contact_id: newAppointment.contact_id === 'none' ? null : newAppointment.contact_id
       };
 
       const { error } = await supabase
@@ -118,7 +118,7 @@ export function CalendarScheduler() {
         end_time: '',
         location: '',
         meeting_link: '',
-        contact_id: ''
+        contact_id: 'none'
       });
       fetchData();
     } catch (error) {
@@ -411,7 +411,7 @@ export function CalendarScheduler() {
                       <SelectValue placeholder="Select contact" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">No contact</SelectItem>
+                      <SelectItem value="none">No contact</SelectItem>
                       {contacts.map(contact => (
                         <SelectItem key={contact.id} value={contact.id}>
                           {contact.first_name} {contact.last_name} ({contact.company})

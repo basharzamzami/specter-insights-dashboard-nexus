@@ -50,8 +50,8 @@ export function TaskManager() {
     description: '',
     priority: 'medium',
     due_date: '',
-    contact_id: '',
-    deal_id: ''
+    contact_id: 'none',
+    deal_id: 'none'
   });
 
   const priorities = [
@@ -127,8 +127,8 @@ export function TaskManager() {
         ...newTask,
         user_id: user.id,
         due_date: newTask.due_date || null,
-        contact_id: newTask.contact_id || null,
-        deal_id: newTask.deal_id || null
+        contact_id: newTask.contact_id === 'none' ? null : newTask.contact_id,
+        deal_id: newTask.deal_id === 'none' ? null : newTask.deal_id
       };
 
       const { error } = await supabase
@@ -148,8 +148,8 @@ export function TaskManager() {
         description: '',
         priority: 'medium',
         due_date: '',
-        contact_id: '',
-        deal_id: ''
+        contact_id: 'none',
+        deal_id: 'none'
       });
       fetchData();
     } catch (error) {
@@ -369,7 +369,7 @@ export function TaskManager() {
                       <SelectValue placeholder="Select contact" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">No contact</SelectItem>
+                      <SelectItem value="none">No contact</SelectItem>
                       {contacts.map(contact => (
                         <SelectItem key={contact.id} value={contact.id}>
                           {contact.first_name} {contact.last_name} ({contact.company})
@@ -385,7 +385,7 @@ export function TaskManager() {
                       <SelectValue placeholder="Select deal" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="">No deal</SelectItem>
+                      <SelectItem value="none">No deal</SelectItem>
                       {deals.map(deal => (
                         <SelectItem key={deal.id} value={deal.id}>
                           {deal.title} (${deal.value?.toLocaleString()})

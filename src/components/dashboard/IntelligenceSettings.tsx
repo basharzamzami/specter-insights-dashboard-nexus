@@ -25,7 +25,7 @@ export const IntelligenceSettings = () => {
   const [isPersonaDialogOpen, setIsPersonaDialogOpen] = useState(false);
   const [newPersona, setNewPersona] = useState({
     name: "",
-    platform: "",
+    platform: "linkedin",
     voice_tone: "",
     scripts: {}
   });
@@ -105,7 +105,7 @@ export const IntelligenceSettings = () => {
     } else {
       toast.success("Persona created successfully");
       setIsPersonaDialogOpen(false);
-      setNewPersona({ name: "", platform: "", voice_tone: "", scripts: {} });
+      setNewPersona({ name: "", platform: "linkedin", voice_tone: "", scripts: {} });
       loadPersonas();
     }
   };
