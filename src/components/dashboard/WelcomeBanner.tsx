@@ -326,7 +326,11 @@ export const WelcomeBanner = ({ user }: WelcomeBannerProps) => {
                         <Badge variant="outline" className="bg-success/10 text-success border-success/20">
                           {campaign.performance}
                         </Badge>
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => window.location.href = `/campaign-details?name=${encodeURIComponent(campaign.name)}`}
+                        >
                           <Eye className="h-4 w-4" />
                         </Button>
                       </div>
