@@ -96,7 +96,7 @@ export const OperationsManager = () => {
     title: '',
     description: '',
     content: '',
-    platform: '',
+    platform: 'linkedin', // Set a default value instead of empty string
     priority: 'medium',
     assignee: '',
     dueDate: ''
@@ -133,7 +133,7 @@ export const OperationsManager = () => {
       title: operation.title,
       description: operation.description,
       content: operation.content || '',
-      platform: operation.platform || '',
+      platform: operation.platform || 'linkedin', // Use default instead of empty string
       priority: operation.priority,
       assignee: operation.assignee || '',
       dueDate: operation.dueDate || ''
