@@ -259,6 +259,7 @@ export function SocialMediaManager() {
   };
 
   const getTotalEngagement = (metrics: any) => {
+    if (!metrics) return 0;
     return (metrics.likes || 0) + (metrics.comments || 0) + (metrics.shares || 0);
   };
 
