@@ -22,6 +22,7 @@ import { TaskManager } from "@/components/dashboard/TaskManager";
 import { EmailMarketing } from "@/components/dashboard/EmailMarketing";
 import { SocialMediaManager } from "@/components/dashboard/SocialMediaManager";
 import { CalendarScheduler } from "@/components/dashboard/CalendarScheduler";
+import { OperationsManager } from "@/components/dashboard/OperationsManager";
 import { Loader2, Bell } from "lucide-react";
 
 const Dashboard = () => {
@@ -92,6 +93,8 @@ const Dashboard = () => {
         return <SocialMediaManager />;
       case "calendar":
         return <CalendarScheduler />;
+      case "operations":
+        return <OperationsManager />;
       default:
         return (
           <div className="space-y-8">

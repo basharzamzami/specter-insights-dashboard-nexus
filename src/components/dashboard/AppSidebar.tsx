@@ -17,7 +17,8 @@ import {
   Users,
   CheckSquare,
   Mail,
-  Share2
+  Share2,
+  Cog
 } from "lucide-react";
 import {
   Sidebar,
@@ -55,6 +56,7 @@ const mainItems: SidebarItem[] = [
 
 const analyticsItems: SidebarItem[] = [
   { name: "Performance", icon: BarChart3, key: "analytics" },
+  { name: "Operations Manager", icon: Cog, key: "operations", badge: "NEW" },
   { name: "Campaign Reports", icon: FileText, key: "reporting" },
   { name: "Activity Log", icon: Activity, key: "activity" },
   { name: "Email Marketing", icon: Mail, key: "email" },
