@@ -9,7 +9,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Calendar, Clock, MapPin, Video, User, Phone } from 'lucide-react';
+import { Plus, Calendar, Clock, MapPin, Video, User, Phone, TrendingUp, BarChart3, Users, Target } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 
 interface Appointment {
   id: string;
@@ -153,6 +154,67 @@ export function CalendarScheduler() {
       });
     }
   };
+
+  // Dummy analytics data
+  const appointmentTrend = [
+    { month: 'Jan', scheduled: 45, completed: 42, cancelled: 3, conversion: 93 },
+    { month: 'Feb', scheduled: 52, completed: 48, cancelled: 4, conversion: 92 },
+    { month: 'Mar', scheduled: 38, completed: 35, cancelled: 3, conversion: 92 },
+    { month: 'Apr', scheduled: 67, completed: 63, cancelled: 4, conversion: 94 },
+    { month: 'May', scheduled: 71, completed: 68, cancelled: 3, conversion: 96 },
+    { month: 'Jun', scheduled: 84, completed: 79, cancelled: 5, conversion: 94 }
+  ];
+
+  const meetingTypes = [
+    { name: 'Sales Call', value: 35, color: '#6366f1', count: 28 },
+    { name: 'Demo', value: 25, color: '#8b5cf6', count: 20 },
+    { name: 'Discovery', value: 20, color: '#06b6d4', count: 16 },
+    { name: 'Follow-up', value: 15, color: '#10b981', count: 12 },
+    { name: 'Support', value: 5, color: '#f59e0b', count: 4 }
+  ];
+
+  const timeUtilization = [
+    { hour: '9 AM', appointments: 3, capacity: 4 },
+    { hour: '10 AM', appointments: 4, capacity: 4 },
+    { hour: '11 AM', appointments: 3, capacity: 4 },
+    { hour: '12 PM', appointments: 2, capacity: 4 },
+    { hour: '1 PM', appointments: 1, capacity: 4 },
+    { hour: '2 PM', appointments: 4, capacity: 4 },
+    { hour: '3 PM', appointments: 3, capacity: 4 },
+    { hour: '4 PM', appointments: 2, capacity: 4 },
+    { hour: '5 PM', appointments: 1, capacity: 4 }
+  ];
+
+  const calendarStats = [
+    {
+      title: "Total Appointments",
+      value: appointments.length.toString(),
+      icon: Calendar,
+      color: "text-blue-600",
+      trend: "+12 this month"
+    },
+    {
+      title: "Completion Rate",
+      value: "94%",
+      icon: Target,
+      color: "text-green-600",
+      trend: "+2% vs last month"
+    },
+    {
+      title: "Avg. Meeting Duration",
+      value: "45 min",
+      icon: Clock,
+      color: "text-purple-600",
+      trend: "+5 min vs avg"
+    },
+    {
+      title: "Weekly Meetings",
+      value: "18",
+      icon: Users,
+      color: "text-orange-600",
+      trend: "+3 vs last week"
+    }
+  ];
 
   const getStatusBadge = (status: string) => {
     const statusConfig = appointmentStatuses.find(s => s.value === status);
@@ -371,9 +433,9 @@ export function CalendarScheduler() {
         </div>
       </div>
 
-      {/* Stats */}
+      {/* Calendar Statistics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, index) => {
+        {calendarStats.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <Card key={index}>
@@ -383,10 +445,114 @@ export function CalendarScheduler() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stat.value}</div>
+                <p className="text-xs text-muted-foreground">{stat.trend}</p>
               </CardContent>
             </Card>
           );
         })}
+      </div>
+
+      {/* Calendar Analytics */}
+      <div className="grid lg:grid-cols-3 gap-6 mb-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <BarChart3 className="h-5 w-5" />
+              <span>Appointment Trends</span>
+            </CardTitle>
+            <CardDescription>Monthly appointment performance</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={250}>
+              <AreaChart data={appointmentTrend}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                <XAxis dataKey="month" className="fill-muted-foreground" fontSize={12} />
+                <YAxis className="fill-muted-foreground" fontSize={12} />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "6px"
+                  }}
+                />
+                <Area type="monotone" dataKey="scheduled" stroke="#6366f1" fill="#6366f1" fillOpacity={0.2} />
+                <Area type="monotone" dataKey="completed" stroke="#10b981" fill="#10b981" fillOpacity={0.2} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Target className="h-5 w-5" />
+              <span>Meeting Types</span>
+            </CardTitle>
+            <CardDescription>Distribution by meeting purpose</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={meetingTypes}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={40}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {meetingTypes.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="mt-4 space-y-2">
+              {meetingTypes.map((item, index) => (
+                <div key={item.name} className="flex items-center justify-between text-sm">
+                  <div className="flex items-center space-x-2">
+                    <div 
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: item.color }}
+                    />
+                    <span>{item.name}</span>
+                  </div>
+                  <span className="font-medium">{item.count}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Clock className="h-5 w-5" />
+              <span>Time Utilization</span>
+            </CardTitle>
+            <CardDescription>Daily capacity vs bookings</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={250}>
+              <BarChart data={timeUtilization}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                <XAxis dataKey="hour" className="fill-muted-foreground" fontSize={12} />
+                <YAxis className="fill-muted-foreground" fontSize={12} />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "6px"
+                  }}
+                />
+                <Bar dataKey="capacity" fill="#e5e7eb" />
+                <Bar dataKey="appointments" fill="#6366f1" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
       </div>
 
       <div className="grid gap-6 md:grid-cols-3">

@@ -10,7 +10,8 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { Plus, Calendar, Eye, Heart, MessageCircle, Share, BarChart3, TrendingUp, Users } from 'lucide-react';
+import { Plus, Search, Calendar, MoreHorizontal, TrendingUp, Users, Heart, Share2, Eye, BarChart3, Target, Share, MessageCircle } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 
 interface SocialPost {
   id: string;
@@ -147,6 +148,62 @@ export function SocialMediaManager() {
       });
     }
   };
+
+  // Dummy analytics data
+  const engagementTrend = [
+    { month: 'Jan', likes: 1250, comments: 340, shares: 180, reach: 15400 },
+    { month: 'Feb', likes: 1850, comments: 480, shares: 260, reach: 18200 },
+    { month: 'Mar', likes: 2100, comments: 520, shares: 310, reach: 21500 },
+    { month: 'Apr', likes: 2850, comments: 680, shares: 420, reach: 26800 },
+    { month: 'May', likes: 3200, comments: 750, shares: 480, reach: 32100 },
+    { month: 'Jun', likes: 3850, comments: 890, shares: 620, reach: 38500 }
+  ];
+
+  const platformPerformance = [
+    { platform: 'LinkedIn', posts: 24, likes: 1420, comments: 180, shares: 95, reach: 12500 },
+    { platform: 'Twitter', posts: 18, likes: 890, comments: 120, shares: 160, reach: 8900 },
+    { platform: 'Facebook', posts: 12, likes: 650, comments: 85, shares: 45, reach: 5200 },
+    { platform: 'Instagram', posts: 15, likes: 1100, comments: 95, shares: 25, reach: 7800 }
+  ];
+
+  const postTypes = [
+    { name: 'Industry News', value: 30, color: '#6366f1', engagement: 4.2 },
+    { name: 'Company Updates', value: 25, color: '#8b5cf6', engagement: 3.8 },
+    { name: 'Thought Leadership', value: 20, color: '#06b6d4', engagement: 5.1 },
+    { name: 'Product Content', value: 15, color: '#10b981', engagement: 3.5 },
+    { name: 'Behind the Scenes', value: 10, color: '#f59e0b', engagement: 6.2 }
+  ];
+
+  const socialStats = [
+    {
+      title: "Total Posts",
+      value: filteredPosts.length.toString(),
+      icon: Share2,
+      color: "text-blue-600",
+      trend: "+8 this month"
+    },
+    {
+      title: "Avg. Engagement",
+      value: "4.2%",
+      icon: Heart,
+      color: "text-red-600", 
+      trend: "+0.8% vs last month"
+    },
+    {
+      title: "Total Reach",
+      value: "124K",
+      icon: Eye,
+      color: "text-green-600",
+      trend: "+18K this month"
+    },
+    {
+      title: "Active Platforms",
+      value: "4",
+      icon: Target,
+      color: "text-purple-600",
+      trend: "LinkedIn performing best"
+    }
+  ];
 
   const updatePostStatus = async (postId: string, newStatus: string) => {
     try {
@@ -325,9 +382,9 @@ export function SocialMediaManager() {
         </Dialog>
       </div>
 
-      {/* Stats */}
+      {/* Social Media Statistics */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        {stats.map((stat, index) => {
+        {socialStats.map((stat, index) => {
           const Icon = stat.icon;
           return (
             <Card key={index}>
@@ -337,11 +394,116 @@ export function SocialMediaManager() {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{stat.value}</div>
-                <p className="text-xs text-muted-foreground">{stat.change}</p>
+                <p className="text-xs text-muted-foreground">{stat.trend}</p>
               </CardContent>
             </Card>
           );
         })}
+      </div>
+
+      {/* Social Media Analytics */}
+      <div className="grid lg:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <BarChart3 className="h-5 w-5" />
+              <span>Engagement Trends</span>
+            </CardTitle>
+            <CardDescription>Monthly social media performance</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <AreaChart data={engagementTrend}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                <XAxis dataKey="month" className="fill-muted-foreground" fontSize={12} />
+                <YAxis className="fill-muted-foreground" fontSize={12} />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "6px"
+                  }}
+                />
+                <Area type="monotone" dataKey="reach" stroke="#6366f1" fill="#6366f1" fillOpacity={0.1} />
+                <Area type="monotone" dataKey="likes" stroke="#ef4444" fill="#ef4444" fillOpacity={0.2} />
+                <Area type="monotone" dataKey="comments" stroke="#10b981" fill="#10b981" fillOpacity={0.2} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Target className="h-5 w-5" />
+              <span>Platform Performance</span>
+            </CardTitle>
+            <CardDescription>Engagement by social platform</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={platformPerformance}>
+                <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
+                <XAxis dataKey="platform" className="fill-muted-foreground" fontSize={12} />
+                <YAxis className="fill-muted-foreground" fontSize={12} />
+                <Tooltip 
+                  contentStyle={{ 
+                    backgroundColor: "hsl(var(--card))",
+                    border: "1px solid hsl(var(--border))",
+                    borderRadius: "6px"
+                  }}
+                />
+                <Bar dataKey="likes" fill="#ef4444" />
+                <Bar dataKey="comments" fill="#10b981" />
+                <Bar dataKey="shares" fill="#6366f1" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center space-x-2">
+              <Share2 className="h-5 w-5" />
+              <span>Content Types</span>
+            </CardTitle>
+            <CardDescription>Post performance by content type</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={200}>
+              <PieChart>
+                <Pie
+                  data={postTypes}
+                  cx="50%"
+                  cy="50%"
+                  innerRadius={40}
+                  outerRadius={80}
+                  paddingAngle={5}
+                  dataKey="value"
+                >
+                  {postTypes.map((entry, index) => (
+                    <Cell key={`cell-${index}`} fill={entry.color} />
+                  ))}
+                </Pie>
+                <Tooltip />
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="mt-4 space-y-2">
+              {postTypes.map((item, index) => (
+                <div key={item.name} className="flex items-center justify-between text-sm">
+                  <div className="flex items-center space-x-2">
+                    <div 
+                      className="w-3 h-3 rounded-full"
+                      style={{ backgroundColor: item.color }}
+                    />
+                    <span>{item.name}</span>
+                  </div>
+                  <span className="font-medium">{item.engagement}% avg</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
       {/* Platform Overview */}
