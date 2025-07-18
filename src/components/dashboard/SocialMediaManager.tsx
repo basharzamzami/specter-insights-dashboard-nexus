@@ -128,16 +128,37 @@ export function SocialMediaManager() {
         engagement_metrics: {}
       };
 
-      const { error } = await supabase
-        .from('social_posts')
-        .insert([postData]);
+      // Use the social-scheduler edge function for scheduling
+      if (newPost.scheduled_at) {
+        const { data, error } = await supabase.functions.invoke('social-scheduler', {
+          body: {
+            platform: newPost.platform,
+            content: newPost.content,
+            scheduled_time: newPost.scheduled_at,
+            media_urls: postData.media_urls,
+            user_id: user.id
+          }
+        });
 
-      if (error) throw error;
+        if (error) throw error;
 
-      toast({
-        title: "Success",
-        description: "Social media post created successfully",
-      });
+        toast({
+          title: "Success",
+          description: `Post scheduled for ${new Date(newPost.scheduled_at).toLocaleString()}`,
+        });
+      } else {
+        // Save as draft in social_posts table
+        const { error } = await supabase
+          .from('social_posts')
+          .insert([postData]);
+
+        if (error) throw error;
+
+        toast({
+          title: "Success",
+          description: "Social media post saved as draft",
+        });
+      }
 
       setIsAddDialogOpen(false);
       setNewPost({

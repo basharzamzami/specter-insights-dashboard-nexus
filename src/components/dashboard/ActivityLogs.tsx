@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Activity, Clock, User, Target, Calendar } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ActivityLog {
   id: string;
@@ -60,12 +61,67 @@ export const ActivityLogs = () => {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Simulate loading
-    setTimeout(() => {
-      setLogs(mockActivityLogs);
-      setIsLoading(false);
-    }, 1000);
+    fetchActivityLogs();
+    
+    // Refresh activity logs every 15 seconds for real-time updates
+    const interval = setInterval(fetchActivityLogs, 15000);
+    return () => clearInterval(interval);
   }, []);
+
+  const fetchActivityLogs = async () => {
+    try {
+      setIsLoading(true);
+      
+      // Fetch from multiple sources
+      const [actionLogs, operationHistory] = await Promise.all([
+        supabase
+          .from('action_logs')
+          .select('*')
+          .order('timestamp', { ascending: false })
+          .limit(10),
+        supabase
+          .from('operation_history')
+          .select('*')
+          .order('created_at', { ascending: false })
+          .limit(10)
+      ]);
+
+      // Combine and format the logs
+      const combinedLogs: ActivityLog[] = [
+        // Convert action logs
+        ...(actionLogs.data || []).map(log => ({
+          id: log.id,
+          action: log.action_type,
+          details: log.details ? JSON.stringify(log.details) : 'System action performed',
+          timestamp: log.timestamp || new Date().toISOString(),
+          type: log.target_type as ActivityLog['type'] || 'system',
+          user: log.triggered_by || 'System'
+        })),
+        // Convert operation history
+        ...(operationHistory.data || []).map(op => ({
+          id: op.id,
+          action: op.operation_type,
+          details: op.description || 'Operation completed',
+          timestamp: op.created_at,
+          type: 'analysis' as const,
+          user: op.user_id || 'System'
+        }))
+      ];
+
+      // Sort by timestamp and merge with mock data for demo
+      const allLogs = [...combinedLogs, ...mockActivityLogs]
+        .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
+        .slice(0, 15);
+
+      setLogs(allLogs);
+    } catch (error) {
+      console.error('Error fetching activity logs:', error);
+      // Fallback to mock data
+      setLogs(mockActivityLogs);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const getActivityIcon = (type: ActivityLog['type']) => {
     switch (type) {

@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   Edit3, 
   Calendar, 
@@ -142,44 +143,93 @@ export const OperationsManager = () => {
     setIsDialogOpen(true);
   };
 
-  const handleSaveOperation = () => {
+  const handleSaveOperation = async () => {
     if (!selectedOperation) return;
 
-    const updatedOperations = operations.map(op => 
-      op.id === selectedOperation.id 
-        ? {
-            ...op,
+    try {
+      // Use the operational-mode edge function to save operation updates
+      const { data, error } = await supabase.functions.invoke('operational-mode', {
+        body: {
+          action: 'update_operation',
+          operation_id: selectedOperation.id,
+          operation_data: {
             title: editForm.title,
             description: editForm.description,
             content: editForm.content,
             platform: editForm.platform,
             priority: editForm.priority,
             assignee: editForm.assignee,
-            dueDate: editForm.dueDate
+            due_date: editForm.dueDate
           }
-        : op
-    );
+        }
+      });
 
-    setOperations(updatedOperations);
-    setIsDialogOpen(false);
-    setSelectedOperation(null);
-    
-    toast({
-      title: "Operation Updated",
-      description: "The operation has been successfully updated.",
-    });
+      if (error) throw error;
+
+      const updatedOperations = operations.map(op => 
+        op.id === selectedOperation.id 
+          ? {
+              ...op,
+              title: editForm.title,
+              description: editForm.description,
+              content: editForm.content,
+              platform: editForm.platform,
+              priority: editForm.priority,
+              assignee: editForm.assignee,
+              dueDate: editForm.dueDate
+            }
+          : op
+      );
+
+      setOperations(updatedOperations);
+      setIsDialogOpen(false);
+      setSelectedOperation(null);
+      
+      toast({
+        title: "Operation Updated",
+        description: "The operation has been successfully updated and logged.",
+      });
+    } catch (error) {
+      console.error('Error updating operation:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update operation. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleStatusChange = (operationId: string, newStatus: Operation['status']) => {
-    const updatedOperations = operations.map(op => 
-      op.id === operationId ? { ...op, status: newStatus } : op
-    );
-    setOperations(updatedOperations);
-    
-    toast({
-      title: "Status Updated",
-      description: `Operation status changed to ${newStatus.replace('_', ' ')}.`,
-    });
+  const handleStatusChange = async (operationId: string, newStatus: Operation['status']) => {
+    try {
+      // Use the operational-mode edge function to log status changes
+      const { data, error } = await supabase.functions.invoke('operational-mode', {
+        body: {
+          action: 'status_change',
+          operation_id: operationId,
+          new_status: newStatus,
+          operation_type: operations.find(op => op.id === operationId)?.type || 'edit'
+        }
+      });
+
+      if (error) throw error;
+
+      const updatedOperations = operations.map(op => 
+        op.id === operationId ? { ...op, status: newStatus } : op
+      );
+      setOperations(updatedOperations);
+      
+      toast({
+        title: "Status Updated",
+        description: `Operation status changed to ${newStatus.replace('_', ' ')}.`,
+      });
+    } catch (error) {
+      console.error('Error updating status:', error);
+      toast({
+        title: "Error", 
+        description: "Failed to update operation status.",
+        variant: "destructive",
+      });
+    }
   };
 
   const getStatusOptions = (currentStatus: string) => {

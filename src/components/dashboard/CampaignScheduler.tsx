@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Calendar, Plus, Play, Pause, Edit, Eye } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -7,6 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { CampaignForm } from "./CampaignForm";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { populateWithDemoData } from "@/utils/demoData";
 
 interface Campaign {
   id: string;
@@ -49,12 +51,60 @@ const mockCampaigns: Campaign[] = [
 ];
 
 export const CampaignScheduler = () => {
-  const [campaigns, setCampaigns] = useState<Campaign[]>(mockCampaigns);
+  const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    fetchCampaigns();
+  }, []);
+
+  const fetchCampaigns = async () => {
+    try {
+      const fetchRealCampaigns = async () => {
+        const { data, error } = await supabase
+          .from('campaigns')
+          .select(`
+            id,
+            target_company,
+            type,
+            objective,
+            status,
+            scheduled_date,
+            created_at,
+            actions
+          `)
+          .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        // Transform database campaigns to component format
+        return data.map(campaign => ({
+          id: campaign.id,
+          name: `${campaign.type} - ${campaign.target_company}`,
+          description: campaign.objective || 'Strategic campaign',
+          startDate: campaign.scheduled_date || campaign.created_at,
+          endDate: campaign.scheduled_date ? 
+            new Date(new Date(campaign.scheduled_date).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString() : 
+            new Date(new Date(campaign.created_at).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+          status: campaign.status as Campaign['status'],
+          posts: Array.isArray(campaign.actions) ? campaign.actions.length : 0
+        }));
+      };
+
+      const campaignsData = await populateWithDemoData(fetchRealCampaigns, mockCampaigns, 3);
+      setCampaigns(campaignsData as Campaign[]);
+    } catch (error) {
+      console.error('Error fetching campaigns:', error);
+      setCampaigns(mockCampaigns);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusColor = (status: Campaign['status']) => {
     switch (status) {
@@ -76,14 +126,48 @@ export const CampaignScheduler = () => {
     }
   };
 
-  const handleCreateCampaign = (campaignData: any) => {
-    const newCampaign: Campaign = {
-      id: Date.now().toString(),
-      ...campaignData,
-      posts: 0
-    };
-    setCampaigns(prev => [newCampaign, ...prev]);
-    setIsDialogOpen(false);
+  const handleCreateCampaign = async (campaignData: any) => {
+    try {
+      const { data, error } = await supabase
+        .from('campaigns')
+        .insert([{
+          target_company: campaignData.name || 'Target Company',
+          type: 'marketing',
+          objective: campaignData.description,
+          status: campaignData.status || 'draft',
+          scheduled_date: campaignData.startDate,
+          actions: []
+        }])
+        .select()
+        .single();
+
+      if (error) throw error;
+
+      const newCampaign: Campaign = {
+        id: data.id,
+        name: campaignData.name,
+        description: campaignData.description,
+        startDate: campaignData.startDate,
+        endDate: campaignData.endDate,
+        status: campaignData.status || 'draft',
+        posts: 0
+      };
+
+      setCampaigns(prev => [newCampaign, ...prev]);
+      setIsDialogOpen(false);
+      
+      toast({
+        title: "Campaign Created",
+        description: "New campaign has been successfully created.",
+      });
+    } catch (error) {
+      console.error('Error creating campaign:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create campaign. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleEditCampaign = (campaign: Campaign) => {
@@ -128,8 +212,33 @@ export const CampaignScheduler = () => {
       </div>
 
       {/* Campaign Grid */}
-      <div className="grid gap-4">
-        {campaigns.map((campaign, index) => (
+      {loading ? (
+        <div className="grid gap-4">
+          {[1, 2, 3].map((i) => (
+            <Card key={i} className="animate-pulse">
+              <CardHeader>
+                <div className="flex justify-between items-center">
+                  <div className="space-y-2">
+                    <div className="h-4 bg-muted rounded w-48"></div>
+                    <div className="h-3 bg-muted rounded w-64"></div>
+                  </div>
+                  <div className="h-5 bg-muted rounded w-16"></div>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="h-3 bg-muted rounded"></div>
+                  <div className="h-3 bg-muted rounded"></div>
+                  <div className="h-3 bg-muted rounded"></div>
+                  <div className="h-3 bg-muted rounded"></div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      ) : (
+        <div className="grid gap-4">
+          {campaigns.map((campaign, index) => (
           <Card 
             key={campaign.id}
             className={`card-hover slide-in animate-delay-${(index % 4) * 100}`}
@@ -199,8 +308,9 @@ export const CampaignScheduler = () => {
               </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Edit Campaign Dialog */}
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>

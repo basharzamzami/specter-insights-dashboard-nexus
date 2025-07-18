@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 interface Notification {
   id: string;
@@ -92,16 +93,53 @@ export const NotificationCenter = () => {
   const [filter, setFilter] = useState<"all" | "unread" | "actionable">("all");
 
   useEffect(() => {
-    // Simulate real-time notifications
+    fetchIntelligenceAlerts();
+    
+    // Check for new intelligence alerts every 30 seconds
     const interval = setInterval(() => {
-      const chance = Math.random();
-      if (chance < 0.15) { // 15% chance every 45 seconds
-        addRandomNotification();
-      }
-    }, 45000);
+      fetchIntelligenceAlerts();
+    }, 30000);
 
     return () => clearInterval(interval);
   }, []);
+
+  const fetchIntelligenceAlerts = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('intelligence_feeds')
+        .select('*')
+        .eq('is_trending', true)
+        .order('created_at', { ascending: false })
+        .limit(10);
+
+      if (error) throw error;
+
+      // Convert intelligence feeds to notifications format
+      const intelligenceNotifications: Notification[] = data.map(feed => ({
+        id: feed.id,
+        type: feed.impact === 'critical' ? 'critical' : 
+              feed.impact === 'high' ? 'opportunity' : 'info',
+        title: feed.title,
+        message: feed.description || 'Intelligence update detected',
+        timestamp: new Date(feed.created_at),
+        actionable: feed.tracking_enabled || false,
+        competitor: feed.competitor || undefined,
+        read: false,
+        source: 'ai' as const,
+        priority: feed.priority as 'high' | 'medium' | 'low',
+        data: feed.data
+      }));
+
+      // Merge with existing mock notifications, avoiding duplicates
+      setNotifications(prev => {
+        const existingIds = prev.map(n => n.id);
+        const newNotifications = intelligenceNotifications.filter(n => !existingIds.includes(n.id));
+        return [...newNotifications, ...prev].slice(0, 25); // Keep only 25 most recent
+      });
+    } catch (error) {
+      console.error('Error fetching intelligence alerts:', error);
+    }
+  };
 
   const addRandomNotification = () => {
     const types: Array<Notification["type"]> = ["critical", "warning", "info", "success", "opportunity"];

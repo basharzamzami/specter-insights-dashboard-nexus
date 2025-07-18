@@ -1,9 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { TrendingUp, TrendingDown, Target, Users, DollarSign, Eye } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 import { 
   LineChart, 
   Line, 
@@ -46,6 +48,45 @@ const competitorShare = [
 
 export const PerformanceOps = () => {
   const [activeTab, setActiveTab] = useState("traffic");
+  const [realKeywordData, setRealKeywordData] = useState(keywordData);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
+
+  useEffect(() => {
+    fetchPerformanceData();
+  }, []);
+
+  const fetchPerformanceData = async () => {
+    try {
+      setLoading(true);
+      
+      // Fetch real SEO keyword data
+      const { data: seoData, error } = await supabase
+        .from('seo_keywords')
+        .select('*')
+        .order('rank')
+        .limit(10);
+
+      if (error) throw error;
+
+      if (seoData && seoData.length > 0) {
+        const formattedKeywords = seoData.map(item => ({
+          keyword: item.keyword,
+          rank: item.rank || 0,
+          change: item.rank_change ? 
+            (item.rank_change > 0 ? `+${item.rank_change}` : item.rank_change.toString()) : 
+            "0",
+          traffic: item.traffic_estimate || 0
+        }));
+        
+        setRealKeywordData([...formattedKeywords, ...keywordData].slice(0, 5));
+      }
+    } catch (error) {
+      console.error('Error fetching performance data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const handleExportReport = () => {
     // Create comprehensive report data
@@ -264,7 +305,7 @@ export const PerformanceOps = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {keywordData.map((item, index) => (
+                {realKeywordData.map((item, index) => (
                   <div 
                     key={item.keyword}
                     className={`flex items-center justify-between p-4 bg-muted/30 rounded-lg slide-in animate-delay-${index * 100}`}
