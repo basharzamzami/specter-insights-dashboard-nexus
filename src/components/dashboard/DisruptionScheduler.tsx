@@ -134,6 +134,10 @@ export const DisruptionScheduler = () => {
     });
   };
 
+  const handleResumeOperation = (id: string) => {
+    handleStatusChange(id, "active");
+  };
+
   const handleDeleteOperation = (id: string) => {
     setOperations(prev => prev.filter(op => op.id !== id));
     toast({
@@ -143,7 +147,7 @@ export const DisruptionScheduler = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 mb-8">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-3">
@@ -307,38 +311,49 @@ export const DisruptionScheduler = () => {
                     </div>
                   </div>
                   
-                  <div className="flex items-center gap-2">
-                    {operation.status === "scheduled" && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleStatusChange(operation.id, "active")}
-                      >
-                        <Play className="h-3 w-3 mr-1" />
-                        Start
-                      </Button>
-                    )}
-                    
-                    {operation.status === "active" && (
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleStatusChange(operation.id, "paused")}
-                      >
-                        <Pause className="h-3 w-3 mr-1" />
-                        Pause
-                      </Button>
-                    )}
-                    
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      onClick={() => handleDeleteOperation(operation.id)}
-                      className="text-destructive hover:text-destructive"
-                    >
-                      <Trash2 className="h-3 w-3" />
-                    </Button>
-                  </div>
+                   <div className="flex items-center gap-2">
+                     {operation.status === "scheduled" && (
+                       <Button
+                         size="sm"
+                         variant="outline"
+                         onClick={() => handleStatusChange(operation.id, "active")}
+                       >
+                         <Play className="h-3 w-3 mr-1" />
+                         Start
+                       </Button>
+                     )}
+                     
+                     {operation.status === "active" && (
+                       <Button
+                         size="sm"
+                         variant="outline"
+                         onClick={() => handleStatusChange(operation.id, "paused")}
+                       >
+                         <Pause className="h-3 w-3 mr-1" />
+                         Pause
+                       </Button>
+                     )}
+
+                     {operation.status === "paused" && (
+                       <Button
+                         size="sm"
+                         variant="outline"
+                         onClick={() => handleResumeOperation(operation.id)}
+                       >
+                         <Play className="h-3 w-3 mr-1" />
+                         Resume
+                       </Button>
+                     )}
+                     
+                     <Button
+                       size="sm"
+                       variant="outline"
+                       onClick={() => handleDeleteOperation(operation.id)}
+                       className="text-destructive hover:text-destructive"
+                     >
+                       <Trash2 className="h-3 w-3" />
+                     </Button>
+                   </div>
                 </div>
               </div>
             </CardContent>

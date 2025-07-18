@@ -198,6 +198,30 @@ export function EmailMarketing() {
     return campaign.opened_count > 0 ? Math.round((campaign.clicked_count / campaign.opened_count) * 100) : 0;
   };
 
+  const handleViewCampaignDetails = (campaign: EmailCampaign) => {
+    toast({
+      title: "Campaign Details",
+      description: `Viewing details for "${campaign.name}". Campaign status: ${campaign.status}`,
+    });
+    // Here you could navigate to a detailed campaign page or open a modal
+    // navigate(`/campaigns/${campaign.id}`);
+  };
+
+  const handleUseTemplate = (template: EmailTemplate) => {
+    setNewCampaign({
+      name: `Campaign from ${template.name}`,
+      subject: template.subject,
+      content: template.content,
+      template_id: template.id,
+      scheduled_at: ''
+    });
+    setIsCampaignDialogOpen(true);
+    toast({
+      title: "Template Loaded",
+      description: `Template "${template.name}" has been loaded into campaign creator.`,
+    });
+  };
+
   const campaignStats = [
     {
       title: "Total Campaigns",
@@ -493,7 +517,11 @@ export function EmailMarketing() {
                             Send
                           </Button>
                         )}
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleViewCampaignDetails(campaign)}
+                        >
                           View Details
                         </Button>
                       </div>
@@ -544,7 +572,11 @@ export function EmailMarketing() {
                           <span className="text-xs text-muted-foreground">
                             {new Date(template.created_at).toLocaleDateString()}
                           </span>
-                          <Button variant="outline" size="sm">
+                          <Button 
+                            variant="outline" 
+                            size="sm"
+                            onClick={() => handleUseTemplate(template)}
+                          >
                             Use Template
                           </Button>
                         </div>

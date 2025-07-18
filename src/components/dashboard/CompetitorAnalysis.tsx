@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { AlertTriangle, TrendingUp, TrendingDown, Target, Zap, DollarSign, Search, Brain, Eye, Shield, Crosshair, MessageSquare, ExternalLink, Calendar, Users, Briefcase, Loader2, Minus } from "lucide-react";
+import { AlertTriangle, TrendingUp, TrendingDown, Target, Zap, DollarSign, Search, Brain, Eye, Shield, Crosshair, MessageSquare, ExternalLink, Calendar, Users, Briefcase, Loader2, Minus, Trash2 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -361,6 +361,22 @@ export const CompetitorAnalysis = () => {
     }
   };
 
+  const handleDeleteCompetitor = async (competitorId: string) => {
+    try {
+      // Remove from competitors list
+      setCompetitors(prev => prev.filter(comp => comp.id !== competitorId));
+      
+      toast.success("Competitor Removed", {
+        description: "Competitor analysis has been deleted."
+      });
+    } catch (error) {
+      console.error('Error deleting competitor:', error);
+      toast.error("Error", {
+        description: "Failed to delete competitor analysis."
+      });
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
@@ -431,9 +447,22 @@ export const CompetitorAnalysis = () => {
                     {competitor.vulnerabilities.length} vulnerabilities
                   </Badge>
                 </div>
-                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
-                  <ExternalLink className="h-4 w-4" />
-                  <span>{competitor.website}</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                    <ExternalLink className="h-4 w-4" />
+                    <span>{competitor.website}</span>
+                  </div>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteCompetitor(competitor.id);
+                    }}
+                    className="text-destructive hover:text-destructive"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                  </Button>
                 </div>
               </div>
             </CardHeader>

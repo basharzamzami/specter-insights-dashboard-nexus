@@ -201,22 +201,25 @@ export const OperationsManager = () => {
 
   const handleStatusChange = async (operationId: string, newStatus: Operation['status']) => {
     try {
-      // Use the operational-mode edge function to log status changes
-      const { data, error } = await supabase.functions.invoke('operational-mode', {
-        body: {
-          action: 'status_change',
-          operation_id: operationId,
-          new_status: newStatus,
-          operation_type: operations.find(op => op.id === operationId)?.type || 'edit'
-        }
-      });
-
-      if (error) throw error;
-
+      // Update status locally first for immediate UI feedback
       const updatedOperations = operations.map(op => 
         op.id === operationId ? { ...op, status: newStatus } : op
       );
       setOperations(updatedOperations);
+      
+      // Try to log to edge function, but don't fail if it's down
+      try {
+        await supabase.functions.invoke('operational-mode', {
+          body: {
+            action: 'status_change',
+            operation_id: operationId,
+            new_status: newStatus,
+            operation_type: operations.find(op => op.id === operationId)?.type || 'edit'
+          }
+        });
+      } catch (edgeError) {
+        console.warn('Edge function unavailable, continuing locally:', edgeError);
+      }
       
       toast({
         title: "Status Updated",

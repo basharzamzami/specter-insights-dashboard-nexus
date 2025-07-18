@@ -288,6 +288,20 @@ export function SocialMediaManager() {
     return posts.filter(post => post.platform === platform);
   };
 
+  const handleSchedulePosts = (post: SocialPost) => {
+    setNewPost({
+      platform: post.platform,
+      content: post.content,
+      scheduled_at: '',
+      media_urls: post.media_urls ? post.media_urls.join(', ') : ''
+    });
+    setIsAddDialogOpen(true);
+    toast({
+      title: "Schedule Posts",
+      description: "Post content loaded for scheduling on multiple platforms.",
+    });
+  };
+
   const stats = [
     {
       title: "Total Posts",

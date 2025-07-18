@@ -97,6 +97,11 @@ export default function MonitoringDashboard() {
           variant: "destructive"
         });
       }
+
+      toast({
+        title: "Data Refreshed",
+        description: "Monitoring dashboard updated with latest data.",
+      });
     } catch (error) {
       console.error('Error loading monitoring data:', error);
       toast({
@@ -106,6 +111,34 @@ export default function MonitoringDashboard() {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleMarkAsResolved = async (alertId: string) => {
+    if (!monitoringData) return;
+    
+    try {
+      // Update the alert status locally
+      const updatedAlerts = monitoringData.alerts.map(alert =>
+        alert.id === alertId ? { ...alert, resolved: true } : alert
+      );
+      
+      setMonitoringData({
+        ...monitoringData,
+        alerts: updatedAlerts
+      });
+
+      toast({
+        title: "Alert Resolved",
+        description: "Alert has been marked as resolved.",
+      });
+    } catch (error) {
+      console.error('Error resolving alert:', error);
+      toast({
+        title: "Error",
+        description: "Failed to resolve alert.",
+        variant: "destructive"
+      });
     }
   };
 
@@ -558,7 +591,11 @@ export default function MonitoringDashboard() {
                       </div>
                       <p className="text-sm">{alert.message}</p>
                       {!alert.resolved && (
-                        <Button size="sm" variant="outline">
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => handleMarkAsResolved(alert.id)}
+                        >
                           Mark as Resolved
                         </Button>
                       )}
