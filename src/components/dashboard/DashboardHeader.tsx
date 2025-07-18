@@ -48,7 +48,10 @@ export const DashboardHeader = ({ user, onAIToggle, isAIOpen, onNotificationsCli
             <span className="absolute -top-1 -right-1 h-3 w-3 bg-destructive rounded-full animate-pulse"></span>
           </Button>
           
-          <Button variant="ghost" size="sm">
+          <Button variant="ghost" size="sm" onClick={() => {
+            // Navigate to settings or open settings dialog
+            console.log("Settings clicked");
+          }}>
             <Settings className="h-5 w-5" />
           </Button>
           

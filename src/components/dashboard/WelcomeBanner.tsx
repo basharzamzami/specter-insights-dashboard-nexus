@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { Crown, ChevronDown, Target, Zap, TrendingUp, TrendingDown, Users, Eye, BarChart3, Activity, Gauge } from "lucide-react";
+import { Crown, ChevronDown, Target, Zap, TrendingUp, TrendingDown, Users, Eye, BarChart3, Activity, Gauge, FileText } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -56,6 +57,7 @@ const marketShareData = [
 export const WelcomeBanner = ({ user }: WelcomeBannerProps) => {
   const [selectedClient, setSelectedClient] = useState("Specter Net");
   const [activeTab, setActiveTab] = useState("overview");
+  const { toast } = useToast();
   
   const clients = [
     { name: "Specter Net", status: "active" },
@@ -144,6 +146,11 @@ export const WelcomeBanner = ({ user }: WelcomeBannerProps) => {
                   document.body.appendChild(link);
                   link.click();
                   document.body.removeChild(link);
+                  
+                  toast({
+                    title: "Report Exported",
+                    description: "Executive summary report downloaded successfully.",
+                  });
                 }}
               >
                 <Eye className="h-4 w-4 mr-2" />
