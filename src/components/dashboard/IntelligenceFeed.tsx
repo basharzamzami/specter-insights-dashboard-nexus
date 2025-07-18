@@ -164,76 +164,32 @@ export const IntelligenceFeed = () => {
   };
 
   const handleAnalyzeImpact = async (item: IntelligenceItem) => {
-    try {
-      const { data: response, error } = await supabase.functions.invoke('intelligence-feed', {
-        body: { 
-          action: 'create_counter_strategy',
-          feedData: item
-        }
-      });
-
-      if (error) throw error;
-      
-      toast.success("Impact analysis complete", {
-        description: `Analysis generated for ${item.title}. Strategic recommendations available.`
-      });
-    } catch (error) {
-      console.error('Analysis error:', error);
-      toast.error("Analysis failed", {
-        description: "Unable to complete impact analysis."
-      });
-    }
+    // Navigate to impact analysis page
+    const params = new URLSearchParams({
+      title: item.title,
+      competitor: item.competitor,
+      type: item.type
+    });
+    window.location.href = `/impact-analysis?${params.toString()}`;
   };
 
   const handleCreateCounterStrategy = async (item: IntelligenceItem) => {
-    try {
-      const { data: response, error } = await supabase.functions.invoke('intelligence-feed', {
-        body: { 
-          action: 'create_counter_strategy',
-          feedData: item
-        }
-      });
-
-      if (error) throw error;
-      if (!response.success) throw new Error(response.error);
-
-      const strategy = response.data;
-      
-      toast.success("Counter-strategy created", {
-        description: `${strategy.title} ready for execution. Timeline: ${strategy.timeline}`
-      });
-    } catch (error) {
-      console.error('Strategy creation error:', error);
-      toast.error("Strategy creation failed", {
-        description: "Unable to create counter-strategy."
-      });
-    }
+    // Navigate to strategy builder page
+    const params = new URLSearchParams({
+      title: item.title,
+      competitor: item.competitor,
+      type: item.type
+    });
+    window.location.href = `/strategy?${params.toString()}`;
   };
 
   const handleExecuteResponse = async (item: IntelligenceItem) => {
-    try {
-      const { data: response, error } = await supabase.functions.invoke('intelligence-feed', {
-        body: { 
-          action: 'execute_response',
-          feedData: item,
-          strategy: { title: `Response to ${item.competitor}` }
-        }
-      });
-
-      if (error) throw error;
-      if (!response.success) throw new Error(response.error);
-
-      const execution = response.data;
-      
-      toast.success("Response executed", {
-        description: `${execution.message}. Status: ${execution.status}`
-      });
-    } catch (error) {
-      console.error('Response execution error:', error);
-      toast.error("Response execution failed", {
-        description: "Unable to execute response."
-      });
-    }
+    // Navigate to execution center page
+    const params = new URLSearchParams({
+      strategy_id: Math.random().toString(36).substr(2, 9),
+      title: `Emergency Response: ${item.title}`
+    });
+    window.location.href = `/execution?${params.toString()}`;
   };
 
   const handleEnableTracking = async (item: IntelligenceItem) => {
@@ -457,7 +413,13 @@ export const IntelligenceFeed = () => {
                   <Button 
                     size="sm" 
                     variant="outline"
-                    onClick={() => toast.success("Monitoring enabled", { description: "Situation monitoring activated" })}
+                    onClick={() => {
+                      const params = new URLSearchParams({
+                        execution_id: Math.random().toString(36).substr(2, 9),
+                        title: `Monitoring: ${item.title}`
+                      });
+                      window.location.href = `/monitoring?${params.toString()}`;
+                    }}
                   >
                     Monitor Situation
                   </Button>
