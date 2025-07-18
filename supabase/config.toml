@@ -2,3 +2,15 @@ project_id = "gifzytiilztglnvescqg"
 
 [functions.ask-specter]
 verify_jwt = false
+
+[functions.seo-analysis]
+verify_jwt = false
+
+[functions.intelligence-feed]
+verify_jwt = false
+
+[functions.social-scheduler]
+verify_jwt = false
+
+[functions.operational-mode]
+verify_jwt = false

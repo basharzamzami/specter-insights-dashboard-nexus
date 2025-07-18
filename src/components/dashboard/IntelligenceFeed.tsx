@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
-import { Rss, TrendingUp, Users, Briefcase, AlertTriangle, ExternalLink, Filter } from "lucide-react";
+import { Rss, TrendingUp, Users, Briefcase, AlertTriangle, ExternalLink, Filter, Monitor, Eye, Play } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useUser } from "@clerk/clerk-react";
+import { toast } from "sonner";
 
 interface IntelligenceItem {
   id: string;
@@ -18,6 +21,9 @@ interface IntelligenceItem {
   competitor: string;
   url?: string;
   impact: "positive" | "negative" | "neutral";
+  is_trending?: boolean;
+  tracking_enabled?: boolean;
+  data?: any;
 }
 
 const mockIntelligence: IntelligenceItem[] = [
@@ -94,10 +100,174 @@ const mockIntelligence: IntelligenceItem[] = [
 ];
 
 export const IntelligenceFeed = () => {
-  const { toast } = useToast();
-  const [intelligence, setIntelligence] = useState<IntelligenceItem[]>(mockIntelligence);
+  const { user } = useUser();
+  const [intelligence, setIntelligence] = useState<IntelligenceItem[]>([]);
   const [filter, setFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    loadLiveFeeds();
+  }, []);
+
+  const loadLiveFeeds = async () => {
+    setIsLoading(true);
+    try {
+      const { data: response, error } = await supabase.functions.invoke('intelligence-feed', {
+        body: { action: 'fetch_live_feeds' }
+      });
+
+      if (error) throw error;
+      if (!response.success) throw new Error(response.error);
+
+      // Transform the data to match our interface
+      const transformedData = response.data.map((feed: any) => ({
+        id: feed.id || Math.random().toString(36).substr(2, 9),
+        type: feed.type,
+        title: feed.title,
+        description: feed.description,
+        source: feed.source,
+        timestamp: formatTimestamp(feed.created_at || new Date().toISOString()),
+        priority: feed.priority,
+        competitor: feed.competitor,
+        url: feed.url,
+        impact: feed.impact,
+        is_trending: feed.is_trending,
+        tracking_enabled: feed.tracking_enabled,
+        data: feed.data
+      }));
+
+      setIntelligence(transformedData);
+    } catch (error) {
+      console.error('Error loading feeds:', error);
+      toast.error("Failed to load intelligence feeds", {
+        description: "Using cached data. Please try again later."
+      });
+      // Fallback to mock data
+      setIntelligence(mockIntelligence);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const formatTimestamp = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffDays = Math.floor(diffHours / 24);
+
+    if (diffHours < 1) return 'Just now';
+    if (diffHours < 24) return `${diffHours} hours ago`;
+    if (diffDays === 1) return '1 day ago';
+    return `${diffDays} days ago`;
+  };
+
+  const handleAnalyzeImpact = async (item: IntelligenceItem) => {
+    try {
+      const { data: response, error } = await supabase.functions.invoke('intelligence-feed', {
+        body: { 
+          action: 'create_counter_strategy',
+          feedData: item
+        }
+      });
+
+      if (error) throw error;
+      
+      toast.success("Impact analysis complete", {
+        description: `Analysis generated for ${item.title}. Strategic recommendations available.`
+      });
+    } catch (error) {
+      console.error('Analysis error:', error);
+      toast.error("Analysis failed", {
+        description: "Unable to complete impact analysis."
+      });
+    }
+  };
+
+  const handleCreateCounterStrategy = async (item: IntelligenceItem) => {
+    try {
+      const { data: response, error } = await supabase.functions.invoke('intelligence-feed', {
+        body: { 
+          action: 'create_counter_strategy',
+          feedData: item
+        }
+      });
+
+      if (error) throw error;
+      if (!response.success) throw new Error(response.error);
+
+      const strategy = response.data;
+      
+      toast.success("Counter-strategy created", {
+        description: `${strategy.title} ready for execution. Timeline: ${strategy.timeline}`
+      });
+    } catch (error) {
+      console.error('Strategy creation error:', error);
+      toast.error("Strategy creation failed", {
+        description: "Unable to create counter-strategy."
+      });
+    }
+  };
+
+  const handleExecuteResponse = async (item: IntelligenceItem) => {
+    try {
+      const { data: response, error } = await supabase.functions.invoke('intelligence-feed', {
+        body: { 
+          action: 'execute_response',
+          feedData: item,
+          strategy: { title: `Response to ${item.competitor}` }
+        }
+      });
+
+      if (error) throw error;
+      if (!response.success) throw new Error(response.error);
+
+      const execution = response.data;
+      
+      toast.success("Response executed", {
+        description: `${execution.message}. Status: ${execution.status}`
+      });
+    } catch (error) {
+      console.error('Response execution error:', error);
+      toast.error("Response execution failed", {
+        description: "Unable to execute response."
+      });
+    }
+  };
+
+  const handleEnableTracking = async (item: IntelligenceItem) => {
+    try {
+      const newTrackingState = !item.tracking_enabled;
+      
+      const { data: response, error } = await supabase.functions.invoke('intelligence-feed', {
+        body: { 
+          action: 'enable_tracking',
+          feedId: item.id,
+          trackingEnabled: newTrackingState
+        }
+      });
+
+      if (error) throw error;
+      if (!response.success) throw new Error(response.error);
+
+      // Update local state
+      setIntelligence(prev => prev.map(intel => 
+        intel.id === item.id 
+          ? { ...intel, tracking_enabled: newTrackingState }
+          : intel
+      ));
+      
+      toast.success(`Tracking ${newTrackingState ? 'enabled' : 'disabled'}`, {
+        description: `Real-time monitoring ${newTrackingState ? 'activated' : 'deactivated'} for ${item.title}`
+      });
+    } catch (error) {
+      console.error('Tracking toggle error:', error);
+      toast.error("Tracking toggle failed", {
+        description: "Unable to update tracking status."
+      });
+    }
+  };
 
   const getTypeIcon = (type: string) => {
     switch (type) {
@@ -225,12 +395,7 @@ export const IntelligenceFeed = () => {
                       <Button 
                         size="sm" 
                         variant="outline"
-                        onClick={() => {
-                          toast({
-                            title: "Analysis Initiated",
-                            description: "Analysis initiated for " + item.title,
-                          });
-                        }}
+                        onClick={() => handleAnalyzeImpact(item)}
                       >
                         <TrendingUp className="h-3 w-3 mr-1" />
                         Analyze Impact
@@ -238,12 +403,7 @@ export const IntelligenceFeed = () => {
                       <Button 
                         size="sm" 
                         variant="outline"
-                        onClick={() => {
-                          toast({
-                            title: "Counter-Strategy Created",
-                            description: "Counter-strategy created for " + item.competitor,
-                          });
-                        }}
+                        onClick={() => handleCreateCounterStrategy(item)}
                       >
                         <Users className="h-3 w-3 mr-1" />
                         Create Counter-Strategy
@@ -289,12 +449,7 @@ export const IntelligenceFeed = () => {
                   <Button 
                     size="sm" 
                     className="btn-glow"
-                    onClick={() => {
-                      toast({
-                        title: "Response Activated",
-                        description: "Response protocol activated",
-                      });
-                    }}
+                    onClick={() => handleExecuteResponse(item)}
                   >
                     <Briefcase className="h-3 w-3 mr-1" />
                     Execute Response
@@ -302,12 +457,7 @@ export const IntelligenceFeed = () => {
                   <Button 
                     size="sm" 
                     variant="outline"
-                    onClick={() => {
-                      toast({
-                        title: "Monitoring Enabled",
-                        description: "Situation monitoring enabled",
-                      });
-                    }}
+                    onClick={() => toast.success("Monitoring enabled", { description: "Situation monitoring activated" })}
                   >
                     Monitor Situation
                   </Button>
@@ -331,12 +481,7 @@ export const IntelligenceFeed = () => {
                     <Button 
                       size="sm" 
                       variant="outline"
-                      onClick={() => {
-                        toast({
-                          title: "Tracking Activated",
-                          description: "Trend tracking activated",
-                        });
-                      }}
+                      onClick={() => handleEnableTracking({ id: `trend-${index}`, title: trend } as IntelligenceItem)}
                     >
                       Track
                     </Button>

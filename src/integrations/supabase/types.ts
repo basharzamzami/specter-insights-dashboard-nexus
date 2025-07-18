@@ -288,6 +288,51 @@ export type Database = {
         }
         Relationships: []
       }
+      competitor_tracking: {
+        Row: {
+          backlinks: number | null
+          company_name: string
+          created_at: string
+          created_by: string | null
+          domain: string
+          id: string
+          keywords: number | null
+          market_share: number | null
+          organic_traffic: number | null
+          paid_traffic: number | null
+          seo_score: number | null
+          updated_at: string
+        }
+        Insert: {
+          backlinks?: number | null
+          company_name: string
+          created_at?: string
+          created_by?: string | null
+          domain: string
+          id?: string
+          keywords?: number | null
+          market_share?: number | null
+          organic_traffic?: number | null
+          paid_traffic?: number | null
+          seo_score?: number | null
+          updated_at?: string
+        }
+        Update: {
+          backlinks?: number | null
+          company_name?: string
+          created_at?: string
+          created_by?: string | null
+          domain?: string
+          id?: string
+          keywords?: number | null
+          market_share?: number | null
+          organic_traffic?: number | null
+          paid_traffic?: number | null
+          seo_score?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       competitors: {
         Row: {
           client_id: string | null
@@ -657,6 +702,57 @@ export type Database = {
           },
         ]
       }
+      intelligence_feeds: {
+        Row: {
+          competitor: string | null
+          created_at: string
+          data: Json | null
+          description: string | null
+          id: string
+          impact: string
+          is_trending: boolean | null
+          priority: string
+          source: string
+          title: string
+          tracking_enabled: boolean | null
+          type: string
+          updated_at: string
+          url: string | null
+        }
+        Insert: {
+          competitor?: string | null
+          created_at?: string
+          data?: Json | null
+          description?: string | null
+          id?: string
+          impact: string
+          is_trending?: boolean | null
+          priority: string
+          source: string
+          title: string
+          tracking_enabled?: boolean | null
+          type: string
+          updated_at?: string
+          url?: string | null
+        }
+        Update: {
+          competitor?: string | null
+          created_at?: string
+          data?: Json | null
+          description?: string | null
+          id?: string
+          impact?: string
+          is_trending?: boolean | null
+          priority?: string
+          source?: string
+          title?: string
+          tracking_enabled?: boolean | null
+          type?: string
+          updated_at?: string
+          url?: string | null
+        }
+        Relationships: []
+      }
       landing_pages: {
         Row: {
           content: Json
@@ -732,6 +828,39 @@ export type Database = {
         }
         Relationships: []
       }
+      operation_history: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          metrics: Json | null
+          operation_type: string
+          result: string | null
+          target: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          metrics?: Json | null
+          operation_type: string
+          result?: string | null
+          target?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          metrics?: Json | null
+          operation_type?: string
+          result?: string | null
+          target?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       personas: {
         Row: {
           avatar_url: string | null
@@ -795,6 +924,48 @@ export type Database = {
         }
         Relationships: []
       }
+      scheduled_posts: {
+        Row: {
+          content: string
+          created_at: string
+          created_by: string | null
+          engagement_metrics: Json | null
+          id: string
+          media_urls: string[] | null
+          platform: string
+          post_id: string | null
+          scheduled_time: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          created_by?: string | null
+          engagement_metrics?: Json | null
+          id?: string
+          media_urls?: string[] | null
+          platform: string
+          post_id?: string | null
+          scheduled_time: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          engagement_metrics?: Json | null
+          id?: string
+          media_urls?: string[] | null
+          platform?: string
+          post_id?: string | null
+          scheduled_time?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sentiment_analysis: {
         Row: {
           analyzed_at: string | null
@@ -826,6 +997,48 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      seo_keywords: {
+        Row: {
+          created_at: string
+          difficulty: number | null
+          domain: string
+          id: string
+          keyword: string
+          previous_rank: number | null
+          rank: number | null
+          rank_change: number | null
+          search_volume: number | null
+          traffic_estimate: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          difficulty?: number | null
+          domain: string
+          id?: string
+          keyword: string
+          previous_rank?: number | null
+          rank?: number | null
+          rank_change?: number | null
+          search_volume?: number | null
+          traffic_estimate?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          difficulty?: number | null
+          domain?: string
+          id?: string
+          keyword?: string
+          previous_rank?: number | null
+          rank?: number | null
+          rank_change?: number | null
+          search_volume?: number | null
+          traffic_estimate?: number | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       social_posts: {
         Row: {
