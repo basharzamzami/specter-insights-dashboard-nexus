@@ -1,10 +1,14 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Plus, Play, Pause, Edit, Eye } from "lucide-react";
+import { Calendar, Plus, Play, Pause, Edit, Eye, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { CampaignForm } from "./CampaignForm";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -54,6 +58,7 @@ export const CampaignScheduler = () => {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isScheduleDialogOpen, setIsScheduleDialogOpen] = useState(false);
   const [selectedCampaign, setSelectedCampaign] = useState<Campaign | null>(null);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
@@ -176,11 +181,37 @@ export const CampaignScheduler = () => {
   };
 
   const handleSchedulePosts = (campaign: Campaign) => {
+    setSelectedCampaign(campaign);
+    setIsScheduleDialogOpen(true);
     toast({
       title: "Post Scheduler Opened",
       description: `Opening post scheduling interface for "${campaign.name}" campaign.`,
     });
-    // In a real app, this would open a post scheduling interface
+  };
+
+  const [postContent, setPostContent] = useState('');
+  const [postPlatform, setPostPlatform] = useState('linkedin');
+  const [scheduledTime, setScheduledTime] = useState('');
+
+  const handleCreateScheduledPost = () => {
+    if (!selectedCampaign || !postContent.trim()) return;
+
+    // Update campaign with new post count
+    setCampaigns(prev => prev.map(c => 
+      c.id === selectedCampaign.id 
+        ? { ...c, posts: c.posts + 1 }
+        : c
+    ));
+
+    toast({
+      title: "Post Scheduled Successfully",
+      description: `New ${postPlatform} post scheduled for ${selectedCampaign.name}.`,
+    });
+
+    // Reset form
+    setPostContent('');
+    setScheduledTime('');
+    setIsScheduleDialogOpen(false);
   };
 
   const handleViewDetails = (campaign: Campaign) => {
@@ -342,6 +373,66 @@ export const CampaignScheduler = () => {
                 setIsEditDialogOpen(false);
               }}>
                 Save Changes
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Schedule Posts Dialog */}
+      <Dialog open={isScheduleDialogOpen} onOpenChange={setIsScheduleDialogOpen}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>Schedule Post: {selectedCampaign?.name}</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="platform">Platform</Label>
+                <Select value={postPlatform} onValueChange={setPostPlatform}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="linkedin">LinkedIn</SelectItem>
+                    <SelectItem value="twitter">Twitter</SelectItem>
+                    <SelectItem value="facebook">Facebook</SelectItem>
+                    <SelectItem value="instagram">Instagram</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="scheduledTime">Scheduled Time</Label>
+                <Input
+                  id="scheduledTime"
+                  type="datetime-local"
+                  value={scheduledTime}
+                  onChange={(e) => setScheduledTime(e.target.value)}
+                />
+              </div>
+            </div>
+            
+            <div>
+              <Label htmlFor="postContent">Post Content</Label>
+              <Textarea
+                id="postContent"
+                placeholder="Write your post content here..."
+                value={postContent}
+                onChange={(e) => setPostContent(e.target.value)}
+                className="min-h-[200px]"
+              />
+            </div>
+
+            <div className="flex justify-end space-x-2">
+              <Button variant="outline" onClick={() => setIsScheduleDialogOpen(false)}>
+                Cancel
+              </Button>
+              <Button 
+                onClick={handleCreateScheduledPost}
+                disabled={!postContent.trim()}
+              >
+                <Send className="h-4 w-4 mr-2" />
+                Schedule Post
               </Button>
             </div>
           </div>

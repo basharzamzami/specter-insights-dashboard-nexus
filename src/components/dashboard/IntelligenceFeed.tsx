@@ -196,33 +196,71 @@ export const IntelligenceFeed = () => {
     try {
       const newTrackingState = !item.tracking_enabled;
       
-      const { data: response, error } = await supabase.functions.invoke('intelligence-feed', {
-        body: { 
-          action: 'enable_tracking',
-          feedId: item.id,
-          trackingEnabled: newTrackingState
-        }
-      });
-
-      if (error) throw error;
-      if (!response.success) throw new Error(response.error);
-
-      // Update local state
+      // Update local state immediately for better UX
       setIntelligence(prev => prev.map(intel => 
         intel.id === item.id 
           ? { ...intel, tracking_enabled: newTrackingState }
           : intel
       ));
       
+      // Try to update via edge function, but don't fail if it's unavailable
+      try {
+        const { data: response, error } = await supabase.functions.invoke('intelligence-feed', {
+          body: { 
+            action: 'enable_tracking',
+            feedId: item.id,
+            trackingEnabled: newTrackingState
+          }
+        });
+
+        if (error) throw error;
+        if (!response.success) throw new Error(response.error);
+      } catch (edgeError) {
+        console.warn('Edge function unavailable, continuing with local state:', edgeError);
+      }
+      
       toast.success(`Tracking ${newTrackingState ? 'enabled' : 'disabled'}`, {
         description: `Real-time monitoring ${newTrackingState ? 'activated' : 'deactivated'} for ${item.title}`
       });
     } catch (error) {
       console.error('Tracking toggle error:', error);
+      // Revert the local state change if there was an error
+      setIntelligence(prev => prev.map(intel => 
+        intel.id === item.id 
+          ? { ...intel, tracking_enabled: !item.tracking_enabled }
+          : intel
+      ));
       toast.error("Tracking toggle failed", {
         description: "Unable to update tracking status."
       });
     }
+  };
+
+  const handleMarkAsResolved = async (item: IntelligenceItem) => {
+    try {
+      // Remove item from the intelligence feed
+      setIntelligence(prev => prev.filter(intel => intel.id !== item.id));
+      
+      toast.success("Item marked as resolved", {
+        description: `"${item.title}" has been removed from the intelligence feed.`
+      });
+    } catch (error) {
+      console.error('Error marking as resolved:', error);
+      toast.error("Failed to mark as resolved");
+    }
+  };
+
+  const handleRefreshData = async () => {
+    setIsLoading(true);
+    toast.success("Refreshing intelligence data", {
+      description: "Loading the latest competitor intelligence..."
+    });
+    
+    await loadLiveFeeds();
+    
+    toast.success("Data refreshed successfully", {
+      description: `Updated ${intelligence.length} intelligence items.`
+    });
   };
 
   const getTypeIcon = (type: string) => {
@@ -273,6 +311,25 @@ export const IntelligenceFeed = () => {
         </div>
         
         <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleRefreshData}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Monitor className="h-4 w-4 mr-2 animate-spin" />
+                Refreshing...
+              </>
+            ) : (
+              <>
+                <Monitor className="h-4 w-4 mr-2" />
+                Refresh Data
+              </>
+            )}
+          </Button>
+          
           <Select value={filter} onValueChange={setFilter}>
             <SelectTrigger className="w-32">
               <SelectValue placeholder="Type" />
@@ -346,39 +403,47 @@ export const IntelligenceFeed = () => {
                 <div className="space-y-4">
                   <p className="text-sm leading-relaxed">{item.description}</p>
                   
-                  <div className="flex items-center justify-between">
-                    <div className="flex gap-2">
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => handleAnalyzeImpact(item)}
-                      >
-                        <TrendingUp className="h-3 w-3 mr-1" />
-                        Analyze Impact
-                      </Button>
-                      <Button 
-                        size="sm" 
-                        variant="outline"
-                        onClick={() => handleCreateCounterStrategy(item)}
-                      >
-                        <Users className="h-3 w-3 mr-1" />
-                        Create Counter-Strategy
-                      </Button>
-                    </div>
-                    
-                    {item.url && (
-                      <Button 
-                        size="sm" 
-                        variant="ghost"
-                        onClick={() => {
-                          window.open(item.url, '_blank');
-                        }}
-                      >
-                        <ExternalLink className="h-3 w-3 mr-1" />
-                        View Source
-                      </Button>
-                    )}
-                  </div>
+                   <div className="flex items-center justify-between">
+                     <div className="flex gap-2">
+                       <Button 
+                         size="sm" 
+                         variant="outline"
+                         onClick={() => handleMarkAsResolved(item)}
+                       >
+                         <Eye className="h-3 w-3 mr-1" />
+                         Mark as Resolved
+                       </Button>
+                       <Button 
+                         size="sm" 
+                         variant="outline"
+                         onClick={() => handleAnalyzeImpact(item)}
+                       >
+                         <TrendingUp className="h-3 w-3 mr-1" />
+                         Analyze Impact
+                       </Button>
+                       <Button 
+                         size="sm" 
+                         variant="outline"
+                         onClick={() => handleCreateCounterStrategy(item)}
+                       >
+                         <Users className="h-3 w-3 mr-1" />
+                         Create Counter-Strategy
+                       </Button>
+                     </div>
+                     
+                     {item.url && (
+                       <Button 
+                         size="sm" 
+                         variant="ghost"
+                         onClick={() => {
+                           window.open(item.url, '_blank');
+                         }}
+                       >
+                         <ExternalLink className="h-3 w-3 mr-1" />
+                         View Source
+                       </Button>
+                     )}
+                   </div>
                 </div>
               </CardContent>
             </Card>

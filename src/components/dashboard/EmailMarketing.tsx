@@ -198,13 +198,16 @@ export function EmailMarketing() {
     return campaign.opened_count > 0 ? Math.round((campaign.clicked_count / campaign.opened_count) * 100) : 0;
   };
 
+  const [campaignDetailsDialogOpen, setCampaignDetailsDialogOpen] = useState(false);
+  const [selectedCampaignDetails, setSelectedCampaignDetails] = useState<EmailCampaign | null>(null);
+
   const handleViewCampaignDetails = (campaign: EmailCampaign) => {
+    setSelectedCampaignDetails(campaign);
+    setCampaignDetailsDialogOpen(true);
     toast({
-      title: "Campaign Details",
-      description: `Viewing details for "${campaign.name}". Campaign status: ${campaign.status}`,
+      title: "Campaign Details Opened",
+      description: `Viewing detailed analytics for "${campaign.name}".`,
     });
-    // Here you could navigate to a detailed campaign page or open a modal
-    // navigate(`/campaigns/${campaign.id}`);
   };
 
   const handleUseTemplate = (template: EmailTemplate) => {
@@ -597,6 +600,114 @@ export function EmailMarketing() {
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Campaign Details Dialog */}
+      <Dialog open={campaignDetailsDialogOpen} onOpenChange={setCampaignDetailsDialogOpen}>
+        <DialogContent className="max-w-4xl">
+          <DialogHeader>
+            <DialogTitle>Campaign Details: {selectedCampaignDetails?.name}</DialogTitle>
+            <DialogDescription>
+              Detailed analytics and performance metrics for your email campaign
+            </DialogDescription>
+          </DialogHeader>
+          {selectedCampaignDetails && (
+            <div className="space-y-6">
+              {/* Campaign Overview */}
+              <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">Recipients</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{selectedCampaignDetails.recipient_count}</div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">Sent</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{selectedCampaignDetails.sent_count}</div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">Open Rate</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{getOpenRate(selectedCampaignDetails)}%</div>
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium">Click Rate</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-2xl font-bold">{getClickRate(selectedCampaignDetails)}%</div>
+                  </CardContent>
+                </Card>
+              </div>
+
+              {/* Campaign Content */}
+              <div className="space-y-4">
+                <div>
+                  <h3 className="font-medium mb-2">Subject Line</h3>
+                  <p className="text-sm text-muted-foreground bg-muted p-3 rounded-lg">
+                    {selectedCampaignDetails.subject}
+                  </p>
+                </div>
+                <div>
+                  <h3 className="font-medium mb-2">Email Content</h3>
+                  <div className="text-sm text-muted-foreground bg-muted p-3 rounded-lg max-h-48 overflow-y-auto">
+                    <pre className="whitespace-pre-wrap font-sans">
+                      {selectedCampaignDetails.content}
+                    </pre>
+                  </div>
+                </div>
+              </div>
+
+              {/* Timeline */}
+              <div className="space-y-2">
+                <h3 className="font-medium">Campaign Timeline</h3>
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between p-2 bg-muted rounded-lg">
+                    <span className="text-sm">Campaign Created</span>
+                    <span className="text-sm text-muted-foreground">
+                      {new Date(selectedCampaignDetails.created_at).toLocaleString()}
+                    </span>
+                  </div>
+                  {selectedCampaignDetails.scheduled_at && (
+                    <div className="flex items-center justify-between p-2 bg-muted rounded-lg">
+                      <span className="text-sm">Scheduled For</span>
+                      <span className="text-sm text-muted-foreground">
+                        {new Date(selectedCampaignDetails.scheduled_at).toLocaleString()}
+                      </span>
+                    </div>
+                  )}
+                  {selectedCampaignDetails.sent_at && (
+                    <div className="flex items-center justify-between p-2 bg-muted rounded-lg">
+                      <span className="text-sm">Campaign Sent</span>
+                      <span className="text-sm text-muted-foreground">
+                        {new Date(selectedCampaignDetails.sent_at).toLocaleString()}
+                      </span>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex justify-end space-x-2">
+                <Button variant="outline" onClick={() => setCampaignDetailsDialogOpen(false)}>
+                  Close
+                </Button>
+                <Button>
+                  <BarChart3 className="h-4 w-4 mr-2" />
+                  Export Report
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
