@@ -66,10 +66,16 @@ export function SalesPipeline() {
 
   const fetchData = async () => {
     try {
-      // Fetch pipeline stages
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        throw new Error('User not authenticated');
+      }
+
+      // Fetch pipeline stages for current user
       const { data: pipelineData } = await supabase
         .from('pipelines')
         .select('*')
+        .eq('user_id', user.id)
         .limit(1)
         .single();
 
@@ -86,19 +92,21 @@ export function SalesPipeline() {
         setNewDeal(prev => ({ ...prev, stage: pipeline.stages[0]?.name || '' }));
       }
 
-      // Fetch deals with contact info
+      // Fetch deals with contact info - FILTERED BY USER
       const { data: dealsData } = await supabase
         .from('deals')
         .select(`
           *,
           contact:contacts(first_name, last_name, email, company)
         `)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      // Fetch contacts for dropdown
+      // Fetch contacts for dropdown - FILTERED BY USER
       const { data: contactsData } = await supabase
         .from('contacts')
         .select('id, first_name, last_name, email, company')
+        .eq('user_id', user.id)
         .order('first_name');
 
       setDeals(dealsData || []);
@@ -166,10 +174,14 @@ export function SalesPipeline() {
 
   const updateDealStage = async (dealId: string, newStage: string) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
       const { error } = await supabase
         .from('deals')
         .update({ stage: newStage })
-        .eq('id', dealId);
+        .eq('id', dealId)
+        .eq('user_id', user.id);
 
       if (error) throw error;
 

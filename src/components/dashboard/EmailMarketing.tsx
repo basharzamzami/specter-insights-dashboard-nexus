@@ -78,13 +78,20 @@ export function EmailMarketing() {
 
   const fetchData = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
       const [templatesResponse] = await Promise.all([
-        supabase.from('email_templates').select('*').order('created_at', { ascending: false })
+        supabase.from('email_templates').select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false })
       ]);
 
-      // Fetch campaigns with demo data fallback
+      // Fetch campaigns with demo data fallback - FILTERED BY USER
       const fetchCampaigns = async () => {
-        const { data, error } = await supabase.from('email_campaigns').select('*').order('created_at', { ascending: false });
+        const { data, error } = await supabase.from('email_campaigns').select('*')
+          .eq('user_id', user.id)
+          .order('created_at', { ascending: false });
         if (error) throw error;
         return data || [];
       };

@@ -67,16 +67,23 @@ export function CalendarScheduler() {
 
   const fetchData = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
       const [contactsResponse] = await Promise.all([
-        supabase.from('contacts').select('id, first_name, last_name, email, phone, company').order('first_name')
+        supabase.from('contacts').select('id, first_name, last_name, email, phone, company')
+          .eq('user_id', user.id)
+          .order('first_name')
       ]);
 
-      // Fetch appointments with demo data fallback
+      // Fetch appointments with demo data fallback - FILTERED BY USER
       const fetchAppointments = async () => {
         const { data } = await supabase.from('appointments').select(`
           *,
           contact:contacts(first_name, last_name, email, phone, company)
-        `).order('start_time', { ascending: true });
+        `)
+        .eq('user_id', user.id)
+        .order('start_time', { ascending: true });
         return data || [];
       };
 
@@ -143,10 +150,14 @@ export function CalendarScheduler() {
 
   const updateAppointmentStatus = async (appointmentId: string, newStatus: string) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
       const { error } = await supabase
         .from('appointments')
         .update({ status: newStatus })
-        .eq('id', appointmentId);
+        .eq('id', appointmentId)
+        .eq('user_id', user.id);
 
       if (error) throw error;
 

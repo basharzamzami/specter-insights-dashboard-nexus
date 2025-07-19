@@ -80,18 +80,27 @@ export function TaskManager() {
 
   const fetchData = async () => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
       const [contactsResponse, dealsResponse] = await Promise.all([
-        supabase.from('contacts').select('id, first_name, last_name, company').order('first_name'),
-        supabase.from('deals').select('id, title, value').order('title')
+        supabase.from('contacts').select('id, first_name, last_name, company')
+          .eq('user_id', user.id)
+          .order('first_name'),
+        supabase.from('deals').select('id, title, value')
+          .eq('user_id', user.id)
+          .order('title')
       ]);
 
-      // Fetch tasks with demo data fallback
+      // Fetch tasks with demo data fallback - FILTERED BY USER
       const fetchTasks = async () => {
         const { data } = await supabase.from('tasks').select(`
           *,
           contact:contacts(first_name, last_name, company),
           deal:deals(title, value)
-        `).order('created_at', { ascending: false });
+        `)
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
         return data || [];
       };
 
@@ -221,6 +230,9 @@ export function TaskManager() {
 
   const updateTaskStatus = async (taskId: string, newStatus: string) => {
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error('User not authenticated');
+
       const updates: any = { status: newStatus };
       if (newStatus === 'completed') {
         updates.completed_at = new Date().toISOString();
@@ -229,7 +241,8 @@ export function TaskManager() {
       const { error } = await supabase
         .from('tasks')
         .update(updates)
-        .eq('id', taskId);
+        .eq('id', taskId)
+        .eq('user_id', user.id);
 
       if (error) throw error;
 
