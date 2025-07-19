@@ -3,15 +3,16 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 const Auth = () => {
-  const { isSignedIn } = useUser();
+  const { isSignedIn, user } = useUser();
   const navigate = useNavigate();
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
 
   useEffect(() => {
-    if (isSignedIn) {
-      navigate("/");
+    if (isSignedIn && user) {
+      // Redirect to user-specific dashboard after login
+      navigate(`/dashboard/${user.id}`);
     }
-  }, [isSignedIn, navigate]);
+  }, [isSignedIn, user, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-subtle flex items-center justify-center p-4">

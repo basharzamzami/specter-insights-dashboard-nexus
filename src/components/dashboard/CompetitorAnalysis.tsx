@@ -76,6 +76,8 @@ export const CompetitorAnalysis = () => {
     const { data, error } = await supabase
       .from('competitor_profiles')
       .select('*')
+      .eq('created_by', user.id)
+      .eq('is_deleted', false)
       .order('created_at', { ascending: false });
 
     if (error) {
@@ -92,6 +94,8 @@ export const CompetitorAnalysis = () => {
     const { data, error } = await supabase
       .from('personas')
       .select('*')
+      .eq('created_by', user.id)
+      .eq('is_deleted', false)
       .order('created_at', { ascending: false });
 
     if (data) setPersonas(data);
@@ -363,11 +367,12 @@ export const CompetitorAnalysis = () => {
 
   const handleDeleteCompetitor = async (competitorId: string) => {
     try {
-      // Delete from database first
+      // Soft delete - mark as deleted instead of permanent removal
       const { error } = await supabase
         .from('competitor_profiles')
-        .delete()
-        .eq('id', competitorId);
+        .update({ is_deleted: true })
+        .eq('id', competitorId)
+        .eq('created_by', user.id); // Ensure user can only delete their own data
 
       if (error) throw error;
 
@@ -375,7 +380,7 @@ export const CompetitorAnalysis = () => {
       setCompetitors(prev => prev.filter(comp => comp.id !== competitorId));
       
       toast.success("Competitor Removed", {
-        description: "Competitor analysis has been deleted."
+        description: "Competitor analysis has been deleted. You can restore it later if needed."
       });
     } catch (error) {
       console.error('Error deleting competitor:', error);

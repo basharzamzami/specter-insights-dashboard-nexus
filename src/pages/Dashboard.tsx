@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/clerk-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/dashboard/AppSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
@@ -29,6 +29,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 const Dashboard = () => {
   const { isLoaded, isSignedIn, user } = useUser();
   const navigate = useNavigate();
+  const { userId } = useParams();
   const [activeView, setActiveView] = useState("overview");
   const [isAIOpen, setIsAIOpen] = useState(false);
   const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
@@ -36,8 +37,13 @@ const Dashboard = () => {
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       navigate("/auth");
+    } else if (isLoaded && isSignedIn && user) {
+      // Redirect to user-specific dashboard if not already there
+      if (!userId || userId !== user.id) {
+        navigate(`/dashboard/${user.id}`, { replace: true });
+      }
     }
-  }, [isLoaded, isSignedIn, navigate]);
+  }, [isLoaded, isSignedIn, user, userId, navigate]);
 
   if (!isLoaded || !isSignedIn) {
     return (

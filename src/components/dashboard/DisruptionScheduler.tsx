@@ -78,11 +78,15 @@ export const DisruptionScheduler = () => {
   }, [user]);
 
   const fetchOperations = async () => {
+    if (!user) return;
+    
     try {
       setLoading(true);
       const { data, error } = await supabase
         .from('disruption_operations')
         .select('*')
+        .eq('user_id', user.id)
+        .eq('is_deleted', false)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
@@ -165,7 +169,8 @@ export const DisruptionScheduler = () => {
         status: "scheduled",
         scheduled_date: newOperation.scheduledDate || new Date().toISOString(),
         estimated_duration: newOperation.estimatedDuration || "1 week",
-        description: newOperation.description || ""
+        description: newOperation.description || "",
+        is_deleted: false
       };
 
       const { error } = await supabase
@@ -198,11 +203,14 @@ export const DisruptionScheduler = () => {
   };
 
   const handleStatusChange = async (id: string, newStatus: string) => {
+    if (!user) return;
+    
     try {
       const { error } = await supabase
         .from('disruption_operations')
         .update({ status: newStatus })
-        .eq('id', id);
+        .eq('id', id)
+        .eq('user_id', user.id); // Ensure user can only update their own data
 
       if (error) throw error;
 
@@ -230,11 +238,15 @@ export const DisruptionScheduler = () => {
   };
 
   const handleDeleteOperation = async (id: string) => {
+    if (!user) return;
+    
     try {
+      // Soft delete - mark as deleted instead of permanent removal
       const { error } = await supabase
         .from('disruption_operations')
-        .delete()
-        .eq('id', id);
+        .update({ is_deleted: true })
+        .eq('id', id)
+        .eq('user_id', user.id); // Ensure user can only delete their own data
 
       if (error) throw error;
 
@@ -243,7 +255,7 @@ export const DisruptionScheduler = () => {
       
       toast({
         title: "Operation Deleted",
-        description: "Operation has been removed from the schedule.",
+        description: "Operation has been removed from the schedule. You can restore it later if needed.",
       });
     } catch (error) {
       console.error('Error deleting operation:', error);

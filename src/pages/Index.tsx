@@ -64,8 +64,11 @@ const Index = () => {
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       navigate("/auth");
+    } else if (isLoaded && isSignedIn && user) {
+      // Redirect authenticated users to their personal dashboard
+      navigate(`/dashboard/${user.id}`, { replace: true });
     }
-  }, [isSignedIn, isLoaded, navigate]);
+  }, [isSignedIn, isLoaded, user, navigate]);
 
   const handleCompetitorAnalysis = async () => {
     if (!competitorInput.trim()) {

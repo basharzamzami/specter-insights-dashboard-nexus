@@ -204,6 +204,7 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           id: string
+          is_deleted: boolean | null
           objective: string | null
           scheduled_date: string | null
           status: string | null
@@ -216,6 +217,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           id?: string
+          is_deleted?: boolean | null
           objective?: string | null
           scheduled_date?: string | null
           status?: string | null
@@ -228,6 +230,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           id?: string
+          is_deleted?: boolean | null
           objective?: string | null
           scheduled_date?: string | null
           status?: string | null
@@ -246,6 +249,7 @@ export type Database = {
           customer_complaints: Json | null
           estimated_ad_spend: number | null
           id: string
+          is_deleted: boolean | null
           sentiment_score: number | null
           seo_score: number | null
           social_sentiment: Json | null
@@ -262,6 +266,7 @@ export type Database = {
           customer_complaints?: Json | null
           estimated_ad_spend?: number | null
           id?: string
+          is_deleted?: boolean | null
           sentiment_score?: number | null
           seo_score?: number | null
           social_sentiment?: Json | null
@@ -278,6 +283,7 @@ export type Database = {
           customer_complaints?: Json | null
           estimated_ad_spend?: number | null
           id?: string
+          is_deleted?: boolean | null
           sentiment_score?: number | null
           seo_score?: number | null
           social_sentiment?: Json | null
@@ -518,6 +524,7 @@ export type Database = {
           description: string | null
           estimated_duration: string | null
           id: string
+          is_deleted: boolean | null
           name: string
           priority: string
           scheduled_date: string
@@ -532,6 +539,7 @@ export type Database = {
           description?: string | null
           estimated_duration?: string | null
           id?: string
+          is_deleted?: boolean | null
           name: string
           priority: string
           scheduled_date: string
@@ -546,6 +554,7 @@ export type Database = {
           description?: string | null
           estimated_duration?: string | null
           id?: string
+          is_deleted?: boolean | null
           name?: string
           priority?: string
           scheduled_date?: string
@@ -912,6 +921,7 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           id: string
+          is_deleted: boolean | null
           name: string
           platform: string | null
           scripts: Json | null
@@ -922,6 +932,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           id?: string
+          is_deleted?: boolean | null
           name: string
           platform?: string | null
           scripts?: Json | null
@@ -932,6 +943,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           id?: string
+          is_deleted?: boolean | null
           name?: string
           platform?: string | null
           scripts?: Json | null
