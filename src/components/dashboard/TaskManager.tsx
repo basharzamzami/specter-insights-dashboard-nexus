@@ -80,7 +80,7 @@ export function TaskManager() {
 
   const fetchData = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await getUser();
       if (!user) throw new Error('User not authenticated');
 
       const [contactsResponse, dealsResponse] = await Promise.all([
@@ -230,7 +230,7 @@ export function TaskManager() {
 
   const updateTaskStatus = async (taskId: string, newStatus: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await getUser();
       if (!user) throw new Error('User not authenticated');
 
       const updates: any = { status: newStatus };

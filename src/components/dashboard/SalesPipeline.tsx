@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
 import { Plus, DollarSign, Calendar, User, Percent, Target, TrendingUp, BarChart } from 'lucide-react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
@@ -49,6 +50,7 @@ export function SalesPipeline() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { getUser } = useClerkSupabaseAuth();
 
   const [newDeal, setNewDeal] = useState({
     title: '',
@@ -66,7 +68,7 @@ export function SalesPipeline() {
 
   const fetchData = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await getUser();
       if (!user) {
         throw new Error('User not authenticated');
       }
@@ -127,7 +129,7 @@ export function SalesPipeline() {
     e.preventDefault();
     
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await getUser();
       if (!user) throw new Error('Not authenticated');
 
       const dealData = {
@@ -174,7 +176,7 @@ export function SalesPipeline() {
 
   const updateDealStage = async (dealId: string, newStage: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await getUser();
       if (!user) throw new Error('User not authenticated');
 
       const { error } = await supabase

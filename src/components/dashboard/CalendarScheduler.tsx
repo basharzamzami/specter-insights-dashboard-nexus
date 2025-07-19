@@ -67,7 +67,7 @@ export function CalendarScheduler() {
 
   const fetchData = async () => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await getUser();
       if (!user) throw new Error('User not authenticated');
 
       const [contactsResponse] = await Promise.all([
@@ -150,7 +150,7 @@ export function CalendarScheduler() {
 
   const updateAppointmentStatus = async (appointmentId: string, newStatus: string) => {
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await getUser();
       if (!user) throw new Error('User not authenticated');
 
       const { error } = await supabase

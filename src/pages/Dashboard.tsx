@@ -151,16 +151,12 @@ const Dashboard = () => {
                 Ask Specter
               </button>
               
-              <div className="flex items-center space-x-2">
-                <div className="w-8 h-8 bg-gradient-to-br from-primary to-secondary rounded-full flex items-center justify-center">
-                  <span className="text-xs font-bold text-white">
-                    {user?.firstName?.charAt(0) || user?.emailAddresses?.[0]?.emailAddress?.charAt(0) || "U"}
-                  </span>
-                </div>
-                <span className="text-sm font-medium">
-                  {user?.firstName || user?.emailAddresses?.[0]?.emailAddress?.split('@')[0] || "Agent"}
-                </span>
-              </div>
+              <DashboardHeader 
+                user={user} 
+                onAIToggle={() => setIsAIOpen(!isAIOpen)} 
+                isAIOpen={isAIOpen}
+                onNotificationsClick={() => setIsNotificationsOpen(true)}
+              />
             </div>
           </header>
           

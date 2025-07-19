@@ -10,6 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
 import { Plus, Search, Phone, Mail, Building, Calendar, MoreHorizontal, Star, TrendingUp, Users, Target, BarChart3, UserCheck } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 
@@ -39,6 +40,7 @@ export function LeadsManager() {
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
+  const { getUser } = useClerkSupabaseAuth();
 
   const [newContact, setNewContact] = useState({
     first_name: '',
@@ -118,7 +120,7 @@ export function LeadsManager() {
     e.preventDefault();
     
     try {
-      const { data: { user } } = await supabase.auth.getUser();
+      const { data: { user } } = await getUser();
       if (!user) throw new Error('Not authenticated');
 
       const contactData = {

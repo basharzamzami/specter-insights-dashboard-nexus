@@ -1,7 +1,9 @@
-import { UserButton } from "@clerk/clerk-react";
-import { Bell, Settings, Bot } from "lucide-react";
+import { UserButton, useClerk } from "@clerk/clerk-react";
+import { Bell, Settings, Bot, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { useNavigate } from "react-router-dom";
+import { useToast } from "@/hooks/use-toast";
 
 interface DashboardHeaderProps {
   user: any;
@@ -11,6 +13,26 @@ interface DashboardHeaderProps {
 }
 
 export const DashboardHeader = ({ user, onAIToggle, isAIOpen, onNotificationsClick }: DashboardHeaderProps) => {
+  const { signOut } = useClerk();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const handleLogout = async () => {
+    try {
+      await signOut();
+      navigate("/auth");
+      toast({
+        title: "Logged out successfully",
+        description: "You have been securely logged out of Specter Net™",
+      });
+    } catch (error) {
+      toast({
+        title: "Logout failed",
+        description: "There was an issue logging out. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
   return (
     <header className="bg-card border-b border-border px-6 py-4">
@@ -53,6 +75,10 @@ export const DashboardHeader = ({ user, onAIToggle, isAIOpen, onNotificationsCli
             console.log("Settings clicked");
           }}>
             <Settings className="h-5 w-5" />
+          </Button>
+
+          <Button variant="ghost" size="sm" onClick={handleLogout} className="text-destructive hover:text-destructive">
+            <LogOut className="h-5 w-5" />
           </Button>
           
           <div className="flex items-center space-x-3">
