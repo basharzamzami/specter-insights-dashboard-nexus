@@ -363,6 +363,14 @@ export const CompetitorAnalysis = () => {
 
   const handleDeleteCompetitor = async (competitorId: string) => {
     try {
+      // Delete from database first
+      const { error } = await supabase
+        .from('competitor_profiles')
+        .delete()
+        .eq('id', competitorId);
+
+      if (error) throw error;
+
       // Remove from competitors list
       setCompetitors(prev => prev.filter(comp => comp.id !== competitorId));
       
