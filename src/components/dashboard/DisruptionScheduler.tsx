@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Calendar, Clock, Target, Zap, Plus, Trash2, Play, Pause } from "lucide-react";
+import { useState, useEffect } from "react";
+import { Calendar, Clock, Target, Zap, Plus, Trash2, Play, Pause, RefreshCw } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -9,6 +9,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
+import { useUser } from "@clerk/clerk-react";
 
 interface DisruptionOperation {
   id: string;
@@ -59,13 +61,59 @@ const mockOperations: DisruptionOperation[] = [
 ];
 
 export const DisruptionScheduler = () => {
-  const [operations, setOperations] = useState<DisruptionOperation[]>(mockOperations);
+  const [operations, setOperations] = useState<DisruptionOperation[]>([]);
+  const [loading, setLoading] = useState(true);
   const [newOperation, setNewOperation] = useState<Partial<DisruptionOperation>>({
     type: 'seo',
     priority: 'medium'
   });
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const { toast } = useToast();
+  const { user } = useUser();
+
+  useEffect(() => {
+    if (user) {
+      fetchOperations();
+    }
+  }, [user]);
+
+  const fetchOperations = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('disruption_operations')
+        .select('*')
+        .order('created_at', { ascending: false });
+
+      if (error) throw error;
+
+      // Map database fields to component interface
+      const mappedOperations: DisruptionOperation[] = (data || []).map(op => ({
+        id: op.id,
+        name: op.name,
+        target: op.target,
+        type: op.type as DisruptionOperation['type'],
+        priority: op.priority as DisruptionOperation['priority'],
+        status: op.status as DisruptionOperation['status'],
+        scheduledDate: op.scheduled_date,
+        estimatedDuration: op.estimated_duration || '',
+        description: op.description || ''
+      }));
+
+      setOperations(mappedOperations);
+    } catch (error) {
+      console.error('Error fetching operations:', error);
+      toast({
+        title: "Error",
+        description: "Failed to fetch operations. Using demo data.",
+        variant: "destructive",
+      });
+      // Fallback to mock data
+      setOperations(mockOperations);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -88,7 +136,7 @@ export const DisruptionScheduler = () => {
     }
   };
 
-  const handleCreateOperation = () => {
+  const handleCreateOperation = async () => {
     if (!newOperation.name || !newOperation.target) {
       toast({
         title: "Missing Information",
@@ -98,53 +146,124 @@ export const DisruptionScheduler = () => {
       return;
     }
 
-    const operation: DisruptionOperation = {
-      id: Date.now().toString(),
-      name: newOperation.name!,
-      target: newOperation.target!,
-      type: newOperation.type as any || "seo",
-      priority: newOperation.priority as any || "medium",
-      status: "scheduled",
-      scheduledDate: newOperation.scheduledDate || new Date().toISOString(),
-      estimatedDuration: newOperation.estimatedDuration || "1 week",
-      description: newOperation.description || ""
-    };
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to create operations.",
+        variant: "destructive"
+      });
+      return;
+    }
 
-    setOperations(prev => [operation, ...prev]);
-    setNewOperation({
-      type: 'seo',
-      priority: 'medium'
-    });
-    setIsDialogOpen(false);
-    
-    toast({
-      title: "Operation Scheduled",
-      description: `${operation.name} has been added to the disruption timeline.`,
-    });
+    try {
+      const operationData = {
+        user_id: user.id,
+        name: newOperation.name!,
+        target: newOperation.target!,
+        type: newOperation.type || "seo",
+        priority: newOperation.priority || "medium",
+        status: "scheduled",
+        scheduled_date: newOperation.scheduledDate || new Date().toISOString(),
+        estimated_duration: newOperation.estimatedDuration || "1 week",
+        description: newOperation.description || ""
+      };
+
+      const { error } = await supabase
+        .from('disruption_operations')
+        .insert([operationData]);
+
+      if (error) throw error;
+
+      setNewOperation({
+        type: 'seo',
+        priority: 'medium'
+      });
+      setIsDialogOpen(false);
+      
+      toast({
+        title: "Operation Scheduled",
+        description: `${operationData.name} has been added to the disruption timeline.`,
+      });
+
+      // Refresh data
+      fetchOperations();
+    } catch (error) {
+      console.error('Error creating operation:', error);
+      toast({
+        title: "Error",
+        description: "Failed to create operation. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleStatusChange = (id: string, newStatus: string) => {
-    setOperations(prev => prev.map(op => 
-      op.id === id ? { ...op, status: newStatus as any } : op
-    ));
-    
-    toast({
-      title: "Status Updated",
-      description: `Operation status changed to ${newStatus}.`,
-    });
+  const handleStatusChange = async (id: string, newStatus: string) => {
+    try {
+      const { error } = await supabase
+        .from('disruption_operations')
+        .update({ status: newStatus })
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // Update local state for immediate feedback
+      setOperations(prev => prev.map(op => 
+        op.id === id ? { ...op, status: newStatus as DisruptionOperation['status'] } : op
+      ));
+      
+      toast({
+        title: "Status Updated",
+        description: `Operation status changed to ${newStatus}.`,
+      });
+    } catch (error) {
+      console.error('Error updating operation status:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update operation status.",
+        variant: "destructive",
+      });
+    }
   };
 
   const handleResumeOperation = (id: string) => {
     handleStatusChange(id, "active");
   };
 
-  const handleDeleteOperation = (id: string) => {
-    setOperations(prev => prev.filter(op => op.id !== id));
-    toast({
-      title: "Operation Deleted",
-      description: "Operation has been removed from the schedule.",
-    });
+  const handleDeleteOperation = async (id: string) => {
+    try {
+      const { error } = await supabase
+        .from('disruption_operations')
+        .delete()
+        .eq('id', id);
+
+      if (error) throw error;
+
+      // Update local state for immediate feedback
+      setOperations(prev => prev.filter(op => op.id !== id));
+      
+      toast({
+        title: "Operation Deleted",
+        description: "Operation has been removed from the schedule.",
+      });
+    } catch (error) {
+      console.error('Error deleting operation:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete operation.",
+        variant: "destructive",
+      });
+    }
   };
+
+  if (loading) {
+    return (
+      <div className="space-y-6 mb-8">
+        <div className="flex items-center justify-center py-8">
+          <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6 mb-8">
@@ -157,112 +276,124 @@ export const DisruptionScheduler = () => {
           <p className="text-muted-foreground">Plan and execute strategic market disruption operations</p>
         </div>
         
-        <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-          <DialogTrigger asChild>
-            <Button className="btn-glow">
-              <Plus className="h-4 w-4 mr-2" />
-              Schedule Operation
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[525px]">
-            <DialogHeader>
-              <DialogTitle>Schedule New Disruption Operation</DialogTitle>
-              <DialogDescription>
-                Configure a strategic operation to disrupt competitor activities
-              </DialogDescription>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">Operation Name</Label>
-                <Input
-                  id="name"
-                  placeholder="e.g., Keyword Hijacking Campaign"
-                  value={newOperation.name || ""}
-                  onChange={(e) => setNewOperation(prev => ({ ...prev, name: e.target.value }))}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="target">Target Competitor</Label>
-                <Input
-                  id="target"
-                  placeholder="e.g., TechCorp"
-                  value={newOperation.target || ""}
-                  onChange={(e) => setNewOperation(prev => ({ ...prev, target: e.target.value }))}
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label>Operation Type</Label>
-                  <Select onValueChange={(value) => setNewOperation(prev => ({ ...prev, type: value as any }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="seo">SEO Disruption</SelectItem>
-                      <SelectItem value="ads">Ad Campaign</SelectItem>
-                      <SelectItem value="social">Social Media</SelectItem>
-                      <SelectItem value="content">Content Strategy</SelectItem>
-                      <SelectItem value="technical">Technical Attack</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-2">
-                  <Label>Priority</Label>
-                  <Select onValueChange={(value) => setNewOperation(prev => ({ ...prev, priority: value as any }))}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select priority" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="high">High</SelectItem>
-                      <SelectItem value="medium">Medium</SelectItem>
-                      <SelectItem value="low">Low</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="scheduledDate">Scheduled Date</Label>
-                  <Input
-                    id="scheduledDate"
-                    type="datetime-local"
-                    value={newOperation.scheduledDate || ""}
-                    onChange={(e) => setNewOperation(prev => ({ ...prev, scheduledDate: e.target.value }))}
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="duration">Estimated Duration</Label>
-                  <Input
-                    id="duration"
-                    placeholder="e.g., 2 weeks"
-                    value={newOperation.estimatedDuration || ""}
-                    onChange={(e) => setNewOperation(prev => ({ ...prev, estimatedDuration: e.target.value }))}
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="description">Operation Description</Label>
-                <Textarea
-                  id="description"
-                  placeholder="Describe the strategic objectives and tactics..."
-                  value={newOperation.description || ""}
-                  onChange={(e) => setNewOperation(prev => ({ ...prev, description: e.target.value }))}
-                />
-              </div>
-
-              <Button onClick={handleCreateOperation} className="w-full btn-glow">
-                <Zap className="h-4 w-4 mr-2" />
+        <div className="flex items-center gap-3">
+          <Button
+            variant="outline"
+            onClick={fetchOperations}
+            disabled={loading}
+            className="gap-2"
+          >
+            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            Refresh
+          </Button>
+        
+          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="btn-glow">
+                <Plus className="h-4 w-4 mr-2" />
                 Schedule Operation
               </Button>
-            </div>
-          </DialogContent>
-        </Dialog>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[525px]">
+              <DialogHeader>
+                <DialogTitle>Schedule New Disruption Operation</DialogTitle>
+                <DialogDescription>
+                  Configure a strategic operation to disrupt competitor activities
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Operation Name</Label>
+                  <Input
+                    id="name"
+                    placeholder="e.g., Keyword Hijacking Campaign"
+                    value={newOperation.name || ""}
+                    onChange={(e) => setNewOperation(prev => ({ ...prev, name: e.target.value }))}
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="target">Target Competitor</Label>
+                  <Input
+                    id="target"
+                    placeholder="e.g., TechCorp"
+                    value={newOperation.target || ""}
+                    onChange={(e) => setNewOperation(prev => ({ ...prev, target: e.target.value }))}
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label>Operation Type</Label>
+                    <Select onValueChange={(value) => setNewOperation(prev => ({ ...prev, type: value as any }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="seo">SEO Disruption</SelectItem>
+                        <SelectItem value="ads">Ad Campaign</SelectItem>
+                        <SelectItem value="social">Social Media</SelectItem>
+                        <SelectItem value="content">Content Strategy</SelectItem>
+                        <SelectItem value="technical">Technical Attack</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label>Priority</Label>
+                    <Select onValueChange={(value) => setNewOperation(prev => ({ ...prev, priority: value as any }))}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select priority" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="low">Low</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="scheduledDate">Scheduled Date</Label>
+                    <Input
+                      id="scheduledDate"
+                      type="datetime-local"
+                      value={newOperation.scheduledDate || ""}
+                      onChange={(e) => setNewOperation(prev => ({ ...prev, scheduledDate: e.target.value }))}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="duration">Estimated Duration</Label>
+                    <Input
+                      id="duration"
+                      placeholder="e.g., 2 weeks"
+                      value={newOperation.estimatedDuration || ""}
+                      onChange={(e) => setNewOperation(prev => ({ ...prev, estimatedDuration: e.target.value }))}
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="description">Operation Description</Label>
+                  <Textarea
+                    id="description"
+                    placeholder="Describe the strategic objectives and tactics..."
+                    value={newOperation.description || ""}
+                    onChange={(e) => setNewOperation(prev => ({ ...prev, description: e.target.value }))}
+                  />
+                </div>
+
+                <Button onClick={handleCreateOperation} className="w-full btn-glow">
+                  <Zap className="h-4 w-4 mr-2" />
+                  Schedule Operation
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Operations Timeline */}
@@ -361,7 +492,7 @@ export const DisruptionScheduler = () => {
         ))}
       </div>
 
-      {operations.length === 0 && (
+      {operations.length === 0 && !loading && (
         <Card className="text-center py-12">
           <CardContent>
             <Calendar className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
