@@ -26,6 +26,7 @@ interface SidebarItem {
 const sidebarItems: SidebarItem[] = [
   { name: "Mission Control", icon: Zap, key: "overview" },
   { name: "Target Analysis", icon: Target, key: "competitors" },
+  { name: "Strike Planner", icon: Target, key: "strikes" },
   { name: "Operations", icon: Calendar, key: "campaigns" },
   { name: "Disruption Schedule", icon: Clock, key: "scheduler" },
   { name: "Intel Feed", icon: Rss, key: "intelligence" },

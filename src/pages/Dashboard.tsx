@@ -24,6 +24,7 @@ import { SocialMediaManager } from "@/components/dashboard/SocialMediaManager";
 import { CalendarScheduler } from "@/components/dashboard/CalendarScheduler";
 import { OperationsManager } from "@/components/dashboard/OperationsManager";
 import { TrashBin } from "@/components/dashboard/TrashBin";
+import { StrikePlanner } from "@/components/dashboard/StrikePlanner";
 import { Loader2, Bell } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -76,6 +77,8 @@ const Dashboard = () => {
         return <CompetitorAnalysis />;
       case "campaigns":
         return <CampaignScheduler />;
+      case "strikes":
+        return <StrikePlanner />;
       case "scheduler":
         return <DisruptionScheduler />;
       case "intelligence":
