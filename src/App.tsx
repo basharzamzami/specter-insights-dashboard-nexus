@@ -13,6 +13,7 @@ import ImpactAnalysis from "./pages/ImpactAnalysis";
 import StrategyBuilder from "./pages/StrategyBuilder";
 import ExecutionCenter from "./pages/ExecutionCenter";
 import MonitoringDashboard from "./pages/MonitoringDashboard";
+import { ClientOnboarding } from "@/components/auth/ClientOnboarding";
 
 const queryClient = new QueryClient();
 
@@ -26,6 +27,7 @@ const App = () => (
           <Route path="/" element={<Dashboard />} />
           <Route path="/dashboard/:userId" element={<Dashboard />} />
           <Route path="/auth" element={<Auth />} />
+          <Route path="/onboarding" element={<ClientOnboarding />} />
           <Route path="/competitor/:id" element={<CompetitorDetails />} />
           <Route path="/campaigns/new" element={<CampaignBuilder />} />
           <Route path="/campaign-details" element={<CampaignDetails />} />

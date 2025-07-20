@@ -1,4 +1,6 @@
 import React, { useState } from 'react';
+import { useUser } from '@clerk/clerk-react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -20,10 +22,12 @@ interface ClientData {
 }
 
 export const ClientOnboarding = () => {
+  const { user } = useUser();
+  const navigate = useNavigate();
   const [clientData, setClientData] = useState<ClientData>({
     businessName: '',
     industry: '',
-    email: '',
+    email: user?.emailAddresses[0]?.emailAddress || '',
     phone: '',
     city: '',
     state: '',
@@ -51,9 +55,13 @@ export const ClientOnboarding = () => {
         description: "Your elite intelligence platform is now being configured for your business.",
       });
 
-      // Redirect to dashboard after successful onboarding
+      // Redirect to user-specific dashboard after successful onboarding
       setTimeout(() => {
-        window.location.href = '/dashboard';
+        if (user?.id) {
+          navigate(`/dashboard/${user.id}`);
+        } else {
+          navigate('/dashboard');
+        }
       }, 2000);
 
     } catch (error) {

@@ -9,8 +9,16 @@ const Auth = () => {
 
   useEffect(() => {
     if (isSignedIn && user) {
-      // Redirect to user-specific dashboard after login
-      navigate(`/dashboard/${user.id}`);
+      // Check if this is a new user (simplified check - in production you'd check a database)
+      const isNewUser = user.createdAt && new Date(user.createdAt).getTime() > Date.now() - 120000; // Created within last 2 minutes
+      
+      if (isNewUser) {
+        // Redirect new users to onboarding
+        navigate('/onboarding');
+      } else {
+        // Redirect existing users to dashboard
+        navigate(`/dashboard/${user.id}`);
+      }
     }
   }, [isSignedIn, user, navigate]);
 
