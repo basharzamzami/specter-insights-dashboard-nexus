@@ -205,6 +205,56 @@ export type Database = {
           },
         ]
       }
+      campaign_recommendations: {
+        Row: {
+          competitor_id: string | null
+          created_at: string
+          description: string | null
+          details: Json | null
+          estimated_budget: number | null
+          id: string
+          status: string
+          title: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          competitor_id?: string | null
+          created_at?: string
+          description?: string | null
+          details?: Json | null
+          estimated_budget?: number | null
+          id?: string
+          status?: string
+          title: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          competitor_id?: string | null
+          created_at?: string
+          description?: string | null
+          details?: Json | null
+          estimated_budget?: number | null
+          id?: string
+          status?: string
+          title?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "campaign_recommendations_competitor_id_fkey"
+            columns: ["competitor_id"]
+            isOneToOne: false
+            referencedRelation: "competitor_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       campaigns: {
         Row: {
           actions: Json | null
@@ -999,6 +1049,50 @@ export type Database = {
         }
         Relationships: []
       }
+      performance_metrics: {
+        Row: {
+          competitor_id: string | null
+          created_at: string
+          id: string
+          metadata: Json | null
+          metric_type: string
+          period_end: string
+          period_start: string
+          user_id: string
+          value: number
+        }
+        Insert: {
+          competitor_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          metric_type: string
+          period_end: string
+          period_start: string
+          user_id: string
+          value: number
+        }
+        Update: {
+          competitor_id?: string | null
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+          metric_type?: string
+          period_end?: string
+          period_start?: string
+          user_id?: string
+          value?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "performance_metrics_competitor_id_fkey"
+            columns: ["competitor_id"]
+            isOneToOne: false
+            referencedRelation: "competitor_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       personas: {
         Row: {
           avatar_url: string | null
@@ -1299,6 +1393,50 @@ export type Database = {
             columns: ["deal_id"]
             isOneToOne: false
             referencedRelation: "deals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      threat_alerts: {
+        Row: {
+          alert_type: string
+          competitor_id: string | null
+          created_at: string
+          id: string
+          message: string
+          read_status: boolean | null
+          severity: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          alert_type: string
+          competitor_id?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          read_status?: boolean | null
+          severity?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          alert_type?: string
+          competitor_id?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          read_status?: boolean | null
+          severity?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "threat_alerts_competitor_id_fkey"
+            columns: ["competitor_id"]
+            isOneToOne: false
+            referencedRelation: "competitor_profiles"
             referencedColumns: ["id"]
           },
         ]

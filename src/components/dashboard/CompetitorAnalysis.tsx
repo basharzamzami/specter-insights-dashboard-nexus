@@ -11,23 +11,7 @@ import { AlertTriangle, TrendingUp, TrendingDown, Target, Zap, DollarSign, Searc
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-
-interface CompetitorProfile {
-  id: string;
-  company_name: string;
-  website?: string;
-  seo_score?: number;
-  sentiment_score: number;
-  vulnerabilities: string[];
-  top_keywords: string[];
-  estimated_ad_spend?: number;
-  ad_activity: any;
-  social_sentiment: any;
-  customer_complaints: any;
-  created_by?: string;
-  created_at: string;
-  updated_at: string;
-}
+import { useCompetitorProfiles, CompetitorProfile } from "@/hooks/useCompetitorProfiles";
 
 interface ActionItem {
   id: string;
@@ -52,7 +36,7 @@ export const CompetitorAnalysis = () => {
   const { user } = useUser();
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const [competitors, setCompetitors] = useState<CompetitorProfile[]>([]);
+  const { competitors, addCompetitor, deleteCompetitor, loading: competitorsLoading } = useCompetitorProfiles();
   const [selectedCompetitor, setSelectedCompetitor] = useState<CompetitorProfile | null>(null);
   const [isActionDialogOpen, setIsActionDialogOpen] = useState(false);
   const [isCampaignDialogOpen, setIsCampaignDialogOpen] = useState(false);
@@ -66,27 +50,8 @@ export const CompetitorAnalysis = () => {
   const [personas, setPersonas] = useState<any[]>([]);
 
   useEffect(() => {
-    loadCompetitors();
     loadPersonas();
   }, [user]);
-
-  const loadCompetitors = async () => {
-    if (!user) return;
-    
-    const { data, error } = await supabase
-      .from('competitor_profiles')
-      .select('*')
-      .eq('created_by', user.id)
-      .eq('is_deleted', false)
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error loading competitors:', error);
-      return;
-    }
-
-    setCompetitors(data || []);
-  };
 
   const loadPersonas = async () => {
     if (!user) return;
@@ -140,19 +105,10 @@ export const CompetitorAnalysis = () => {
           top_issues: ['Performance issues', 'Pricing concerns', 'Support delays'],
           volume: Math.floor(Math.random() * 50) + 10,
           platforms: ['Twitter', 'Reddit', 'G2', 'Trustpilot']
-        },
-        created_by: user.id
+        }
       };
       
-      const { data, error } = await supabase
-        .from('competitor_profiles')
-        .insert([competitorData])
-        .select()
-        .single();
-
-      if (error) throw error;
-
-      setCompetitors(prev => [data, ...prev]);
+      await addCompetitor(competitorData);
       setInputValue("");
       
       toast.success("Real-time competitor analysis complete", {
@@ -367,26 +323,9 @@ export const CompetitorAnalysis = () => {
 
   const handleDeleteCompetitor = async (competitorId: string) => {
     try {
-      // Soft delete - mark as deleted instead of permanent removal
-      const { error } = await supabase
-        .from('competitor_profiles')
-        .update({ is_deleted: true })
-        .eq('id', competitorId)
-        .eq('created_by', user.id); // Ensure user can only delete their own data
-
-      if (error) throw error;
-
-      // Remove from competitors list
-      setCompetitors(prev => prev.filter(comp => comp.id !== competitorId));
-      
-      toast.success("Competitor Removed", {
-        description: "Competitor analysis has been deleted. You can restore it later if needed."
-      });
+      await deleteCompetitor(competitorId);
     } catch (error) {
       console.error('Error deleting competitor:', error);
-      toast.error("Error", {
-        description: "Failed to delete competitor analysis."
-      });
     }
   };
 
