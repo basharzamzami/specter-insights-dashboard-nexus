@@ -21,34 +21,10 @@ import {
   Cell
 } from "recharts";
 
-const trafficData = [
-  { month: "Jan", organic: 12000, competitor: 8500, shift: "+41%" },
-  { month: "Feb", organic: 15000, competitor: 8200, shift: "+83%" },
-  { month: "Mar", organic: 18000, competitor: 7800, shift: "+131%" },
-  { month: "Apr", organic: 22000, competitor: 7500, shift: "+193%" },
-  { month: "May", organic: 28000, competitor: 7200, shift: "+289%" },
-  { month: "Jun", organic: 35000, competitor: 6900, shift: "+407%" }
-];
-
-const keywordData = [
-  { keyword: "AI automation", rank: 3, change: "+5", traffic: 8500 },
-  { keyword: "business intelligence", rank: 1, change: "+2", traffic: 12000 },
-  { keyword: "competitor analysis", rank: 2, change: "0", traffic: 6800 },
-  { keyword: "market research", rank: 4, change: "+1", traffic: 4200 },
-  { keyword: "data analytics", rank: 6, change: "+3", traffic: 3100 }
-];
-
-const competitorShare = [
-  { name: "Your Brand", value: 35, color: "#6366f1" },
-  { name: "TechCorp", value: 25, color: "#8b5cf6" },
-  { name: "DataSolutions", value: 20, color: "#06b6d4" },
-  { name: "CloudInnovate", value: 15, color: "#10b981" },
-  { name: "Others", value: 5, color: "#6b7280" }
-];
 
 export const PerformanceOps = () => {
-  const [activeTab, setActiveTab] = useState("traffic");
-  const [realKeywordData, setRealKeywordData] = useState(keywordData);
+  const [activeTab, setActiveTab] = useState("overview");
+  const [realKeywordData, setRealKeywordData] = useState([]);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
 
@@ -82,8 +58,8 @@ export const PerformanceOps = () => {
         
         setRealKeywordData(formattedKeywords.slice(0, 5));
       } else {
-        // Fallback to mock data
-        setRealKeywordData(keywordData);
+        // No fallback data - show empty state
+        setRealKeywordData([]);
       }
 
       // Also fetch competitor data for market analysis
@@ -96,11 +72,11 @@ export const PerformanceOps = () => {
 
     } catch (error) {
       console.error('Error fetching performance data:', error);
-      // Fallback to mock data
-      setRealKeywordData(keywordData);
+      // No fallback data
+      setRealKeywordData([]);
       toast({
-        title: "Performance Data Loaded",
-        description: "Using cached SEO performance data.",
+        title: "Performance Data Loading",
+        description: "Connect data sources to see live performance metrics.",
         variant: "default"
       });
     } finally {
@@ -144,9 +120,9 @@ export const PerformanceOps = () => {
             marketShare: "35%",
             revenueImpact: "$2.1M"
           },
-          trafficAnalysis: trafficData,
+          trafficAnalysis: [],
           keywordPerformance: realKeywordData,
-          competitorAnalysis: competitorShare,
+          competitorAnalysis: [],
           recommendations: [
             "Focus on AI automation keywords showing 25% higher conversion",
             "Expand content strategy around business intelligence topics",
@@ -276,223 +252,30 @@ export const PerformanceOps = () => {
         </Button>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card className="card-hover">
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-3">
-              <div className="p-3 bg-success/10 rounded-lg">
-                <TrendingUp className="h-6 w-6 text-success" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">+47%</p>
-                <p className="text-sm text-muted-foreground">Traffic Growth</p>
-              </div>
+      {/* Performance Overview - Ready for Live Data */}
+      <Card className="card-hover">
+        <CardHeader>
+          <CardTitle>Performance Operations</CardTitle>
+          <CardDescription>
+            Real-time performance metrics will appear here once data sources are connected
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center py-16">
+          <div className="text-center space-y-4">
+            <TrendingUp className="h-16 w-16 text-muted-foreground mx-auto" />
+            <div className="space-y-2">
+              <p className="text-xl font-semibold">Analytics Ready</p>
+              <p className="text-muted-foreground max-w-md">
+                Connect your SEO tools, analytics platforms, and competitor tracking systems to see live performance data, keyword rankings, and market analysis.
+              </p>
             </div>
-          </CardContent>
-        </Card>
-
-        <Card className="card-hover">
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-3">
-              <div className="p-3 bg-primary/10 rounded-lg">
-                <Target className="h-6 w-6 text-primary" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">156</p>
-                <p className="text-sm text-muted-foreground">Keywords Won</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="card-hover">
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-3">
-              <div className="p-3 bg-electric/10 rounded-lg">
-                <Users className="h-6 w-6 text-electric" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">35%</p>
-                <p className="text-sm text-muted-foreground">Market Share</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="card-hover">
-          <CardContent className="p-6">
-            <div className="flex items-center space-x-3">
-              <div className="p-3 bg-warning/10 rounded-lg">
-                <DollarSign className="h-6 w-6 text-warning" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">$2.1M</p>
-                <p className="text-sm text-muted-foreground">Rev. Impact</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="traffic">Traffic Analysis</TabsTrigger>
-          <TabsTrigger value="keywords">Keyword Performance</TabsTrigger>
-          <TabsTrigger value="share">Market Share</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="traffic" className="space-y-6">
-          <Card className="card-hover">
-            <CardHeader>
-              <CardTitle>Traffic Shifts vs Competitors</CardTitle>
-              <CardDescription>
-                Monitor organic traffic growth compared to key competitors
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={400}>
-                <LineChart data={trafficData}>
-                  <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
-                  <XAxis dataKey="month" className="fill-muted-foreground" />
-                  <YAxis className="fill-muted-foreground" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: "hsl(var(--card))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "6px"
-                    }}
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="organic" 
-                    stroke="hsl(var(--primary))" 
-                    strokeWidth={3}
-                    name="Your Traffic"
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="competitor" 
-                    stroke="hsl(var(--muted-foreground))" 
-                    strokeWidth={2}
-                    strokeDasharray="5 5"
-                    name="Competitor Avg"
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="keywords" className="space-y-6">
-          <Card className="card-hover">
-            <CardHeader>
-              <CardTitle>Keyword Wins & Rankings</CardTitle>
-              <CardDescription>
-                Track ranking improvements and traffic impact for key terms
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {realKeywordData.map((item, index) => (
-                  <div 
-                    key={item.keyword}
-                    className={`flex items-center justify-between p-4 bg-muted/30 rounded-lg slide-in animate-delay-${index * 100}`}
-                  >
-                    <div className="flex items-center space-x-4">
-                      <Badge className={`${getRankBadge(item.rank)} font-bold`}>
-                        #{item.rank}
-                      </Badge>
-                      <div>
-                        <p className="font-medium">{item.keyword}</p>
-                        <p className="text-sm text-muted-foreground">
-                          {item.traffic.toLocaleString()} monthly searches
-                        </p>
-                      </div>
-                    </div>
-                    <div className="flex items-center space-x-2">
-                      {getChangeIcon(item.change)}
-                      <span className={`text-sm font-medium ${
-                        item.change.startsWith("+") ? "text-success" :
-                        item.change.startsWith("-") ? "text-destructive" :
-                        "text-muted-foreground"
-                      }`}>
-                        {item.change}
-                      </span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="share" className="space-y-6">
-          <div className="grid md:grid-cols-2 gap-6">
-            <Card className="card-hover">
-              <CardHeader>
-                <CardTitle>Share of Voice</CardTitle>
-                <CardDescription>
-                  Your position in the competitive landscape
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <PieChart>
-                    <Pie
-                      data={competitorShare}
-                      cx="50%"
-                      cy="50%"
-                      innerRadius={60}
-                      outerRadius={120}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {competitorShare.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} />
-                      ))}
-                    </Pie>
-                    <Tooltip />
-                  </PieChart>
-                </ResponsiveContainer>
-              </CardContent>
-            </Card>
-
-            <Card className="card-hover">
-              <CardHeader>
-                <CardTitle>Competitive Breakdown</CardTitle>
-                <CardDescription>
-                  Market share distribution and trends
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {competitorShare.map((item, index) => (
-                    <div 
-                      key={item.name}
-                      className={`flex items-center justify-between slide-in animate-delay-${index * 100}`}
-                    >
-                      <div className="flex items-center space-x-3">
-                        <div 
-                          className="w-3 h-3 rounded-full"
-                          style={{ backgroundColor: item.color }}
-                        />
-                        <span className="font-medium">{item.name}</span>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <span className="font-bold">{item.value}%</span>
-                        {index === 0 && (
-                          <TrendingUp className="h-4 w-4 text-success" />
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
+            <Button variant="outline" onClick={handleExportReport}>
+              <Eye className="h-4 w-4 mr-2" />
+              Generate Sample Report
+            </Button>
           </div>
-        </TabsContent>
-      </Tabs>
+        </CardContent>
+      </Card>
     </div>
   );
 };

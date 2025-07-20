@@ -13,48 +13,6 @@ interface ActivityLog {
   user: string;
 }
 
-const mockActivityLogs: ActivityLog[] = [
-  {
-    id: "1",
-    action: "Competitor Analysis Completed",
-    details: "Sentiment analysis for TechCorp finished with 75% positive score",
-    timestamp: "2024-01-15T10:30:00Z",
-    type: "competitor",
-    user: "System"
-  },
-  {
-    id: "2",
-    action: "Campaign Created",
-    details: "Q1 Product Launch campaign created and scheduled",
-    timestamp: "2024-01-15T09:15:00Z",
-    type: "campaign",
-    user: "John Doe"
-  },
-  {
-    id: "3",
-    action: "New Competitor Added",
-    details: "CloudInnovate added to monitoring list",
-    timestamp: "2024-01-15T08:45:00Z",
-    type: "competitor",
-    user: "Jane Smith"
-  },
-  {
-    id: "4",
-    action: "Data Analysis Refresh",
-    details: "Market sentiment data updated for all tracked competitors",
-    timestamp: "2024-01-15T07:00:00Z",
-    type: "analysis",
-    user: "System"
-  },
-  {
-    id: "5",
-    action: "Campaign Status Updated",
-    details: "Customer Success Stories campaign activated",
-    timestamp: "2024-01-14T16:20:00Z",
-    type: "campaign",
-    user: "Marketing Team"
-  }
-];
 
 export const ActivityLogs = () => {
   const [logs, setLogs] = useState<ActivityLog[]>([]);
@@ -108,16 +66,16 @@ export const ActivityLogs = () => {
         }))
       ];
 
-      // Sort by timestamp and merge with mock data for demo
-      const allLogs = [...combinedLogs, ...mockActivityLogs]
+      // Sort by timestamp - live data only
+      const allLogs = combinedLogs
         .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
         .slice(0, 15);
 
       setLogs(allLogs);
     } catch (error) {
       console.error('Error fetching activity logs:', error);
-      // Fallback to mock data
-      setLogs(mockActivityLogs);
+      // No fallback data - show empty state
+      setLogs([]);
     } finally {
       setIsLoading(false);
     }
@@ -195,7 +153,22 @@ export const ActivityLogs = () => {
       </div>
 
       <div className="space-y-3">
-        {logs.map((log, index) => (
+        {logs.length === 0 ? (
+          <Card>
+            <CardContent className="flex items-center justify-center py-16">
+              <div className="text-center space-y-4">
+                <Activity className="h-16 w-16 text-muted-foreground mx-auto" />
+                <div className="space-y-2">
+                  <p className="text-xl font-semibold">Activity Logs Ready</p>
+                  <p className="text-muted-foreground max-w-md">
+                    Start using Specter Net to see real-time activity logs of all operations, campaigns, and system events.
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ) : (
+          logs.map((log, index) => (
           <Card 
             key={log.id}
             className={`card-hover slide-in animate-delay-${(index % 4) * 100}`}
@@ -233,7 +206,7 @@ export const ActivityLogs = () => {
               </div>
             </CardContent>
           </Card>
-        ))}
+        )))}
       </div>
 
       <Card className="border-dashed">

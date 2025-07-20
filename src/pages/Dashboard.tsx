@@ -128,7 +128,7 @@ const Dashboard = () => {
         <AppSidebar activeView={activeView} onViewChange={setActiveView} />
         
         <div className="flex-1 flex flex-col">
-          {/* Enhanced Header with Sidebar Trigger */}
+          {/* Clean Header - Single Specter Logo and Controls */}
           <header className="h-16 border-b border-border/50 bg-card/50 backdrop-blur-sm flex items-center justify-between px-6">
             <div className="flex items-center space-x-4">
               <SidebarTrigger className="hover:bg-accent hover:text-accent-foreground transition-colors" />
@@ -154,12 +154,14 @@ const Dashboard = () => {
                 Ask Specter
               </button>
               
-              <DashboardHeader 
-                user={user} 
-                onAIToggle={() => setIsAIOpen(!isAIOpen)} 
-                isAIOpen={isAIOpen}
-                onNotificationsClick={() => setIsNotificationsOpen(true)}
-              />
+              <div className="flex items-center space-x-2">
+                <span className="text-sm font-medium">{user?.firstName || user?.fullName || 'Agent'}</span>
+                <div className="w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center">
+                  <span className="text-xs font-medium text-primary">
+                    {(user?.firstName?.[0] || user?.fullName?.[0] || 'A').toUpperCase()}
+                  </span>
+                </div>
+              </div>
             </div>
           </header>
           

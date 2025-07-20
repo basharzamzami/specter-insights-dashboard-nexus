@@ -28,32 +28,6 @@ interface ActionLog {
   details: any;
 }
 
-// Mock data for enhanced visualizations
-const sentimentTrendData = [
-  { name: 'Week 1', competitor1: 65, competitor2: 45, competitor3: 80, ourScore: 75 },
-  { name: 'Week 2', competitor1: 62, competitor2: 48, competitor3: 78, ourScore: 78 },
-  { name: 'Week 3', competitor1: 58, competitor2: 52, competitor3: 75, ourScore: 82 },
-  { name: 'Week 4', competitor1: 55, competitor2: 55, competitor3: 72, ourScore: 85 },
-  { name: 'Week 5', competitor1: 52, competitor2: 58, competitor3: 70, ourScore: 88 },
-];
-
-const campaignPerformanceData = [
-  { name: 'SEO Attacks', successful: 12, failed: 3, pending: 5 },
-  { name: 'Social Ops', successful: 8, failed: 2, pending: 3 },
-  { name: 'Whisper Campaigns', successful: 15, failed: 1, pending: 7 },
-  { name: 'Disruption', successful: 6, failed: 4, pending: 2 },
-  { name: 'Ad Hijacking', successful: 10, failed: 2, pending: 4 },
-];
-
-const marketShareData = [
-  { name: 'Our Company', value: 35, color: '#3b82f6' },
-  { name: 'TechCorp', value: 28, color: '#ef4444' },
-  { name: 'DataSolutions', value: 18, color: '#f59e0b' },
-  { name: 'CloudInnovate', value: 12, color: '#10b981' },
-  { name: 'Others', value: 7, color: '#6b7280' },
-];
-
-const COLORS = ['#3b82f6', '#ef4444', '#f59e0b', '#10b981', '#6b7280'];
 
 export const CampaignReporting = () => {
   const { user } = useUser();
@@ -125,18 +99,16 @@ export const CampaignReporting = () => {
     }
   };
 
-  const generateMockStats = () => ({
-    totalCampaigns: campaigns.length || 24,
-    activeCampaigns: campaigns.filter(c => c.status === 'active').length || 8,
-    completedCampaigns: campaigns.filter(c => c.status === 'completed').length || 16,
-    totalReach: Math.floor(Math.random() * 100000) + 250000,
-    engagementRate: (Math.random() * 3 + 4).toFixed(1),
-    sentimentShift: (Math.random() * 15 + 8).toFixed(1),
-    successRate: (Math.random() * 20 + 75).toFixed(1),
-    competitorsAnalyzed: Math.floor(Math.random() * 10) + 15
-  });
-
-  const stats = generateMockStats();
+  const stats = {
+    totalCampaigns: campaigns.length,
+    activeCampaigns: campaigns.filter(c => c.status === 'active').length,
+    completedCampaigns: campaigns.filter(c => c.status === 'completed').length,
+    totalReach: 0,
+    engagementRate: "0.0",
+    sentimentShift: "0.0",
+    successRate: "0.0",
+    competitorsAnalyzed: 0
+  };
 
   const exportData = (format: string) => {
     // Create demo data if no campaigns exist
@@ -327,92 +299,27 @@ export const CampaignReporting = () => {
         ))}
       </div>
 
-      {/* Visualization Tabs */}
-      {viewMode === "overview" && (
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* Sentiment Trend Analysis */}
-          <Card className="animate-slide-in-right">
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <LineChart className="h-5 w-5" />
-                Sentiment Warfare Timeline
-              </CardTitle>
-              <CardDescription>Tracking competitor sentiment degradation vs our improvement</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <RechartsLineChart data={sentimentTrendData}>
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Line type="monotone" dataKey="ourScore" stroke="#3b82f6" strokeWidth={3} name="Our Score" />
-                  <Line type="monotone" dataKey="competitor1" stroke="#ef4444" strokeWidth={2} name="TechCorp" />
-                  <Line type="monotone" dataKey="competitor2" stroke="#f59e0b" strokeWidth={2} name="DataSolutions" />
-                  <Line type="monotone" dataKey="competitor3" stroke="#10b981" strokeWidth={2} name="CloudInnovate" />
-                </RechartsLineChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-
-          {/* Market Share Analysis */}
-          <Card className="animate-slide-in-right" style={{ animationDelay: '0.1s' }}>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5" />
-                Market Dominance Analysis
-              </CardTitle>
-              <CardDescription>Current market share distribution after operations</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ResponsiveContainer width="100%" height={300}>
-                <PieChart>
-                  <Pie
-                    data={marketShareData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {marketShareData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                  </Pie>
-                  <Tooltip />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
-      )}
-
-      {viewMode === "performance" && (
-        <Card className="animate-fade-in">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5" />
-              Operation Performance Matrix
-            </CardTitle>
-            <CardDescription>Success rates across different attack vectors</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ResponsiveContainer width="100%" height={400}>
-              <BarChart data={campaignPerformanceData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Bar dataKey="successful" stackId="a" fill="#10b981" name="Successful" />
-                <Bar dataKey="pending" stackId="a" fill="#f59e0b" name="Pending" />
-                <Bar dataKey="failed" stackId="a" fill="#ef4444" name="Failed" />
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      )}
+      {/* Live Analytics Ready */}
+      <Card className="animate-fade-in">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BarChart3 className="h-5 w-5" />
+            Intelligence Analytics
+          </CardTitle>
+          <CardDescription>Real-time campaign data will appear here as operations are launched</CardDescription>
+        </CardHeader>
+        <CardContent className="flex items-center justify-center py-16">
+          <div className="text-center space-y-4">
+            <Target className="h-16 w-16 text-muted-foreground mx-auto" />
+            <div className="space-y-2">
+              <p className="text-xl font-semibold">Analytics Ready</p>
+              <p className="text-muted-foreground max-w-md">
+                Launch campaigns and operations to see real-time performance metrics, sentiment analysis, and competitive intelligence data.
+              </p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Campaign Performance List */}
       <Card className="animate-fade-in">

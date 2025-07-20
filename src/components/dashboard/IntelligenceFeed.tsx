@@ -26,78 +26,6 @@ interface IntelligenceItem {
   data?: any;
 }
 
-const mockIntelligence: IntelligenceItem[] = [
-  {
-    id: "1",
-    type: "hiring",
-    title: "TechCorp hiring 15 Senior Engineers",
-    description: "Mass hiring spree indicates potential new product launch or scaling issues. Focus areas: AI/ML, Cloud Infrastructure.",
-    source: "LinkedIn Intelligence",
-    timestamp: "2 hours ago",
-    priority: "high",
-    competitor: "TechCorp",
-    impact: "negative",
-    url: "https://linkedin.com/company/techcorp"
-  },
-  {
-    id: "2",
-    type: "review",
-    title: "DataSolutions receives 1-star reviews surge",
-    description: "Customer satisfaction dropping due to recent API changes. 23% increase in negative reviews this week.",
-    source: "Review Monitor",
-    timestamp: "4 hours ago",
-    priority: "high",
-    competitor: "DataSolutions",
-    impact: "positive"
-  },
-  {
-    id: "3",
-    type: "product",
-    title: "CloudInnovate announces AI integration",
-    description: "New AI-powered analytics feature launching Q2. Direct threat to our core value proposition.",
-    source: "Product Hunt",
-    timestamp: "6 hours ago",
-    priority: "high",
-    competitor: "CloudInnovate",
-    impact: "negative",
-    url: "https://producthunt.com/posts/cloudinnovate-ai"
-  },
-  {
-    id: "4",
-    type: "financial",
-    title: "StartupX raises $50M Series B",
-    description: "Significant funding round led by tier-1 VCs. Expected to accelerate market expansion and R&D.",
-    source: "TechCrunch",
-    timestamp: "8 hours ago",
-    priority: "medium",
-    competitor: "StartupX",
-    impact: "negative",
-    url: "https://techcrunch.com/startupx-series-b"
-  },
-  {
-    id: "5",
-    type: "social",
-    title: "Viral thread about TechCorp downtime",
-    description: "Twitter thread by influential tech lead goes viral (50K+ interactions) discussing reliability issues.",
-    source: "Social Monitor",
-    timestamp: "12 hours ago",
-    priority: "medium",
-    competitor: "TechCorp",
-    impact: "positive"
-  },
-  {
-    id: "6",
-    type: "news",
-    title: "Industry report: Market consolidation expected",
-    description: "Gartner predicts 40% of current players will be acquired or fail within 2 years. Opportunity for market capture.",
-    source: "Gartner Research",
-    timestamp: "1 day ago",
-    priority: "medium",
-    competitor: "Industry",
-    impact: "neutral",
-    url: "https://gartner.com/market-analysis"
-  }
-];
 
 export const IntelligenceFeed = () => {
   const { user } = useUser();
@@ -141,10 +69,10 @@ export const IntelligenceFeed = () => {
     } catch (error) {
       console.error('Error loading feeds:', error);
       toast.error("Failed to load intelligence feeds", {
-        description: "Using cached data. Please try again later."
+        description: "Connect intelligence sources to see live data."
       });
-      // Fallback to mock data
-      setIntelligence(mockIntelligence);
+      // No fallback data - show empty state
+      setIntelligence([]);
     } finally {
       setIsLoading(false);
     }
@@ -367,7 +295,26 @@ export const IntelligenceFeed = () => {
         </TabsList>
 
         <TabsContent value="live" className="space-y-4">
-          {filteredIntelligence.map((item, index) => (
+          {filteredIntelligence.length === 0 ? (
+            <Card>
+              <CardContent className="flex items-center justify-center py-16">
+                <div className="text-center space-y-4">
+                  <Rss className="h-16 w-16 text-muted-foreground mx-auto" />
+                  <div className="space-y-2">
+                    <p className="text-xl font-semibold">Intelligence Feed Ready</p>
+                    <p className="text-muted-foreground max-w-md">
+                      Connect your intelligence sources to start monitoring competitor movements, market changes, and strategic opportunities in real-time.
+                    </p>
+                  </div>
+                  <Button variant="outline" onClick={handleRefreshData}>
+                    <Monitor className="h-4 w-4 mr-2" />
+                    Connect Sources
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            filteredIntelligence.map((item, index) => (
             <Card key={item.id} className={`card-hover animate-fade-in animate-delay-${(index % 4) * 100}`}>
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -447,11 +394,22 @@ export const IntelligenceFeed = () => {
                 </div>
               </CardContent>
             </Card>
-          ))}
+          )))}
         </TabsContent>
 
         <TabsContent value="alerts" className="space-y-4">
-          {filteredIntelligence.filter(item => item.priority === "high").map((item, index) => (
+          {filteredIntelligence.filter(item => item.priority === "high").length === 0 ? (
+            <Card>
+              <CardContent className="flex items-center justify-center py-16">
+                <div className="text-center space-y-4">
+                  <AlertTriangle className="h-16 w-16 text-muted-foreground mx-auto" />
+                  <p className="text-xl font-semibold">No Critical Alerts</p>
+                  <p className="text-muted-foreground">All systems running smoothly</p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            filteredIntelligence.filter(item => item.priority === "high").map((item, index) => (
             <Card key={item.id} className="card-hover border-destructive/50">
               <CardHeader>
                 <div className="flex items-start justify-between">
@@ -491,7 +449,7 @@ export const IntelligenceFeed = () => {
                 </div>
               </CardContent>
             </Card>
-          ))}
+          )))}
         </TabsContent>
 
         <TabsContent value="trending" className="space-y-4">

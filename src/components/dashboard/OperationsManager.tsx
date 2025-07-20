@@ -38,50 +38,7 @@ interface Operation {
 }
 
 export const OperationsManager = () => {
-  const [operations, setOperations] = useState<Operation[]>([
-    {
-      id: '1',
-      type: 'edit',
-      title: 'Update LinkedIn Company Page',
-      description: 'Refresh company description with new AI capabilities and competitive positioning',
-      status: 'in_progress',
-      priority: 'high',
-      assignee: 'Sarah Chen',
-      dueDate: '2024-07-20',
-      platform: 'linkedin'
-    },
-    {
-      id: '2',
-      type: 'schedule',
-      title: 'Q3 Product Launch Campaign',
-      description: 'Schedule social media posts for new AI features launch across all platforms',
-      status: 'pending',
-      priority: 'high',
-      assignee: 'Mike Rodriguez',
-      dueDate: '2024-07-25',
-      content: 'Announcing our revolutionary AI-powered competitive intelligence features!'
-    },
-    {
-      id: '3',
-      type: 'edit',
-      title: 'Competitor Analysis Blog Post',
-      description: 'Edit and optimize blog post about latest market trends and competitor insights',
-      status: 'review',
-      priority: 'medium',
-      assignee: 'Emily Foster',
-      dueDate: '2024-07-22'
-    },
-    {
-      id: '4',
-      type: 'schedule',
-      title: 'Weekly Newsletter',
-      description: 'Schedule weekly competitive intelligence newsletter for Tuesday morning',
-      status: 'completed',
-      priority: 'medium',
-      assignee: 'David Kim',
-      dueDate: '2024-07-16'
-    }
-  ]);
+  const [operations, setOperations] = useState<Operation[]>([]);
 
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isAnalyticsOpen, setIsAnalyticsOpen] = useState(false);

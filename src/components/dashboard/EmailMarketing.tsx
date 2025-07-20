@@ -97,7 +97,7 @@ export function EmailMarketing() {
         return data || [];
       };
 
-      const campaignsData = await populateWithDemoData(fetchCampaigns, demoEmailCampaigns, 5);
+      const campaignsData = await fetchCampaigns();
 
       setTemplates(templatesResponse.data || []);
       setCampaigns(campaignsData);
