@@ -9,6 +9,7 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { Shield, Building, Target, Zap } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
 
 interface ClientData {
   businessName: string;
@@ -44,31 +45,57 @@ export const ClientOnboarding = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!user?.id) {
+      toast({
+        title: "Authentication Error",
+        description: "Please sign in to continue.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
 
     try {
-      // Save client data and proceed to dashboard
-      console.log('Client onboarding data:', clientData);
-      
+      // Save client data to Supabase
+      const { error } = await supabase
+        .from('clients')
+        .insert({
+          user_id: user.id,
+          business_name: clientData.businessName,
+          industry: clientData.industry,
+          email: clientData.email,
+          phone: clientData.phone || null,
+          city: clientData.city || null,
+          state: clientData.state || null,
+          zipcode: clientData.zipcode || null,
+          business_goals: clientData.businessGoals
+        });
+
+      if (error) {
+        throw error;
+      }
+
       toast({
         title: "Welcome to Specter Net™",
         description: "Your elite intelligence platform is now being configured for your business.",
       });
 
+      // Trigger background data collection process
+      // TODO: Implement background function for initial AI data collection
+      console.log('Starting background competitor scanning for:', clientData.industry, clientData.city, clientData.state);
+
       // Redirect to user-specific dashboard after successful onboarding
       setTimeout(() => {
-        if (user?.id) {
-          navigate(`/dashboard/${user.id}`);
-        } else {
-          navigate('/dashboard');
-        }
+        navigate(`/dashboard/${user.id}`);
       }, 2000);
 
     } catch (error) {
       console.error('Onboarding error:', error);
       toast({
         title: "Onboarding Error",
-        description: "Please try again or contact support.",
+        description: error instanceof Error ? error.message : "Please try again or contact support.",
         variant: "destructive"
       });
     } finally {

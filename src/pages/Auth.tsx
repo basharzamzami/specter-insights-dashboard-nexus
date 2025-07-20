@@ -1,26 +1,25 @@
 import { SignIn, SignUp, useUser } from "@clerk/clerk-react";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useClientData } from "@/hooks/useClientData";
 
 const Auth = () => {
   const { isSignedIn, user } = useUser();
   const navigate = useNavigate();
   const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const { hasCompletedOnboarding, loading } = useClientData();
 
   useEffect(() => {
-    if (isSignedIn && user) {
-      // Check if this is a new user (simplified check - in production you'd check a database)
-      const isNewUser = user.createdAt && new Date(user.createdAt).getTime() > Date.now() - 120000; // Created within last 2 minutes
-      
-      if (isNewUser) {
-        // Redirect new users to onboarding
-        navigate('/onboarding');
-      } else {
-        // Redirect existing users to dashboard
+    if (isSignedIn && user && !loading) {
+      if (hasCompletedOnboarding) {
+        // Redirect users who have completed onboarding to dashboard
         navigate(`/dashboard/${user.id}`);
+      } else {
+        // Redirect users who haven't completed onboarding
+        navigate('/onboarding');
       }
     }
-  }, [isSignedIn, user, navigate]);
+  }, [isSignedIn, user, hasCompletedOnboarding, loading, navigate]);
 
   return (
     <div className="min-h-screen bg-gradient-subtle flex items-center justify-center p-4">

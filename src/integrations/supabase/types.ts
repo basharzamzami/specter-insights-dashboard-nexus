@@ -250,6 +250,51 @@ export type Database = {
         }
         Relationships: []
       }
+      clients: {
+        Row: {
+          business_goals: string
+          business_name: string
+          city: string | null
+          created_at: string
+          email: string
+          id: string
+          industry: string
+          phone: string | null
+          state: string | null
+          updated_at: string
+          user_id: string
+          zipcode: string | null
+        }
+        Insert: {
+          business_goals: string
+          business_name: string
+          city?: string | null
+          created_at?: string
+          email: string
+          id?: string
+          industry: string
+          phone?: string | null
+          state?: string | null
+          updated_at?: string
+          user_id: string
+          zipcode?: string | null
+        }
+        Update: {
+          business_goals?: string
+          business_name?: string
+          city?: string | null
+          created_at?: string
+          email?: string
+          id?: string
+          industry?: string
+          phone?: string | null
+          state?: string | null
+          updated_at?: string
+          user_id?: string
+          zipcode?: string | null
+        }
+        Relationships: []
+      }
       competitor_profiles: {
         Row: {
           ad_activity: Json | null
