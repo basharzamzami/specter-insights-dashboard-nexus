@@ -9,6 +9,8 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { useUser } from "@clerk/clerk-react";
 import { toast } from "sonner";
+import { useThreatAlerts } from "@/hooks/useThreatAlerts";
+import { useCompetitorProfiles } from "@/hooks/useCompetitorProfiles";
 
 interface IntelligenceItem {
   id: string;
@@ -29,6 +31,8 @@ interface IntelligenceItem {
 
 export const IntelligenceFeed = () => {
   const { user } = useUser();
+  const { alerts, loading: alertsLoading, markAsRead, deleteAlert, unreadCount } = useThreatAlerts();
+  const { competitors, refreshCompetitorData } = useCompetitorProfiles();
   const [intelligence, setIntelligence] = useState<IntelligenceItem[]>([]);
   const [filter, setFilter] = useState<string>("all");
   const [priorityFilter, setPriorityFilter] = useState<string>("all");
@@ -398,58 +402,157 @@ export const IntelligenceFeed = () => {
         </TabsContent>
 
         <TabsContent value="alerts" className="space-y-4">
-          {filteredIntelligence.filter(item => item.priority === "high").length === 0 ? (
+          {alertsLoading ? (
+            <Card>
+              <CardContent className="flex items-center justify-center py-16">
+                <div className="text-center space-y-4">
+                  <Monitor className="h-8 w-8 animate-spin text-primary mx-auto" />
+                  <p className="text-muted-foreground">Loading threat alerts...</p>
+                </div>
+              </CardContent>
+            </Card>
+          ) : alerts.length === 0 ? (
             <Card>
               <CardContent className="flex items-center justify-center py-16">
                 <div className="text-center space-y-4">
                   <AlertTriangle className="h-16 w-16 text-muted-foreground mx-auto" />
-                  <p className="text-xl font-semibold">No Critical Alerts</p>
-                  <p className="text-muted-foreground">All systems running smoothly</p>
+                  <div className="space-y-2">
+                    <p className="text-xl font-semibold">No Active Threats</p>
+                    <p className="text-muted-foreground max-w-md">
+                      All competitor activities are within normal parameters. The AI monitoring system will alert you of any significant changes.
+                    </p>
+                  </div>
+                  <div className="flex gap-2">
+                    <Button variant="outline" onClick={() => refreshCompetitorData()}>
+                      <Monitor className="h-4 w-4 mr-2" />
+                      Refresh Intelligence
+                    </Button>
+                    <Badge variant="secondary" className="px-3 py-1">
+                      {unreadCount} Unread Alerts
+                    </Badge>
+                  </div>
                 </div>
               </CardContent>
             </Card>
           ) : (
-            filteredIntelligence.filter(item => item.priority === "high").map((item, index) => (
-            <Card key={item.id} className="card-hover border-destructive/50">
-              <CardHeader>
-                <div className="flex items-start justify-between">
-                  <div className="flex items-start gap-3 flex-1">
-                    <AlertTriangle className="h-5 w-5 text-destructive mt-1" />
-                    <div className="flex-1">
-                      <CardTitle className="text-lg text-destructive">{item.title}</CardTitle>
-                      <CardDescription>{item.description}</CardDescription>
-                    </div>
-                  </div>
-                  <Badge variant="destructive">CRITICAL</Badge>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="flex gap-2">
-                  <Button 
-                    size="sm" 
-                    className="btn-glow"
-                    onClick={() => handleExecuteResponse(item)}
+            <div className="space-y-3">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-lg font-semibold">Active Threat Alerts</h3>
+                <Badge variant="destructive" className="px-3 py-1">
+                  {unreadCount} Unread
+                </Badge>
+              </div>
+              
+              {alerts.map((alert, index) => {
+                const competitor = competitors.find(c => c.id === alert.competitor_id);
+                const severityIcon = alert.severity === 'critical' ? '🚨' : 
+                                   alert.severity === 'high' ? '⚠️' : 
+                                   alert.severity === 'medium' ? '🔔' : 'ℹ️';
+                
+                return (
+                  <Card 
+                    key={alert.id} 
+                    className={`card-hover border-l-4 ${
+                      alert.severity === 'critical' ? 'border-l-red-500' :
+                      alert.severity === 'high' ? 'border-l-orange-500' :
+                      alert.severity === 'medium' ? 'border-l-yellow-500' : 'border-l-blue-500'
+                    } ${!alert.read_status ? 'bg-muted/20' : ''}`}
                   >
-                    <Briefcase className="h-3 w-3 mr-1" />
-                    Execute Response
-                  </Button>
-                  <Button 
-                    size="sm" 
-                    variant="outline"
-                    onClick={() => {
-                      const params = new URLSearchParams({
-                        execution_id: Math.random().toString(36).substr(2, 9),
-                        title: `Monitoring: ${item.title}`
-                      });
-                      window.location.href = `/monitoring?${params.toString()}`;
-                    }}
-                  >
-                    Monitor Situation
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          )))}
+                    <CardHeader className="pb-3">
+                      <div className="flex items-start justify-between">
+                        <div className="flex items-start gap-3 flex-1">
+                          <div className="text-xl">{severityIcon}</div>
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-1">
+                              <CardTitle className="text-base">{alert.alert_type}</CardTitle>
+                              {!alert.read_status && (
+                                <Badge variant="secondary" className="text-xs">NEW</Badge>
+                              )}
+                            </div>
+                            <CardDescription className="flex items-center gap-2">
+                              {competitor && (
+                                <>
+                                  <span className="font-medium">{competitor.company_name}</span>
+                                  <span>•</span>
+                                </>
+                              )}
+                              <span>{new Date(alert.created_at).toLocaleString()}</span>
+                            </CardDescription>
+                          </div>
+                        </div>
+                        <Badge 
+                          variant={
+                            alert.severity === 'critical' ? 'destructive' :
+                            alert.severity === 'high' ? 'destructive' :
+                            alert.severity === 'medium' ? 'secondary' : 'outline'
+                          }
+                          className="uppercase text-xs"
+                        >
+                          {alert.severity}
+                        </Badge>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="pt-0">
+                      <div className="space-y-4">
+                        <p className="text-sm leading-relaxed">{alert.message}</p>
+                        
+                        <div className="flex items-center justify-between">
+                          <div className="flex gap-2">
+                            {!alert.read_status && (
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => markAsRead(alert.id)}
+                              >
+                                <Eye className="h-3 w-3 mr-1" />
+                                Mark Read
+                              </Button>
+                            )}
+                            
+                            {competitor && (
+                              <Button 
+                                size="sm" 
+                                variant="outline"
+                                onClick={() => window.location.href = `/competitor/${competitor.id}`}
+                              >
+                                <ExternalLink className="h-3 w-3 mr-1" />
+                                View Competitor
+                              </Button>
+                            )}
+                            
+                            <Button 
+                              size="sm" 
+                              variant="outline"
+                              onClick={() => {
+                                const params = new URLSearchParams({
+                                  alert_id: alert.id,
+                                  competitor: competitor?.company_name || 'Unknown',
+                                  type: alert.alert_type
+                                });
+                                window.location.href = `/strategy?${params.toString()}`;
+                              }}
+                            >
+                              <Users className="h-3 w-3 mr-1" />
+                              Create Response
+                            </Button>
+                          </div>
+                          
+                          <Button 
+                            size="sm" 
+                            variant="ghost"
+                            onClick={() => deleteAlert(alert.id)}
+                            className="text-muted-foreground hover:text-destructive"
+                          >
+                            Dismiss
+                          </Button>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
         </TabsContent>
 
         <TabsContent value="trending" className="space-y-4">

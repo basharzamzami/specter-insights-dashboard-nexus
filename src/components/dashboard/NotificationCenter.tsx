@@ -7,6 +7,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useThreatAlerts } from "@/hooks/useThreatAlerts";
 
 interface Notification {
   id: string;
@@ -87,6 +88,7 @@ const mockNotifications: Notification[] = [
 ];
 
 export const NotificationCenter = () => {
+  const { unreadCount: threatUnreadCount } = useThreatAlerts();
   const [notifications, setNotifications] = useState<Notification[]>(mockNotifications);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
@@ -295,7 +297,7 @@ export const NotificationCenter = () => {
     }
   });
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter(n => !n.read).length + threatUnreadCount;
   const criticalCount = notifications.filter(n => n.type === "critical" && !n.read).length;
 
   return (
