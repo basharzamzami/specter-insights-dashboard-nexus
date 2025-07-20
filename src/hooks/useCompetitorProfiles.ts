@@ -176,6 +176,50 @@ export const useCompetitorProfiles = () => {
     }
   };
 
+  const refreshCompetitorData = async (competitorId?: string) => {
+    if (!user?.id) return;
+
+    try {
+      const { data, error } = await supabase.functions.invoke('fetch-competitor-data', {
+        body: { 
+          userId: user.id,
+          competitorId: competitorId 
+        }
+      });
+
+      if (error) throw error;
+      if (!data.success) throw new Error(data.error);
+
+      if (competitorId) {
+        // Update specific competitor
+        setCompetitors(prev => 
+          prev.map(comp => comp.id === competitorId ? data.competitor : comp)
+        );
+        
+        toast({
+          title: "Intelligence Updated",
+          description: `Fresh data collected for competitor. ${data.threats} new threats detected.`,
+        });
+      } else {
+        // Refresh all competitors
+        setCompetitors(data.competitors);
+        
+        toast({
+          title: "Intelligence Refresh Complete",
+          description: "All competitor data has been updated with latest intelligence.",
+        });
+      }
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to refresh competitor data';
+      toast({
+        title: "Error",
+        description: errorMessage,
+        variant: "destructive",
+      });
+      throw err;
+    }
+  };
+
   useEffect(() => {
     fetchCompetitors();
   }, [user?.id]);
@@ -187,6 +231,7 @@ export const useCompetitorProfiles = () => {
     addCompetitor,
     updateCompetitor,
     deleteCompetitor,
+    refreshCompetitorData,
     refetch: fetchCompetitors,
   };
 };
