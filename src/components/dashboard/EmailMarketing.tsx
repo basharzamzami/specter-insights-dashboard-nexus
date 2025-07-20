@@ -11,8 +11,9 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
-import { Plus, Mail, Send, Eye, MousePointer, Users, Calendar, BarChart3, TrendingUp } from 'lucide-react';
+import { Plus, Mail, Send, Eye, MousePointer, Users, Calendar, BarChart3, TrendingUp, Trash2 } from 'lucide-react';
 import { populateWithDemoData, demoEmailCampaigns } from '@/utils/demoData';
+import { softDeleteRecord, excludeDeleted } from '@/utils/softDelete';
 
 interface EmailTemplate {
   id: string;
@@ -82,14 +83,14 @@ export function EmailMarketing() {
       if (!user) throw new Error('User not authenticated');
 
       const [templatesResponse] = await Promise.all([
-        supabase.from('email_templates').select('*')
+        excludeDeleted(supabase.from('email_templates').select('*'))
           .eq('user_id', user.id)
           .order('created_at', { ascending: false })
       ]);
 
-      // Fetch campaigns with demo data fallback - FILTERED BY USER
+      // Fetch campaigns with demo data fallback - FILTERED BY USER AND EXCLUDE DELETED
       const fetchCampaigns = async () => {
-        const { data, error } = await supabase.from('email_campaigns').select('*')
+        const { data, error } = await excludeDeleted(supabase.from('email_campaigns').select('*'))
           .eq('user_id', user.id)
           .order('created_at', { ascending: false });
         if (error) throw error;
@@ -230,6 +231,56 @@ export function EmailMarketing() {
       title: "Template Loaded",
       description: `Template "${template.name}" has been loaded into campaign creator.`,
     });
+  };
+
+  const handleDeleteCampaign = async (campaign: EmailCampaign) => {
+    try {
+      const { data: { user } } = await getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const { error } = await softDeleteRecord('email_campaigns', campaign.id, user.id);
+      
+      if (error) throw error;
+
+      toast({
+        title: "Campaign Moved to Trash",
+        description: `"${campaign.name}" has been moved to trash. You can restore it from the Trash Bin.`,
+      });
+
+      await fetchData();
+    } catch (error) {
+      console.error('Error deleting campaign:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete campaign",
+        variant: "destructive",
+      });
+    }
+  };
+
+  const handleDeleteTemplate = async (template: EmailTemplate) => {
+    try {
+      const { data: { user } } = await getUser();
+      if (!user) throw new Error('User not authenticated');
+
+      const { error } = await softDeleteRecord('email_templates', template.id, user.id);
+      
+      if (error) throw error;
+
+      toast({
+        title: "Template Moved to Trash",
+        description: `"${template.name}" has been moved to trash. You can restore it from the Trash Bin.`,
+      });
+
+      await fetchData();
+    } catch (error) {
+      console.error('Error deleting template:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete template",
+        variant: "destructive",
+      });
+    }
   };
 
   const campaignStats = [
@@ -534,6 +585,14 @@ export function EmailMarketing() {
                         >
                           View Details
                         </Button>
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          className="text-destructive hover:text-destructive"
+                          onClick={() => handleDeleteCampaign(campaign)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                   );
@@ -582,13 +641,23 @@ export function EmailMarketing() {
                           <span className="text-xs text-muted-foreground">
                             {new Date(template.created_at).toLocaleDateString()}
                           </span>
-                          <Button 
-                            variant="outline" 
-                            size="sm"
-                            onClick={() => handleUseTemplate(template)}
-                          >
-                            Use Template
-                          </Button>
+                          <div className="flex items-center space-x-2">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => handleUseTemplate(template)}
+                            >
+                              Use Template
+                            </Button>
+                            <Button 
+                              variant="ghost" 
+                              size="sm"
+                              className="text-destructive hover:text-destructive"
+                              onClick={() => handleDeleteTemplate(template)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
+                          </div>
                         </div>
                       </div>
                     </CardContent>

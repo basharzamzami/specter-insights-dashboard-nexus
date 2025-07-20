@@ -23,6 +23,7 @@ import { EmailMarketing } from "@/components/dashboard/EmailMarketing";
 import { SocialMediaManager } from "@/components/dashboard/SocialMediaManager";
 import { CalendarScheduler } from "@/components/dashboard/CalendarScheduler";
 import { OperationsManager } from "@/components/dashboard/OperationsManager";
+import { TrashBin } from "@/components/dashboard/TrashBin";
 import { Loader2, Bell } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
@@ -103,6 +104,8 @@ const Dashboard = () => {
         return <CalendarScheduler />;
       case "operations":
         return <OperationsManager />;
+      case "trash":
+        return <TrashBin />;
       default:
         return (
           <div className="space-y-8">

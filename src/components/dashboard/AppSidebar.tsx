@@ -18,7 +18,8 @@ import {
   CheckSquare,
   Mail,
   Share2,
-  Cog
+  Cog,
+  Trash2
 } from "lucide-react";
 import {
   Sidebar,
@@ -62,6 +63,7 @@ const analyticsItems: SidebarItem[] = [
   { name: "Email Marketing", icon: Mail, key: "email" },
   { name: "Social Media", icon: Share2, key: "social" },
   { name: "Calendar", icon: Calendar, key: "calendar" },
+  { name: "Trash Bin", icon: Trash2, key: "trash" },
 ];
 
 const systemItems: SidebarItem[] = [

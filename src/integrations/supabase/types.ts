@@ -128,6 +128,13 @@ export type Database = {
             foreignKeyName: "appointments_contact_id_fkey"
             columns: ["contact_id"]
             isOneToOne: false
+            referencedRelation: "active_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "appointments_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
             referencedRelation: "contacts"
             referencedColumns: ["id"]
           },
@@ -203,6 +210,7 @@ export type Database = {
           actions: Json | null
           created_at: string | null
           created_by: string | null
+          deleted_at: string | null
           id: string
           is_deleted: boolean | null
           objective: string | null
@@ -216,6 +224,7 @@ export type Database = {
           actions?: Json | null
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
           id?: string
           is_deleted?: boolean | null
           objective?: string | null
@@ -229,6 +238,7 @@ export type Database = {
           actions?: Json | null
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
           id?: string
           is_deleted?: boolean | null
           objective?: string | null
@@ -247,6 +257,7 @@ export type Database = {
           created_at: string | null
           created_by: string | null
           customer_complaints: Json | null
+          deleted_at: string | null
           estimated_ad_spend: number | null
           id: string
           is_deleted: boolean | null
@@ -264,6 +275,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           customer_complaints?: Json | null
+          deleted_at?: string | null
           estimated_ad_spend?: number | null
           id?: string
           is_deleted?: boolean | null
@@ -281,6 +293,7 @@ export type Database = {
           created_at?: string | null
           created_by?: string | null
           customer_complaints?: Json | null
+          deleted_at?: string | null
           estimated_ad_spend?: number | null
           id?: string
           is_deleted?: boolean | null
@@ -367,6 +380,7 @@ export type Database = {
         Row: {
           company: string | null
           created_at: string
+          deleted_at: string | null
           email: string | null
           first_name: string | null
           id: string
@@ -385,6 +399,7 @@ export type Database = {
         Insert: {
           company?: string | null
           created_at?: string
+          deleted_at?: string | null
           email?: string | null
           first_name?: string | null
           id?: string
@@ -403,6 +418,7 @@ export type Database = {
         Update: {
           company?: string | null
           created_at?: string
+          deleted_at?: string | null
           email?: string | null
           first_name?: string | null
           id?: string
@@ -457,6 +473,7 @@ export type Database = {
           actual_close_date: string | null
           contact_id: string | null
           created_at: string
+          deleted_at: string | null
           description: string | null
           expected_close_date: string | null
           id: string
@@ -473,6 +490,7 @@ export type Database = {
           actual_close_date?: string | null
           contact_id?: string | null
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           expected_close_date?: string | null
           id?: string
@@ -489,6 +507,7 @@ export type Database = {
           actual_close_date?: string | null
           contact_id?: string | null
           created_at?: string
+          deleted_at?: string | null
           description?: string | null
           expected_close_date?: string | null
           id?: string
@@ -502,6 +521,13 @@ export type Database = {
           value?: number | null
         }
         Relationships: [
+          {
+            foreignKeyName: "deals_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "active_contacts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "deals_contact_id_fkey"
             columns: ["contact_id"]
@@ -571,6 +597,7 @@ export type Database = {
           clicked_count: number | null
           content: string
           created_at: string
+          deleted_at: string | null
           id: string
           name: string
           opened_count: number | null
@@ -588,6 +615,7 @@ export type Database = {
           clicked_count?: number | null
           content: string
           created_at?: string
+          deleted_at?: string | null
           id?: string
           name: string
           opened_count?: number | null
@@ -605,6 +633,7 @@ export type Database = {
           clicked_count?: number | null
           content?: string
           created_at?: string
+          deleted_at?: string | null
           id?: string
           name?: string
           opened_count?: number | null
@@ -632,6 +661,7 @@ export type Database = {
         Row: {
           content: string
           created_at: string
+          deleted_at: string | null
           id: string
           is_active: boolean | null
           name: string
@@ -643,6 +673,7 @@ export type Database = {
         Insert: {
           content: string
           created_at?: string
+          deleted_at?: string | null
           id?: string
           is_active?: boolean | null
           name: string
@@ -654,6 +685,7 @@ export type Database = {
         Update: {
           content?: string
           created_at?: string
+          deleted_at?: string | null
           id?: string
           is_active?: boolean | null
           name?: string
@@ -696,6 +728,13 @@ export type Database = {
           user_agent?: string | null
         }
         Relationships: [
+          {
+            foreignKeyName: "form_submissions_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "active_contacts"
+            referencedColumns: ["id"]
+          },
           {
             foreignKeyName: "form_submissions_contact_id_fkey"
             columns: ["contact_id"]
@@ -920,6 +959,7 @@ export type Database = {
           avatar_url: string | null
           created_at: string | null
           created_by: string | null
+          deleted_at: string | null
           id: string
           is_deleted: boolean | null
           name: string
@@ -931,6 +971,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
           id?: string
           is_deleted?: boolean | null
           name: string
@@ -942,6 +983,7 @@ export type Database = {
           avatar_url?: string | null
           created_at?: string | null
           created_by?: string | null
+          deleted_at?: string | null
           id?: string
           is_deleted?: boolean | null
           name?: string
@@ -1145,6 +1187,7 @@ export type Database = {
           contact_id: string | null
           created_at: string
           deal_id: string | null
+          deleted_at: string | null
           description: string | null
           due_date: string | null
           id: string
@@ -1159,6 +1202,7 @@ export type Database = {
           contact_id?: string | null
           created_at?: string
           deal_id?: string | null
+          deleted_at?: string | null
           description?: string | null
           due_date?: string | null
           id?: string
@@ -1173,6 +1217,7 @@ export type Database = {
           contact_id?: string | null
           created_at?: string
           deal_id?: string | null
+          deleted_at?: string | null
           description?: string | null
           due_date?: string | null
           id?: string
@@ -1187,7 +1232,21 @@ export type Database = {
             foreignKeyName: "tasks_contact_id_fkey"
             columns: ["contact_id"]
             isOneToOne: false
+            referencedRelation: "active_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
             referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "active_deals"
             referencedColumns: ["id"]
           },
           {
@@ -1327,7 +1386,264 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      active_campaigns: {
+        Row: {
+          actions: Json | null
+          created_at: string | null
+          created_by: string | null
+          deleted_at: string | null
+          id: string | null
+          is_deleted: boolean | null
+          objective: string | null
+          scheduled_date: string | null
+          status: string | null
+          target_company: string | null
+          type: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          actions?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string | null
+          is_deleted?: boolean | null
+          objective?: string | null
+          scheduled_date?: string | null
+          status?: string | null
+          target_company?: string | null
+          type?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          actions?: Json | null
+          created_at?: string | null
+          created_by?: string | null
+          deleted_at?: string | null
+          id?: string | null
+          is_deleted?: boolean | null
+          objective?: string | null
+          scheduled_date?: string | null
+          status?: string | null
+          target_company?: string | null
+          type?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      active_contacts: {
+        Row: {
+          company: string | null
+          created_at: string | null
+          deleted_at: string | null
+          email: string | null
+          first_name: string | null
+          id: string | null
+          job_title: string | null
+          last_contacted_at: string | null
+          last_name: string | null
+          lead_score: number | null
+          lead_source: string | null
+          lead_status: string | null
+          notes: string | null
+          phone: string | null
+          tags: string[] | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          company?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string | null
+          job_title?: string | null
+          last_contacted_at?: string | null
+          last_name?: string | null
+          lead_score?: number | null
+          lead_source?: string | null
+          lead_status?: string | null
+          notes?: string | null
+          phone?: string | null
+          tags?: string[] | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          company?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          email?: string | null
+          first_name?: string | null
+          id?: string | null
+          job_title?: string | null
+          last_contacted_at?: string | null
+          last_name?: string | null
+          lead_score?: number | null
+          lead_source?: string | null
+          lead_status?: string | null
+          notes?: string | null
+          phone?: string | null
+          tags?: string[] | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      active_deals: {
+        Row: {
+          actual_close_date: string | null
+          contact_id: string | null
+          created_at: string | null
+          deleted_at: string | null
+          description: string | null
+          expected_close_date: string | null
+          id: string | null
+          pipeline_id: string | null
+          probability: number | null
+          stage: string | null
+          status: string | null
+          title: string | null
+          updated_at: string | null
+          user_id: string | null
+          value: number | null
+        }
+        Insert: {
+          actual_close_date?: string | null
+          contact_id?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          expected_close_date?: string | null
+          id?: string | null
+          pipeline_id?: string | null
+          probability?: number | null
+          stage?: string | null
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          value?: number | null
+        }
+        Update: {
+          actual_close_date?: string | null
+          contact_id?: string | null
+          created_at?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          expected_close_date?: string | null
+          id?: string | null
+          pipeline_id?: string | null
+          probability?: number | null
+          stage?: string | null
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+          value?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deals_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "active_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deals_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "deals_pipeline_id_fkey"
+            columns: ["pipeline_id"]
+            isOneToOne: false
+            referencedRelation: "pipelines"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      active_tasks: {
+        Row: {
+          completed_at: string | null
+          contact_id: string | null
+          created_at: string | null
+          deal_id: string | null
+          deleted_at: string | null
+          description: string | null
+          due_date: string | null
+          id: string | null
+          priority: string | null
+          status: string | null
+          title: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          contact_id?: string | null
+          created_at?: string | null
+          deal_id?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string | null
+          priority?: string | null
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          contact_id?: string | null
+          created_at?: string | null
+          deal_id?: string | null
+          deleted_at?: string | null
+          description?: string | null
+          due_date?: string | null
+          id?: string | null
+          priority?: string | null
+          status?: string | null
+          title?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "active_contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_contact_id_fkey"
+            columns: ["contact_id"]
+            isOneToOne: false
+            referencedRelation: "contacts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "active_deals"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "tasks_deal_id_fkey"
+            columns: ["deal_id"]
+            isOneToOne: false
+            referencedRelation: "deals"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
