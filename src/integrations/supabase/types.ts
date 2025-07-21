@@ -309,6 +309,7 @@ export type Database = {
           email: string
           id: string
           industry: string
+          pain_points: string | null
           phone: string | null
           state: string | null
           updated_at: string
@@ -323,6 +324,7 @@ export type Database = {
           email: string
           id?: string
           industry: string
+          pain_points?: string | null
           phone?: string | null
           state?: string | null
           updated_at?: string
@@ -337,6 +339,7 @@ export type Database = {
           email?: string
           id?: string
           industry?: string
+          pain_points?: string | null
           phone?: string | null
           state?: string | null
           updated_at?: string

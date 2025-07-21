@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Shield, Building, Target, Zap } from 'lucide-react';
+import { Shield, Building, Target, Zap, AlertTriangle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
 interface ClientData {
@@ -20,6 +20,7 @@ interface ClientData {
   state: string;
   zipcode: string;
   businessGoals: string;
+  painPoints: string;
 }
 
 export const ClientOnboarding = () => {
@@ -33,7 +34,8 @@ export const ClientOnboarding = () => {
     city: '',
     state: '',
     zipcode: '',
-    businessGoals: ''
+    businessGoals: '',
+    painPoints: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const { toast } = useToast();
@@ -66,11 +68,12 @@ export const ClientOnboarding = () => {
           business_name: clientData.businessName,
           industry: clientData.industry,
           email: clientData.email,
-          phone: clientData.phone || null,
-          city: clientData.city || null,
-          state: clientData.state || null,
-          zipcode: clientData.zipcode || null,
-          business_goals: clientData.businessGoals
+          phone: clientData.phone,
+          city: clientData.city,
+          state: clientData.state,
+          zipcode: clientData.zipcode,
+          business_goals: clientData.businessGoals,
+          pain_points: clientData.painPoints
         });
 
       if (error) {
@@ -172,13 +175,14 @@ export const ClientOnboarding = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="phone">Phone</Label>
+                  <Label htmlFor="phone">Phone *</Label>
                   <Input
                     id="phone"
                     type="tel"
                     value={clientData.phone}
                     onChange={(e) => setClientData(prev => ({ ...prev, phone: e.target.value }))}
                     placeholder="(555) 123-4567"
+                    required
                   />
                 </div>
               </div>
@@ -191,32 +195,35 @@ export const ClientOnboarding = () => {
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="city">City</Label>
+                    <Label htmlFor="city">City *</Label>
                     <Input
                       id="city"
                       value={clientData.city}
                       onChange={(e) => setClientData(prev => ({ ...prev, city: e.target.value }))}
                       placeholder="New York"
+                      required
                     />
                   </div>
                   <div>
-                    <Label htmlFor="state">State</Label>
+                    <Label htmlFor="state">State *</Label>
                     <Input
                       id="state"
                       value={clientData.state}
                       onChange={(e) => setClientData(prev => ({ ...prev, state: e.target.value }))}
                       placeholder="NY"
+                      required
                     />
                   </div>
                 </div>
 
                 <div>
-                  <Label htmlFor="zipcode">Zipcode</Label>
+                  <Label htmlFor="zipcode">Zipcode *</Label>
                   <Input
                     id="zipcode"
                     value={clientData.zipcode}
                     onChange={(e) => setClientData(prev => ({ ...prev, zipcode: e.target.value }))}
                     placeholder="10001"
+                    required
                   />
                 </div>
 
@@ -231,6 +238,29 @@ export const ClientOnboarding = () => {
                     required
                   />
                 </div>
+              </div>
+            </div>
+
+            {/* Pain Points Section */}
+            <div className="space-y-4">
+              <div className="flex items-center space-x-2 mb-4">
+                <AlertTriangle className="h-5 w-5 text-destructive" />
+                <h3 className="text-lg font-semibold">Current Business Challenges</h3>
+              </div>
+              
+              <div>
+                <Label htmlFor="painPoints">What are your biggest business struggles or pain points? *</Label>
+                <Textarea
+                  id="painPoints"
+                  value={clientData.painPoints}
+                  onChange={(e) => setClientData(prev => ({ ...prev, painPoints: e.target.value }))}
+                  placeholder="Describe the main challenges your business is facing, what keeps you up at night, and what you're hoping our intelligence platform will help you overcome..."
+                  className="min-h-[140px]"
+                  required
+                />
+                <p className="text-sm text-muted-foreground mt-2">
+                  This helps us tailor our competitive intelligence to address your specific challenges.
+                </p>
               </div>
             </div>
 
