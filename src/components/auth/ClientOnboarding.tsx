@@ -49,6 +49,7 @@ export const ClientOnboarding = () => {
     e.preventDefault();
     
     if (!user?.id) {
+      console.error('No user ID found:', user);
       toast({
         title: "Authentication Error",
         description: "Please sign in to continue.",
@@ -57,28 +58,50 @@ export const ClientOnboarding = () => {
       return;
     }
 
+    // Validate required fields
+    if (!clientData.businessName || !clientData.industry || !clientData.email || 
+        !clientData.city || !clientData.state || !clientData.zipcode || !clientData.businessGoals) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all required fields.",
+        variant: "destructive"
+      });
+      return;
+    }
+
     setIsSubmitting(true);
+    console.log('Starting onboarding for user:', user.id);
 
     try {
+      // Debug: Log the data being inserted
+      const insertData = {
+        user_id: user.id,
+        business_name: clientData.businessName,
+        industry: clientData.industry,
+        email: clientData.email,
+        phone: clientData.phone || null,
+        city: clientData.city,
+        state: clientData.state,
+        zipcode: clientData.zipcode,
+        business_goals: clientData.businessGoals,
+        pain_points: clientData.painPoints || null
+      };
+      
+      console.log('Inserting client data:', insertData);
+
       // Save client data to Supabase
-      const { error } = await supabase
+      const { data, error } = await supabase
         .from('clients')
-        .insert({
-          user_id: user.id,
-          business_name: clientData.businessName,
-          industry: clientData.industry,
-          email: clientData.email,
-          phone: clientData.phone,
-          city: clientData.city,
-          state: clientData.state,
-          zipcode: clientData.zipcode,
-          business_goals: clientData.businessGoals,
-          pain_points: clientData.painPoints
-        });
+        .insert(insertData)
+        .select()
+        .single();
 
       if (error) {
+        console.error('Database error:', error);
         throw error;
       }
+
+      console.log('Successfully created client record:', data);
 
       toast({
         title: "Welcome to Specter Net™",
@@ -86,7 +109,6 @@ export const ClientOnboarding = () => {
       });
 
       // Trigger background data collection process
-      // TODO: Implement background function for initial AI data collection
       console.log('Starting background competitor scanning for:', clientData.industry, clientData.city, clientData.state);
 
       // Redirect to user-specific dashboard after successful onboarding
@@ -96,9 +118,11 @@ export const ClientOnboarding = () => {
 
     } catch (error) {
       console.error('Onboarding error:', error);
+      const errorMessage = error instanceof Error ? error.message : "An unexpected error occurred";
+      
       toast({
         title: "Onboarding Error",
-        description: error instanceof Error ? error.message : "Please try again or contact support.",
+        description: `${errorMessage}. Please try again or contact support.`,
         variant: "destructive"
       });
     } finally {
