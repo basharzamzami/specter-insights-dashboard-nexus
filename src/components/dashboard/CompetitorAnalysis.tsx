@@ -36,7 +36,7 @@ export const CompetitorAnalysis = () => {
   const { user } = useUser();
   const [inputValue, setInputValue] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-  const { competitors, addCompetitor, deleteCompetitor, loading: competitorsLoading } = useCompetitorProfiles();
+  const { competitors, addCompetitor, deleteCompetitor, loading: competitorsLoading, refetch } = useCompetitorProfiles();
   const [selectedCompetitor, setSelectedCompetitor] = useState<CompetitorProfile | null>(null);
   const [isActionDialogOpen, setIsActionDialogOpen] = useState(false);
   const [isCampaignDialogOpen, setIsCampaignDialogOpen] = useState(false);
@@ -72,53 +72,54 @@ export const CompetitorAnalysis = () => {
     setIsLoading(true);
     
     try {
-      // Use real SEO analysis edge function
-      const { data: analysisResponse, error: functionError } = await supabase.functions.invoke('seo-analysis', {
-        body: { domain: inputValue }
+      console.log(`Starting comprehensive competitor intelligence for: ${inputValue}`);
+      
+      // Use enhanced competitor intelligence function
+      const { data: intelligenceResponse, error: functionError } = await supabase.functions.invoke('competitor-intelligence', {
+        body: { 
+          domain: inputValue,
+          userId: user.id,
+          depth: 'comprehensive'
+        }
       });
 
       if (functionError) throw functionError;
-      if (!analysisResponse.success) throw new Error(analysisResponse.error);
+      if (!intelligenceResponse.success) throw new Error(intelligenceResponse.error);
 
-      const seoData = analysisResponse.data;
+      const intelligence = intelligenceResponse.intelligence;
       
-      // Convert SEO data to competitor profile format
-      const competitorData = {
-        company_name: seoData.domain.charAt(0).toUpperCase() + seoData.domain.slice(1),
-        website: inputValue.startsWith('http') ? inputValue : `https://${inputValue}`,
-        seo_score: seoData.seoScore,
-        sentiment_score: Math.random() * 0.6 + 0.4, // 0.4-1.0 range
-        vulnerabilities: seoData.vulnerabilities,
-        top_keywords: seoData.keywords.map((k: any) => k.keyword),
-        estimated_ad_spend: seoData.competitorAnalysis.monthlyVisitors * 0.1,
-        ad_activity: {
-          platforms: ['Google Ads', 'LinkedIn', 'Facebook'],
-          monthly_impressions: seoData.competitorAnalysis.monthlyVisitors,
-          traffic_sources: seoData.competitorAnalysis.trafficSources
-        },
-        social_sentiment: {
-          positive: Math.floor(Math.random() * 30) + 40,
-          neutral: Math.floor(Math.random() * 30) + 30,
-          negative: Math.floor(Math.random() * 30) + 10
-        },
-        customer_complaints: {
-          top_issues: ['Performance issues', 'Pricing concerns', 'Support delays'],
-          volume: Math.floor(Math.random() * 50) + 10,
-          platforms: ['Twitter', 'Reddit', 'G2', 'Trustpilot']
+      // Also gather Facebook Ads intelligence in parallel
+      const { data: facebookResponse } = await supabase.functions.invoke('facebook-ads-intelligence', {
+        body: { 
+          companyName: intelligence.company_name,
+          domain: inputValue,
+          userId: user.id
         }
-      };
+      });
+
+      // Gather reviews sentiment analysis
+      const { data: reviewsResponse } = await supabase.functions.invoke('reviews-sentiment-analysis', {
+        body: { 
+          companyName: intelligence.company_name,
+          domain: inputValue,
+          userId: user.id,
+          platforms: ['google', 'yelp', 'trustpilot', 'g2']
+        }
+      });
       
-      await addCompetitor(competitorData);
       setInputValue("");
       
-      toast.success("Real-time competitor analysis complete", {
-        description: `${competitorData.company_name} SEO analysis completed with ${seoData.keywords.length} keywords tracked.`
+      // Refresh competitors list to show the new data
+      await refetch();
+      
+      toast.success("Comprehensive competitor intelligence complete", {
+        description: `${intelligence.company_name} analyzed: ${intelligence.vulnerabilities.length} vulnerabilities found, ${intelligenceResponse.threats_detected} threats detected.`
       });
 
     } catch (error) {
       console.error('Analysis error:', error);
-      toast.error("Analysis failed", {
-        description: "Unable to complete real-time competitor analysis. Please try again."
+      toast.error("Intelligence gathering failed", {
+        description: "Unable to complete comprehensive competitor analysis. Please try again."
       });
     } finally {
       setIsLoading(false);
@@ -346,13 +347,13 @@ export const CompetitorAnalysis = () => {
             <span>Target Acquisition</span>
           </CardTitle>
           <CardDescription>
-            Enter competitor domain, company name, or keywords for comprehensive intelligence analysis
+            Enter competitor domain for real-time intelligence: SEO metrics, ad spend, sentiment analysis, tech stack, and competitive vulnerabilities
           </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex space-x-3">
             <Input
-              placeholder="competitor.com or company name..."
+              placeholder="competitor.com (e.g. hubspot.com, salesforce.com)"
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
               onKeyPress={(e) => e.key === 'Enter' && handleAnalyze()}
@@ -366,12 +367,12 @@ export const CompetitorAnalysis = () => {
               {isLoading ? (
                 <>
                   <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                  Analyzing...
+                  Gathering Intelligence...
                 </>
               ) : (
                 <>
-                  <Search className="h-4 w-4 mr-2" />
-                  Analyze Target
+                  <Brain className="h-4 w-4 mr-2" />
+                  Deep Intelligence Scan
                 </>
               )}
             </Button>
