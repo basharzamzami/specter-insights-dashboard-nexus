@@ -1,11 +1,11 @@
 import { useState, useEffect } from "react";
-import { TrendingUp, TrendingDown, Target, Users, DollarSign, Eye } from "lucide-react";
+import { TrendingUp, TrendingDown, Target, Users, DollarSign, Eye, Database, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { DataConnectionPlaceholder, NoDataState } from "@/components/ui/data-connection-placeholder";
 import { 
   LineChart, 
   Line, 
@@ -21,18 +21,39 @@ import {
   Cell
 } from "recharts";
 
-
 export const PerformanceOps = () => {
-  const [activeTab, setActiveTab] = useState("overview");
   const [realKeywordData, setRealKeywordData] = useState([]);
+  const [performanceMetrics, setPerformanceMetrics] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [hasConnectedSources, setHasConnectedSources] = useState(false);
   const { toast } = useToast();
 
   useEffect(() => {
+    checkDataSources();
     fetchPerformanceData();
   }, []);
 
+  const checkDataSources = async () => {
+    try {
+      // Check if user has any connected data sources
+      const { data: settings } = await supabase
+        .from('user_settings')
+        .select('integrations')
+        .single();
+
+      const hasConnections = settings?.integrations && 
+        Object.values(settings.integrations).some((integration: any) => integration?.connected);
+      
+      setHasConnectedSources(hasConnections);
+    } catch (error) {
+      console.error('Error checking data sources:', error);
+      setHasConnectedSources(false);
+    }
+  };
+
   const fetchPerformanceData = async () => {
+    if (!hasConnectedSources) return;
+
     try {
       setLoading(true);
       
@@ -57,27 +78,15 @@ export const PerformanceOps = () => {
         }));
         
         setRealKeywordData(formattedKeywords.slice(0, 5));
-      } else {
-        // No fallback data - show empty state
-        setRealKeywordData([]);
+        setPerformanceMetrics(seoResponse.data.performance_metrics);
       }
-
-      // Also fetch competitor data for market analysis
-      await supabase.functions.invoke('seo-analysis', {
-        body: { 
-          action: 'competitor_analysis',
-          competitor_domain: 'competitor.com'
-        }
-      });
 
     } catch (error) {
       console.error('Error fetching performance data:', error);
-      // No fallback data
-      setRealKeywordData([]);
       toast({
-        title: "Performance Data Loading",
-        description: "Connect data sources to see live performance metrics.",
-        variant: "default"
+        title: "Data Loading Error",
+        description: "Unable to fetch performance data. Please check your integrations.",
+        variant: "destructive"
       });
     } finally {
       setLoading(false);
@@ -86,62 +95,24 @@ export const PerformanceOps = () => {
 
   const handleExportReport = async () => {
     try {
-      // Generate comprehensive SEO report with real data
-      const { data: reportResponse, error } = await supabase.functions.invoke('seo-analysis', {
-        body: { 
-          action: 'generate_seo_report',
-          domain: 'yourcompany.com'
-        }
-      });
+      const reportData = {
+        generatedAt: new Date().toISOString(),
+        reportType: "Performance Operations Report",
+        hasRealData: hasConnectedSources,
+        metrics: performanceMetrics,
+        keywords: realKeywordData,
+        summary: hasConnectedSources ? 
+          "Real-time performance data from connected sources" : 
+          "Connect data sources to generate comprehensive reports"
+      };
 
-      if (error) throw error;
-
-      let reportData;
-      if (reportResponse?.success && reportResponse.data) {
-        reportData = {
-          generatedAt: reportResponse.data.generated_at,
-          reportType: "SEO Performance Operations Report",
-          domain: reportResponse.data.domain,
-          overallScore: reportResponse.data.overall_score,
-          performanceMetrics: reportResponse.data.performance_metrics,
-          topKeywords: reportResponse.data.top_keywords,
-          competitorComparison: reportResponse.data.competitor_comparison,
-          recommendations: reportResponse.data.recommendations,
-          growthProjections: reportResponse.data.growth_projections
-        };
-      } else {
-        // Fallback report data
-        reportData = {
-          generatedAt: new Date().toISOString(),
-          reportType: "Performance Operations Report",
-          summary: {
-            trafficGrowth: "+47%",
-            keywordsWon: 156,
-            marketShare: "35%",
-            revenueImpact: "$2.1M"
-          },
-          trafficAnalysis: [],
-          keywordPerformance: realKeywordData,
-          competitorAnalysis: [],
-          recommendations: [
-            "Focus on AI automation keywords showing 25% higher conversion",
-            "Expand content strategy around business intelligence topics",
-            "Monitor TechCorp's recent product launches for positioning opportunities",
-            "Investigate CloudInnovate's pricing strategy changes",
-            "Optimize for emerging data analytics search terms"
-          ]
-        };
-      }
-
-      // Convert to CSV format for easy analysis
-      const csvContent = generateAdvancedCSVReport(reportData);
+      const csvContent = generateCSVReport(reportData);
       
-      // Create and download file
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
       const link = document.createElement('a');
       const url = URL.createObjectURL(blob);
       link.setAttribute('href', url);
-      link.setAttribute('download', `seo-performance-report-${new Date().toISOString().split('T')[0]}.csv`);
+      link.setAttribute('download', `performance-report-${new Date().toISOString().split('T')[0]}.csv`);
       link.style.visibility = 'hidden';
       document.body.appendChild(link);
       link.click();
@@ -149,7 +120,7 @@ export const PerformanceOps = () => {
 
       toast({
         title: "Report Generated",
-        description: "Comprehensive SEO performance report downloaded successfully.",
+        description: "Performance report downloaded successfully.",
         variant: "default"
       });
     } catch (error) {
@@ -162,120 +133,172 @@ export const PerformanceOps = () => {
     }
   };
 
-  const generateAdvancedCSVReport = (data: any) => {
+  const generateCSVReport = (data: any) => {
     let csv = `${data.reportType}\n`;
     csv += `Generated: ${new Date(data.generatedAt).toLocaleDateString()}\n`;
-    if (data.domain) csv += `Domain: ${data.domain}\n`;
-    if (data.overallScore) csv += `Overall SEO Score: ${data.overallScore}/100\n`;
-    csv += "\n";
+    csv += `Data Source: ${data.hasRealData ? "Live Integrations" : "Sample Data"}\n\n`;
     
-    if (data.performanceMetrics) {
+    if (data.metrics) {
       csv += "PERFORMANCE METRICS\n";
-      csv += `Organic Traffic,${data.performanceMetrics.organic_traffic}\n`;
-      csv += `Keyword Rankings,${data.performanceMetrics.keyword_rankings}\n`;
-      csv += `Backlink Profile,${data.performanceMetrics.backlink_profile}\n`;
-      csv += `Domain Authority,${data.performanceMetrics.domain_authority}\n`;
-      csv += `Page Speed Score,${data.performanceMetrics.page_speed_score}\n`;
-      csv += `Mobile Score,${data.performanceMetrics.mobile_score}\n\n`;
+      csv += `Overall Score,${data.metrics.overall_score || "N/A"}\n`;
+      csv += `Traffic Score,${data.metrics.traffic_score || "N/A"}\n`;
+      csv += `SEO Score,${data.metrics.seo_score || "N/A"}\n\n`;
     }
     
-    if (data.topKeywords && data.topKeywords.length > 0) {
-      csv += "TOP PERFORMING KEYWORDS\n";
-      csv += "Keyword,Current Rank,Previous Rank,Change,Search Volume,Traffic Estimate\n";
-      data.topKeywords.forEach((item: any) => {
-        csv += `${item.keyword},${item.rank},${item.previous_rank || 'N/A'},${item.rank_change || 0},${item.search_volume},${item.traffic_estimate}\n`;
+    if (data.keywords && data.keywords.length > 0) {
+      csv += "KEYWORD PERFORMANCE\n";
+      csv += "Keyword,Rank,Change,Traffic Estimate\n";
+      data.keywords.forEach((item: any) => {
+        csv += `${item.keyword},${item.rank},${item.change},${item.traffic}\n`;
       });
-      csv += "\n";
-    }
-    
-    if (data.competitorComparison && data.competitorComparison.length > 0) {
-      csv += "COMPETITOR ANALYSIS\n";
-      csv += "Company,Domain,SEO Score,Organic Traffic,Market Share\n";
-      data.competitorComparison.forEach((item: any) => {
-        csv += `${item.company_name},${item.domain},${item.seo_score},${item.organic_traffic},${item.market_share}%\n`;
-      });
-      csv += "\n";
-    }
-    
-    if (data.recommendations && data.recommendations.length > 0) {
-      csv += "SEO RECOMMENDATIONS\n";
-      csv += "Priority,Category,Action,Impact,Effort\n";
-      data.recommendations.forEach((rec: any) => {
-        csv += `${rec.priority},${rec.category},${rec.action},${rec.impact},${rec.effort}\n`;
-      });
-      csv += "\n";
-    }
-    
-    if (data.growthProjections) {
-      csv += "GROWTH PROJECTIONS\n";
-      csv += "Timeline,Projected Traffic,Projected Rankings\n";
-      Object.entries(data.growthProjections).forEach(([timeline, projection]: [string, any]) => {
-        csv += `${timeline.replace('_', ' ')},${projection.traffic},${projection.rankings}\n`;
-      });
-      csv += "\n";
-    }
-    
-    // Fallback for older report format
-    if (data.summary) {
-      csv += "EXECUTIVE SUMMARY\n";
-      csv += `Traffic Growth,${data.summary.trafficGrowth}\n`;
-      csv += `Keywords Won,${data.summary.keywordsWon}\n`;
-      csv += `Market Share,${data.summary.marketShare}\n`;
-      csv += `Revenue Impact,${data.summary.revenueImpact}\n\n`;
+    } else {
+      csv += "KEYWORD PERFORMANCE\n";
+      csv += "No keyword data available - connect SEO tools to track performance\n";
     }
     
     return csv;
   };
 
-  const getRankBadge = (rank: number) => {
-    if (rank <= 3) return "bg-success/10 text-success border-success/20";
-    if (rank <= 6) return "bg-warning/10 text-warning border-warning/20";
-    return "bg-destructive/10 text-destructive border-destructive/20";
-  };
+  // Show data connection placeholder if no sources connected
+  if (!hasConnectedSources) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="text-2xl font-bold">Performance Operations</h2>
+            <p className="text-muted-foreground">Real-time performance analytics and competitive insights</p>
+          </div>
+          <Button variant="outline" onClick={handleExportReport}>
+            <Eye className="h-4 w-4 mr-2" />
+            Generate Sample Report
+          </Button>
+        </div>
 
-  const getChangeIcon = (change: string) => {
-    if (change.startsWith("+")) return <TrendingUp className="h-3 w-3 text-success" />;
-    if (change.startsWith("-")) return <TrendingDown className="h-3 w-3 text-destructive" />;
-    return <Target className="h-3 w-3 text-muted-foreground" />;
-  };
+        <DataConnectionPlaceholder
+          title="Performance Analytics Ready"
+          description="Connect your analytics and SEO tools to see live performance data, keyword rankings, traffic insights, and competitive analysis."
+          suggestions={["Google Analytics", "SEMrush", "Ahrefs", "Google Search Console"]}
+          onConnectClick={() => window.location.href = '/data-integration'}
+          icon={<TrendingUp className="h-16 w-16 text-muted-foreground" />}
+        />
 
+        {/* Sample metrics to show capability */}
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {[
+            { label: "Organic Traffic", value: "Connect Analytics", icon: TrendingUp },
+            { label: "Keyword Rankings", value: "Connect SEO Tools", icon: Target },
+            { label: "Conversion Rate", value: "Connect Analytics", icon: DollarSign },
+            { label: "Competitive Gap", value: "Connect Intelligence", icon: AlertTriangle }
+          ].map((metric, index) => (
+            <Card key={index} className="hover:shadow-lg transition-colors">
+              <CardContent className="p-4 text-center">
+                <metric.icon className="h-8 w-8 text-muted-foreground mx-auto mb-2" />
+                <p className="text-2xl font-bold text-muted-foreground">{metric.value}</p>
+                <p className="text-sm text-muted-foreground">{metric.label}</p>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  // Show real data interface when sources are connected
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold">Performance Operations</h2>
-          <p className="text-muted-foreground">Track your competitive advantage and market position</p>
+          <p className="text-muted-foreground">Real-time competitive advantage tracking</p>
         </div>
-        <Button variant="outline" className="btn-glow" onClick={handleExportReport}>
-          <Eye className="h-4 w-4 mr-2" />
-          Export Report
-        </Button>
+        <div className="flex gap-2">
+          <Badge variant="outline" className="px-3 py-1">
+            <Database className="h-3 w-3 mr-1" />
+            Live Data
+          </Badge>
+          <Button variant="outline" onClick={handleExportReport}>
+            <Eye className="h-4 w-4 mr-2" />
+            Export Report
+          </Button>
+        </div>
       </div>
 
-      {/* Performance Overview - Ready for Live Data */}
-      <Card className="card-hover">
-        <CardHeader>
-          <CardTitle>Performance Operations</CardTitle>
-          <CardDescription>
-            Real-time performance metrics will appear here once data sources are connected
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="flex items-center justify-center py-16">
-          <div className="text-center space-y-4">
-            <TrendingUp className="h-16 w-16 text-muted-foreground mx-auto" />
-            <div className="space-y-2">
-              <p className="text-xl font-semibold">Analytics Ready</p>
-              <p className="text-muted-foreground max-w-md">
-                Connect your SEO tools, analytics platforms, and competitor tracking systems to see live performance data, keyword rankings, and market analysis.
-              </p>
+      {/* Real-time metrics */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+        {[
+          { 
+            label: "SEO Performance", 
+            value: performanceMetrics?.seo_score ? `${performanceMetrics.seo_score}/100` : "Loading...",
+            icon: TrendingUp,
+            color: "text-green-600"
+          },
+          { 
+            label: "Keyword Rankings", 
+            value: realKeywordData.length > 0 ? `${realKeywordData.length} tracked` : "0 tracked",
+            icon: Target,
+            color: "text-blue-600"
+          },
+          { 
+            label: "Traffic Score", 
+            value: performanceMetrics?.traffic_score ? `${performanceMetrics.traffic_score}/100` : "Loading...",
+            icon: DollarSign,
+            color: "text-purple-600"
+          },
+          { 
+            label: "Data Points", 
+            value: loading ? "Syncing..." : `${realKeywordData.length * 100}+`,
+            icon: Database,
+            color: "text-orange-600"
+          }
+        ].map((metric, index) => (
+          <Card key={index} className="hover:shadow-lg transition-colors">
+            <CardContent className="p-4 text-center">
+              <metric.icon className={`h-8 w-8 mx-auto mb-2 ${metric.color}`} />
+              <p className="text-2xl font-bold">{metric.value}</p>
+              <p className="text-sm text-muted-foreground">{metric.label}</p>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
+      {/* Keyword performance table */}
+      {realKeywordData.length > 0 ? (
+        <Card>
+          <CardHeader>
+            <CardTitle>Real-time Keyword Performance</CardTitle>
+            <CardDescription>Live rankings from connected SEO tools</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {realKeywordData.map((keyword: any, index) => (
+                <div key={index} className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
+                  <div className="flex-1">
+                    <p className="font-medium">{keyword.keyword}</p>
+                    <p className="text-sm text-muted-foreground">Rank #{keyword.rank}</p>
+                  </div>
+                  <div className="flex items-center gap-4">
+                    <Badge variant={keyword.change.startsWith('+') ? 'destructive' : 'default'}>
+                      {keyword.change}
+                    </Badge>
+                    <span className="text-sm text-muted-foreground">
+                      {keyword.traffic} monthly searches
+                    </span>
+                  </div>
+                </div>
+              ))}
             </div>
-            <Button variant="outline" onClick={handleExportReport}>
-              <Eye className="h-4 w-4 mr-2" />
-              Generate Sample Report
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card>
+          <CardContent className="p-8">
+            <NoDataState 
+              title="Keyword Data Loading"
+              description="Syncing with your SEO tools to fetch real-time keyword rankings"
+            />
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 };
