@@ -382,7 +382,7 @@ export const CampaignReporting = () => {
   );
 }
 
-// Placeholder for when there are no campaigns
+// Placeholder component for when there are no campaigns (production-ready)
 const NoCampaignsPlaceholder = () => (
   <div className="space-y-6">
     {[1, 2, 3].map((i) => (
