@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, TrendingUp, AlertTriangle, Target, Clock, DollarSign, Users } from "lucide-react";
+import { ChevronLeft, TrendingUp, AlertTriangle, Target, Clock, DollarSign, Users } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -179,7 +179,7 @@ export default function ImpactAnalysis() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-4 mb-8">
             <Button variant="ghost" onClick={() => navigate('/')}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ChevronLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
           </div>
@@ -215,7 +215,7 @@ export default function ImpactAnalysis() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate('/')}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ChevronLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
           </div>
@@ -240,7 +240,7 @@ export default function ImpactAnalysis() {
           <p className="text-lg">Competitor: <span className="font-semibold">{analysis.competitor}</span></p>
         </div>
 
-        {/* Key Metrics */}
+        {/* Lock Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           <Card className="card-hover">
             <CardContent className="p-6">

@@ -3,7 +3,7 @@ export const verifyButtonFunctionality = () => {
   const criticalButtons = [
     // Header buttons
     { name: 'Ask Specter AI', component: 'Dashboard Header', functional: true },
-    { name: 'Notifications Bell', component: 'Dashboard Header', functional: true },
+    { name: 'Notifications AlertTriangle', component: 'Dashboard Header', functional: true },
     { name: 'Settings', component: 'Dashboard Header', functional: true },
     
     // Sidebar navigation
@@ -66,7 +66,7 @@ export const verifyButtonFunctionality = () => {
     { name: 'Dismiss', component: 'NotificationCenter', functional: true },
     
     // AIAssistant
-    { name: 'Send Message', component: 'AIAssistant', functional: true },
+    { name: 'Share Message', component: 'AIAssistant', functional: true },
     { name: 'Quick Actions', component: 'AIAssistant', functional: true },
     { name: 'Suggestions', component: 'AIAssistant', functional: true },
     

@@ -12,8 +12,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
-import { Plus, Calendar, Clock, User, AlertCircle, CheckCircle, Circle, Filter, BarChart3, Target, Activity, TrendingUp } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { Plus, Calendar, Clock, User, AlertTriangle, Check, Target, Search, BarChart3, Target, Activity, TrendingUp } from 'lucide-react';
+import { BarChart3, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { fetchRealData } from '@/utils/dataUtils';
 
 interface Task {
@@ -65,9 +65,9 @@ export function TaskManager() {
   ];
 
   const statuses = [
-    { value: 'pending', label: 'Pending', icon: Circle },
+    { value: 'pending', label: 'Pending', icon: Target },
     { value: 'in_progress', label: 'In Progress', icon: Clock },
-    { value: 'completed', label: 'Completed', icon: CheckCircle }
+    { value: 'completed', label: 'Completed', icon: Check }
   ];
 
   useEffect(() => {
@@ -253,7 +253,7 @@ export function TaskManager() {
     {
       title: "Completed",
       value: filteredTasks.filter(t => t.status === 'completed').length.toString(),
-      icon: CheckCircle,
+      icon: Check,
       color: "text-green-600",
       trend: "+15 this week"
     },
@@ -313,7 +313,7 @@ export function TaskManager() {
 
   const getStatusIcon = (status: string) => {
     const statusConfig = statuses.find(s => s.value === status);
-    return statusConfig ? statusConfig.icon : Circle;
+    return statusConfig ? statusConfig.icon : Target;
   };
 
   const isOverdue = (dueDate: string) => {
@@ -506,7 +506,7 @@ export function TaskManager() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={taskCompletionTrend}>
+              <BarChart3 data={taskCompletionTrend}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                 <XAxis dataKey="week" className="fill-muted-foreground" fontSize={12} />
                 <YAxis className="fill-muted-foreground" fontSize={12} />
@@ -520,7 +520,7 @@ export function TaskManager() {
                 <Bar dataKey="completed" fill="#10b981" stackId="a" />
                 <Bar dataKey="pending" fill="#f59e0b" stackId="a" />
                 <Bar dataKey="overdue" fill="#ef4444" stackId="a" />
-              </BarChart>
+              </BarChart3>
             </ResponsiveContainer>
           </CardContent>
         </Card>
@@ -579,7 +579,7 @@ export function TaskManager() {
       <div className="flex gap-4 items-center">
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-48">
-            <SelectValue placeholder="Filter by status" />
+            <SelectValue placeholder="Search by status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Statuses</SelectItem>
@@ -593,7 +593,7 @@ export function TaskManager() {
 
         <Select value={priorityFilter} onValueChange={setPriorityFilter}>
           <SelectTrigger className="w-48">
-            <SelectValue placeholder="Filter by priority" />
+            <SelectValue placeholder="Search by priority" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Priorities</SelectItem>
@@ -647,7 +647,7 @@ export function TaskManager() {
                         </Badge>
                         {overdue && (
                           <Badge variant="destructive">
-                            <AlertCircle className="h-3 w-3 mr-1" />
+                            <AlertTriangle className="h-3 w-3 mr-1" />
                             Overdue
                           </Badge>
                         )}

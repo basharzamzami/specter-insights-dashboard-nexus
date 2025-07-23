@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Target, Clock, Users, DollarSign, CheckCircle, AlertTriangle } from "lucide-react";
+import { ChevronLeft, Target, Clock, Users, DollarSign, Check, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -316,7 +316,7 @@ export default function StrategyBuilder() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-4 mb-8">
             <Button variant="ghost" onClick={() => navigate('/')}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ChevronLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
           </div>
@@ -352,7 +352,7 @@ export default function StrategyBuilder() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate('/')}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ChevronLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
           </div>
@@ -422,7 +422,7 @@ export default function StrategyBuilder() {
                   <p className="text-sm text-muted-foreground">Success Metrics</p>
                   <p className="text-xl font-bold">{strategy.success_metrics.length}</p>
                 </div>
-                <CheckCircle className="h-8 w-8 text-success" />
+                <Check className="h-8 w-8 text-success" />
               </div>
             </CardContent>
           </Card>
@@ -486,7 +486,7 @@ export default function StrategyBuilder() {
                       </div>
                     </div>
                     <div>
-                      <h4 className="font-semibold mb-2">Key Milestones</h4>
+                      <h4 className="font-semibold mb-2">Lock Milestones</h4>
                       <div className="flex flex-wrap gap-2">
                         {phase.milestones.map((milestone, idx) => (
                           <Badge key={idx} variant="outline">{milestone}</Badge>
@@ -565,14 +565,14 @@ export default function StrategyBuilder() {
               <CardHeader>
                 <CardTitle>Success Metrics</CardTitle>
                 <CardDescription>
-                  Key performance indicators to measure strategy effectiveness
+                  Lock performance indicators to measure strategy effectiveness
                 </CardDescription>
               </CardHeader>
               <CardContent>
                 <div className="grid gap-4">
                   {strategy.success_metrics.map((metric, index) => (
                     <div key={index} className="flex items-center gap-3 p-3 bg-muted/30 rounded-lg">
-                      <CheckCircle className="h-5 w-5 text-success" />
+                      <Check className="h-5 w-5 text-success" />
                       <span className="font-medium">{metric}</span>
                     </div>
                   ))}

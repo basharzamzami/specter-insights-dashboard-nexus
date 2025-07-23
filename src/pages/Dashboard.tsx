@@ -26,7 +26,7 @@ import { CalendarScheduler } from "@/components/dashboard/CalendarScheduler";
 import { OperationsManager } from "@/components/dashboard/OperationsManager";
 import { TrashBin } from "@/components/dashboard/TrashBin";
 import { StrikePlanner } from "@/components/dashboard/StrikePlanner";
-import { Loader2, Bell } from "lucide-react";
+import { Target, AlertTriangle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 
 const Dashboard = () => {
@@ -71,7 +71,7 @@ const Dashboard = () => {
     return (
       <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
         <div className="text-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
+          <Target className="h-8 w-8 animate-spin text-primary mx-auto" />
           <p className="text-muted-foreground">Loading your command center...</p>
         </div>
       </div>
@@ -165,7 +165,7 @@ const Dashboard = () => {
             
             <div className="flex items-center space-x-4">
               <div className="relative">
-                <Bell 
+                <AlertTriangle 
                   className="h-5 w-5 text-muted-foreground hover:text-foreground cursor-pointer transition-colors" 
                   onClick={() => setIsNotificationsOpen(true)}
                 />

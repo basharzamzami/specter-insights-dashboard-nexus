@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Calendar, Plus, Play, Pause, Edit, Eye, Send } from "lucide-react";
+import { Calendar, Plus, Play, Pause, Edit, Eye, Share } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -403,7 +403,7 @@ export const CampaignScheduler = () => {
                 onClick={handleCreateScheduledPost}
                 disabled={!postContent.trim()}
               >
-                <Send className="h-4 w-4 mr-2" />
+                <Share className="h-4 w-4 mr-2" />
                 Schedule Post
               </Button>
             </div>

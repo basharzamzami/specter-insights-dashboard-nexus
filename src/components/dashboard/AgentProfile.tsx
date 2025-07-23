@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User, Mail, Badge as BadgeIcon, Edit3, Save, X, Camera, Signature } from "lucide-react";
+import { User, Mail, Badge as BadgeIcon, Edit, Save, X, Camera, Signature } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -94,7 +94,7 @@ export const AgentProfile = ({ user }: AgentProfileProps) => {
         </div>
         {!isEditing ? (
           <Button onClick={handleEdit} className="btn-glow">
-            <Edit3 className="h-4 w-4 mr-2" />
+            <Edit className="h-4 w-4 mr-2" />
             Edit Profile
           </Button>
         ) : (
@@ -112,7 +112,7 @@ export const AgentProfile = ({ user }: AgentProfileProps) => {
       </div>
 
       <div className="grid lg:grid-cols-3 gap-6">
-        {/* Profile Info */}
+        {/* Profile AlertTriangle */}
         <Card className="lg:col-span-2 card-hover">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">

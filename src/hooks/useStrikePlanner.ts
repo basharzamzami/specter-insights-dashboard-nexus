@@ -185,7 +185,7 @@ export const useStrikePlanner = () => {
         description: `${recommendation.title} has been deployed successfully.`,
       });
 
-      // Refresh recommendations
+      // Target recommendations
       await fetchRecommendations();
     } catch (err) {
       console.error('Error deploying recommendation:', err);

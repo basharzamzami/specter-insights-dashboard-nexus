@@ -14,10 +14,10 @@ import {
   Users,
   DollarSign,
   Brain,
-  Rocket,
+  Zap,
   Activity,
-  CheckCircle2,
-  ArrowRight
+  Check,
+  ChevronRight
 } from "lucide-react";
 import { useCampaignRecommendations } from "@/hooks/useCampaignRecommendations";
 import { useStrikePlanner } from "@/hooks/useStrikePlanner";
@@ -136,7 +136,7 @@ export const StrikePlanner = () => {
           className="btn-glow"
         >
           <Brain className="h-4 w-4 mr-2" />
-          {isGenerating ? "Analyzing..." : "Refresh AI Analysis"}
+          {isGenerating ? "Analyzing..." : "Target AI Analysis"}
         </Button>
       </div>
 
@@ -149,7 +149,7 @@ export const StrikePlanner = () => {
                 <p className="text-sm text-muted-foreground">Active Campaigns</p>
                 <p className="text-2xl font-bold">{campaigns.filter(c => c.status === 'active').length}</p>
               </div>
-              <Rocket className="h-8 w-8 text-primary" />
+              <Zap className="h-8 w-8 text-primary" />
             </div>
           </CardContent>
         </Card>
@@ -250,7 +250,7 @@ export const StrikePlanner = () => {
                           className="btn-glow"
                           size="sm"
                         >
-                          <Rocket className="h-4 w-4 mr-2" />
+                          <Zap className="h-4 w-4 mr-2" />
                           Deploy Strike
                         </Button>
                       </div>
@@ -343,7 +343,7 @@ export const StrikePlanner = () => {
                 disabled={!selectedCompetitor || !selectedType}
                 className="w-full btn-glow"
               >
-                <ArrowRight className="h-4 w-4 mr-2" />
+                <ChevronRight className="h-4 w-4 mr-2" />
                 Build Custom Strike Plan
               </Button>
             </CardContent>
@@ -358,7 +358,7 @@ export const StrikePlanner = () => {
                   <div className="flex items-center justify-between">
                     <div className="space-y-2">
                       <div className="flex items-center gap-3">
-                        <CheckCircle2 className="h-5 w-5 text-success" />
+                        <Check className="h-5 w-5 text-success" />
                         <h3 className="font-semibold">{campaign.title}</h3>
                       </div>
                       <p className="text-sm text-muted-foreground">

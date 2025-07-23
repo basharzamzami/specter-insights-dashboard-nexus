@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { AnalyticsService } from "@/services/analyticsService";
 import { useUser } from "@clerk/clerk-react";
-import { Crown, ChevronDown, Target, Zap, TrendingUp, TrendingDown, Users, Eye, BarChart3, Activity, Gauge, FileText } from "lucide-react";
+import { Crown, ChevronDown, Target, Zap, TrendingUp, Users, Eye, Activity, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -13,15 +13,15 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { 
-  LineChart, 
-  Line, 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
+import {
+  LineChart,
+  Line,
+  BarChart3,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
   ResponsiveContainer,
   PieChart,
   Pie,
@@ -234,7 +234,7 @@ export const WelcomeBanner = ({ user }: WelcomeBannerProps) => {
                   {stat.trendUp ? (
                     <TrendingUp className="h-4 w-4 text-green-300" />
                   ) : (
-                    <TrendingDown className="h-4 w-4 text-red-300" />
+                    <TrendingUp className="h-4 w-4 text-red-300" />
                   )}
                 </div>
                 <div>
@@ -255,7 +255,7 @@ export const WelcomeBanner = ({ user }: WelcomeBannerProps) => {
             <div className="flex items-center justify-between">
               <div>
                 <CardTitle className="flex items-center space-x-2">
-                  <BarChart3 className="h-5 w-5" />
+                  <Activity className="h-5 w-5" />
                   <span>Market Intelligence Dashboard</span>
                 </CardTitle>
                 <CardDescription>
@@ -417,14 +417,14 @@ export const WelcomeBanner = ({ user }: WelcomeBannerProps) => {
                   <CardHeader>
                     <CardTitle className="text-lg">Performance Metrics</CardTitle>
                     <CardDescription>
-                      Key competitive indicators
+                      Lock competitive indicators
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg">
                         <div className="flex items-center space-x-3">
-                          <Gauge className="h-5 w-5 text-primary" />
+                          <Activity className="h-5 w-5 text-primary" />
                           <span>Visibility Score</span>
                         </div>
                         <span className="font-bold text-xl">87%</span>

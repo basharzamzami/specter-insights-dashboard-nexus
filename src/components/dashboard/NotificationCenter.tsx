@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Bell, X, AlertTriangle, CheckCircle, Info, Zap, Target, TrendingDown, TrendingUp, Clock, Eye } from "lucide-react";
+import { AlertTriangle, X, AlertTriangle, Check, AlertTriangle, Zap, Target, TrendingUp, TrendingUp, Clock, Eye } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -252,8 +252,8 @@ export const NotificationCenter = () => {
     switch (type) {
       case "critical": return <AlertTriangle className="h-4 w-4" />;
       case "warning": return <AlertTriangle className="h-4 w-4" />;
-      case "success": return <CheckCircle className="h-4 w-4" />;
-      case "info": return <Info className="h-4 w-4" />;
+      case "success": return <Check className="h-4 w-4" />;
+      case "info": return <AlertTriangle className="h-4 w-4" />;
       case "opportunity": return <TrendingUp className="h-4 w-4" />;
     }
   };
@@ -307,7 +307,7 @@ export const NotificationCenter = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-3">
               <div className="relative">
-                <Bell className="h-5 w-5" />
+                <AlertTriangle className="h-5 w-5" />
                 {criticalCount > 0 && (
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full animate-ping"></div>
                 )}
@@ -351,7 +351,7 @@ export const NotificationCenter = () => {
           <div className="max-h-96 overflow-y-auto">
             {filteredNotifications.length === 0 ? (
               <div className="text-center py-12 px-6">
-                <Bell className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-30" />
+                <AlertTriangle className="h-16 w-16 text-muted-foreground mx-auto mb-4 opacity-30" />
                 <p className="text-lg font-medium text-muted-foreground mb-2">All Clear</p>
                 <p className="text-sm text-muted-foreground">No threats detected. Systems operational.</p>
               </div>

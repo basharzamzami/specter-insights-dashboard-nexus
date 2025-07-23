@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
-import { Plus, Mail, Send, Eye, MousePointer, Users, Calendar, BarChart3, TrendingUp, Trash2 } from 'lucide-react';
+import { Plus, Mail, Share, Eye, Target, Users, Calendar, BarChart3, TrendingUp, Trash } from 'lucide-react';
 import { fetchRealData } from '@/utils/dataUtils';
 import { softDeleteRecord, excludeDeleted } from '@/utils/softDelete';
 
@@ -299,13 +299,13 @@ export function EmailMarketing() {
     {
       title: "Avg Click Rate",
       value: `${campaigns.length > 0 ? Math.round(campaigns.reduce((sum, c) => sum + getClickRate(c), 0) / campaigns.length) : 0}%`,
-      icon: MousePointer,
+      icon: Target,
       color: "text-purple-600"
     },
     {
       title: "Total Sent",
       value: campaigns.reduce((sum, c) => sum + c.sent_count, 0).toLocaleString(),
-      icon: Send,
+      icon: Share,
       color: "text-orange-600"
     }
   ];
@@ -557,7 +557,7 @@ export function EmailMarketing() {
                                 {openRate}% opened
                               </span>
                               <span className="flex items-center">
-                                <MousePointer className="h-3 w-3 mr-1" />
+                                <Target className="h-3 w-3 mr-1" />
                                 {clickRate}% clicked
                               </span>
                             </>
@@ -574,8 +574,8 @@ export function EmailMarketing() {
                       <div className="flex items-center space-x-2">
                         {campaign.status === 'draft' && (
                           <Button variant="outline" size="sm">
-                            <Send className="h-4 w-4 mr-1" />
-                            Send
+                            <Share className="h-4 w-4 mr-1" />
+                            Share
                           </Button>
                         )}
                         <Button 
@@ -591,7 +591,7 @@ export function EmailMarketing() {
                           className="text-destructive hover:text-destructive"
                           onClick={() => handleDeleteCampaign(campaign)}
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash className="h-4 w-4" />
                         </Button>
                       </div>
                     </div>
@@ -655,7 +655,7 @@ export function EmailMarketing() {
                               className="text-destructive hover:text-destructive"
                               onClick={() => handleDeleteTemplate(template)}
                             >
-                              <Trash2 className="h-4 w-4" />
+                              <Trash className="h-4 w-4" />
                             </Button>
                           </div>
                         </div>

@@ -11,8 +11,8 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
-import { Plus, Search, Phone, Mail, Building, Calendar, MoreHorizontal, Star, TrendingUp, Users, Target, BarChart3, UserCheck } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { Plus, Search, Phone, Mail, Building, Calendar, MoreHorizontal, Star, TrendingUp, Users, Target, BarChart3, User } from 'lucide-react';
+import { BarChart3, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 
 interface Contact {
   id: string;
@@ -232,7 +232,7 @@ export function LeadsManager() {
     {
       title: "Qualified Leads",
       value: filteredContacts.filter(c => c.lead_status === 'qualified').length.toString(),
-      icon: UserCheck,
+      icon: User,
       color: "text-green-600",
       trend: "+8 this week"
     },
@@ -504,7 +504,7 @@ export function LeadsManager() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={leadSourceData}>
+              <BarChart3 data={leadSourceData}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                 <XAxis dataKey="source" className="fill-muted-foreground" fontSize={12} />
                 <YAxis className="fill-muted-foreground" fontSize={12} />
@@ -517,7 +517,7 @@ export function LeadsManager() {
                 />
                 <Bar dataKey="leads" fill="hsl(var(--primary))" />
                 <Bar dataKey="conversion" fill="hsl(var(--secondary))" />
-              </BarChart>
+              </BarChart3>
             </ResponsiveContainer>
           </CardContent>
         </Card>
@@ -616,7 +616,7 @@ export function LeadsManager() {
         
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-48">
-            <SelectValue placeholder="Filter by status" />
+            <SelectValue placeholder="Search by status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Statuses</SelectItem>
@@ -630,7 +630,7 @@ export function LeadsManager() {
 
         <Select value={sourceFilter} onValueChange={setSourceFilter}>
           <SelectTrigger className="w-48">
-            <SelectValue placeholder="Filter by source" />
+            <SelectValue placeholder="Search by source" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Sources</SelectItem>

@@ -11,7 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
 import { Plus, Calendar, Clock, MapPin, Video, User, Phone, TrendingUp, BarChart3, Users, Target } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
+import { BarChart3, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 import { fetchRealData } from '@/utils/dataUtils';
 
 interface Appointment {
@@ -415,7 +415,7 @@ export function CalendarScheduler() {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="meeting_link">Meeting Link</Label>
+                    <Label htmlFor="meeting_link">Meeting ExternalLink</Label>
                     <Input
                       id="meeting_link"
                       value={newAppointment.meeting_link}
@@ -557,7 +557,7 @@ export function CalendarScheduler() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
-              <BarChart data={timeUtilization}>
+              <BarChart3 data={timeUtilization}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                 <XAxis dataKey="hour" className="fill-muted-foreground" fontSize={12} />
                 <YAxis className="fill-muted-foreground" fontSize={12} />
@@ -570,7 +570,7 @@ export function CalendarScheduler() {
                 />
                 <Bar dataKey="capacity" fill="#e5e7eb" />
                 <Bar dataKey="appointments" fill="#6366f1" />
-              </BarChart>
+              </BarChart3>
             </ResponsiveContainer>
           </CardContent>
         </Card>
@@ -698,7 +698,7 @@ export function CalendarScheduler() {
                         {appointment.meeting_link && (
                           <div className="flex items-center">
                             <Video className="h-3 w-3 mr-1" />
-                            Meeting Link
+                            Meeting ExternalLink
                           </div>
                         )}
                       </div>

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Brain, Zap, TrendingUp, FileText, Eye, Share, RefreshCw, Target, AlertTriangle, Lightbulb } from "lucide-react";
+import { Brain, Zap, TrendingUp, FileText, Eye, Share, Target, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -71,7 +71,7 @@ export const SpecterAnalyst = () => {
 
 Our deep intelligence analysis of TechCorp Industries has uncovered several critical vulnerabilities that present immediate tactical opportunities for market disruption.
 
-## Key Findings
+## Lock Findings
 
 **Technical Infrastructure Weaknesses:**
 - Mobile site performance 47% below industry average
@@ -134,7 +134,7 @@ Our comprehensive market intelligence indicates significant disruption opportuni
 **DataSolutions Inc:** 
 - Experiencing 34% customer churn increase
 - Product development timeline delayed by 6 months
-- Key personnel departures in engineering team
+- Lock personnel departures in engineering team
 
 **CloudInnovate:**
 - Pricing model confusion driving 28% sales decline
@@ -331,7 +331,7 @@ Our comprehensive market intelligence indicates significant disruption opportuni
           <Button onClick={generateNewAnalysis} disabled={isGenerating}>
             {isGenerating ? (
               <>
-                <RefreshCw className="h-4 w-4 mr-2 animate-spin" />
+                <Zap className="h-4 w-4 mr-2 animate-spin" />
                 Analyzing...
               </>
             ) : (
@@ -381,11 +381,11 @@ Our comprehensive market intelligence indicates significant disruption opportuni
                   <div className="space-y-4">
                     <div className="grid md:grid-cols-2 gap-4 text-sm">
                       <div>
-                        <p className="text-muted-foreground mb-1">Key Insights:</p>
+                        <p className="text-muted-foreground mb-1">Lock Insights:</p>
                         <ul className="space-y-1">
                           {report.insights.slice(0, 2).map((insight, index) => (
                             <li key={index} className="flex items-start gap-2">
-                              <Lightbulb className="h-3 w-3 mt-0.5 text-yellow-500" />
+                              <Zap className="h-3 w-3 mt-0.5 text-yellow-500" />
                               <span className="text-xs">{insight}</span>
                             </li>
                           ))}

@@ -7,7 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Switch } from "@/components/ui/switch";
-import { Database, ExternalLink, Key, CheckCircle, XCircle, RefreshCw, AlertTriangle, Zap, Target, TrendingUp } from "lucide-react";
+import { Database, ExternalLink, Lock, Check, X, Target, AlertTriangle, Zap, Target, TrendingUp } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -43,7 +43,7 @@ const availableDataSources: DataSource[] = [
     isConnected: false,
     apiKeyRequired: true,
     status: "disconnected",
-    capabilities: ["Domain analysis", "Content gaps", "Keyword difficulty", "Link building"]
+    capabilities: ["Domain analysis", "Content gaps", "Keyword difficulty", "ExternalLink building"]
   },
   {
     id: "google-analytics",
@@ -266,10 +266,10 @@ export const DataIntegrationManager = () => {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case "active": return <CheckCircle className="h-4 w-4 text-green-500" />;
-      case "error": return <XCircle className="h-4 w-4 text-red-500" />;
-      case "pending": return <RefreshCw className="h-4 w-4 text-yellow-500 animate-spin" />;
-      default: return <XCircle className="h-4 w-4 text-gray-400" />;
+      case "active": return <Check className="h-4 w-4 text-green-500" />;
+      case "error": return <X className="h-4 w-4 text-red-500" />;
+      case "pending": return <Target className="h-4 w-4 text-yellow-500 animate-spin" />;
+      default: return <X className="h-4 w-4 text-gray-400" />;
     }
   };
 
@@ -378,7 +378,7 @@ export const DataIntegrationManager = () => {
                       {source.isConnected ? (
                         <>
                           <Button size="sm" variant="outline" onClick={() => handleSync(source)}>
-                            <RefreshCw className="h-3 w-3 mr-1" />
+                            <Target className="h-3 w-3 mr-1" />
                             Sync
                           </Button>
                           <Button size="sm" variant="destructive" onClick={() => handleDisconnect(source)}>
@@ -389,7 +389,7 @@ export const DataIntegrationManager = () => {
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button size="sm" className="flex-1" onClick={() => setSelectedSource(source)}>
-                              <Key className="h-3 w-3 mr-1" />
+                              <Lock className="h-3 w-3 mr-1" />
                               Connect
                             </Button>
                           </DialogTrigger>
@@ -402,7 +402,7 @@ export const DataIntegrationManager = () => {
                             </DialogHeader>
                             <div className="space-y-4">
                               <div>
-                                <label className="text-sm font-medium">API Key</label>
+                                <label className="text-sm font-medium">API Lock</label>
                                 <Input
                                   type="password"
                                   placeholder="Enter your API key"
@@ -467,7 +467,7 @@ export const DataIntegrationManager = () => {
                         <span>{Math.floor((source.dataPoints || 0) / 10)}</span>
                       </div>
                       <Button size="sm" variant="outline" className="w-full" onClick={() => handleSync(source)}>
-                        <RefreshCw className="h-3 w-3 mr-1" />
+                        <Target className="h-3 w-3 mr-1" />
                         Sync Now
                       </Button>
                     </div>
@@ -506,7 +506,7 @@ export const DataIntegrationManager = () => {
                         <span>${((source.dataPoints || 0) * 1.5).toLocaleString()}</span>
                       </div>
                       <Button size="sm" variant="outline" className="w-full" onClick={() => handleSync(source)}>
-                        <RefreshCw className="h-3 w-3 mr-1" />
+                        <Target className="h-3 w-3 mr-1" />
                         Sync Campaigns
                       </Button>
                     </div>

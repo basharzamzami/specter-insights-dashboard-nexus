@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
-import { Loader2 } from "lucide-react";
+import { Target } from "lucide-react";
 import { useClientData } from "@/hooks/useClientData";
 
 interface AuthGuardProps {
@@ -24,7 +24,7 @@ export const AuthGuard = ({ children, requireOnboarding = false }: AuthGuardProp
     return (
       <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
         <div className="text-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
+          <Target className="h-8 w-8 animate-spin text-primary mx-auto" />
           <p className="text-muted-foreground">Authenticating...</p>
         </div>
       </div>
@@ -35,7 +35,7 @@ export const AuthGuard = ({ children, requireOnboarding = false }: AuthGuardProp
     return (
       <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
         <div className="text-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
+          <Target className="h-8 w-8 animate-spin text-primary mx-auto" />
           <p className="text-muted-foreground">Redirecting to login...</p>
         </div>
       </div>

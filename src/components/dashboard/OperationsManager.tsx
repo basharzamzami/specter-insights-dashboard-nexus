@@ -10,14 +10,14 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { 
-  Edit3, 
+  Edit, 
   Calendar, 
-  Send, 
+  Share, 
   Eye, 
   TrendingUp, 
   Target, 
-  ArrowRight,
-  CheckCircle,
+  ChevronRight,
+  Check,
   Clock,
   Zap,
   Users,
@@ -83,7 +83,7 @@ export const OperationsManager = () => {
   };
 
   const getTypeIcon = (type: string) => {
-    return type === 'edit' ? Edit3 : Calendar;
+    return type === 'edit' ? Edit : Calendar;
   };
 
   const handleEditOperation = (operation: Operation) => {
@@ -206,7 +206,7 @@ export const OperationsManager = () => {
     { title: "Active Operations", value: operations.filter(op => op.status !== 'completed').length, icon: Zap, color: "text-blue-600" },
     { title: "High Priority", value: operations.filter(op => op.priority === 'high').length, icon: Target, color: "text-red-600" },
     { title: "In Review", value: operations.filter(op => op.status === 'review').length, icon: Eye, color: "text-purple-600" },
-    { title: "Completed Today", value: operations.filter(op => op.status === 'completed').length, icon: CheckCircle, color: "text-green-600" }
+    { title: "Completed Today", value: operations.filter(op => op.status === 'completed').length, icon: Check, color: "text-green-600" }
   ];
 
   return (
@@ -298,7 +298,7 @@ export const OperationsManager = () => {
                       >
                         {status === 'in_progress' && <Zap className="h-3 w-3 mr-1" />}
                         {status === 'review' && <Eye className="h-3 w-3 mr-1" />}
-                        {status === 'completed' && <CheckCircle className="h-3 w-3 mr-1" />}
+                        {status === 'completed' && <Check className="h-3 w-3 mr-1" />}
                         {status.replace('_', ' ')}
                       </Button>
                     ))}
@@ -309,7 +309,7 @@ export const OperationsManager = () => {
                     onClick={() => handleEditOperation(operation)}
                     className="opacity-0 group-hover:opacity-100 transition-opacity hover:scale-105"
                   >
-                    <Edit3 className="h-4 w-4 mr-1" />
+                    <Edit className="h-4 w-4 mr-1" />
                     Edit
                   </Button>
                 </div>

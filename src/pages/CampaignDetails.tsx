@@ -7,19 +7,18 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import { 
-  ArrowLeft, 
-  PlayCircle,
-  PauseCircle,
-  StopCircle,
+  ChevronLeft, 
+  Play,
+  Pause,
   BarChart3,
   Target,
   Calendar,
   Users,
   TrendingUp,
-  TrendingDown,
+  TrendingUp,
   Activity,
   AlertTriangle,
-  CheckCircle,
+  Check,
   Clock
 } from "lucide-react";
 import { 
@@ -32,7 +31,7 @@ import {
   ResponsiveContainer,
   AreaChart,
   Area,
-  BarChart,
+  BarChart3,
   Bar
 } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
@@ -149,10 +148,10 @@ export default function CampaignDetails() {
 
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'active': return <PlayCircle className="h-4 w-4" />;
-      case 'paused': return <PauseCircle className="h-4 w-4" />;
-      case 'completed': return <CheckCircle className="h-4 w-4" />;
-      case 'cancelled': return <StopCircle className="h-4 w-4" />;
+      case 'active': return <Play className="h-4 w-4" />;
+      case 'paused': return <Pause className="h-4 w-4" />;
+      case 'completed': return <Check className="h-4 w-4" />;
+      case 'cancelled': return <X className="h-4 w-4" />;
       default: return <Clock className="h-4 w-4" />;
     }
   };
@@ -202,7 +201,7 @@ export default function CampaignDetails() {
               onClick={() => navigate("/")}
               className="hover-scale"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ChevronLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
             <div>
@@ -224,7 +223,7 @@ export default function CampaignDetails() {
                 variant="outline" 
                 onClick={() => handleStatusChange('paused')}
               >
-                <PauseCircle className="h-4 w-4 mr-2" />
+                <Pause className="h-4 w-4 mr-2" />
                 Pause
               </Button>
             )}
@@ -233,7 +232,7 @@ export default function CampaignDetails() {
                 onClick={() => handleStatusChange('active')}
                 className="btn-glow"
               >
-                <PlayCircle className="h-4 w-4 mr-2" />
+                <Play className="h-4 w-4 mr-2" />
                 Resume
               </Button>
             )}
@@ -241,13 +240,13 @@ export default function CampaignDetails() {
               variant="destructive" 
               onClick={() => handleStatusChange('cancelled')}
             >
-              <StopCircle className="h-4 w-4 mr-2" />
+              <X className="h-4 w-4 mr-2" />
               Terminate
             </Button>
           </div>
         </div>
 
-        {/* Key Metrics */}
+        {/* Lock Metrics */}
         <div className="grid grid-cols-4 gap-6">
           <Card className="card-hover">
             <CardContent className="pt-6">
@@ -274,7 +273,7 @@ export default function CampaignDetails() {
               <div className="text-center">
                 <p className="text-3xl font-bold text-red-600">-32%</p>
                 <p className="text-sm text-muted-foreground">Sentiment Impact</p>
-                <TrendingDown className="h-4 w-4 text-red-600 mx-auto mt-2" />
+                <TrendingUp className="h-4 w-4 text-red-600 mx-auto mt-2" />
               </div>
             </CardContent>
           </Card>
@@ -432,14 +431,14 @@ export default function CampaignDetails() {
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={400}>
-                      <BarChart data={mockProgressData}>
+                      <BarChart3 data={mockProgressData}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="day" />
                         <YAxis />
                         <Tooltip />
                         <Bar dataKey="reach" fill="#8884d8" name="Reach" />
                         <Bar dataKey="engagement" fill="#82ca9d" name="Engagement" />
-                      </BarChart>
+                      </BarChart3>
                     </ResponsiveContainer>
                   </CardContent>
                 </Card>

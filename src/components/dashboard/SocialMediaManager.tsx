@@ -11,8 +11,8 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
-import { Plus, Search, Calendar, MoreHorizontal, TrendingUp, Users, Heart, Share2, Eye, BarChart3, Target, Share, MessageCircle } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
+import { Plus, Search, Calendar, MoreHorizontal, TrendingUp, Users, Heart, Share, Eye, BarChart3, Target, Share, MessageCircle } from 'lucide-react';
+import { BarChart3, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 import { fetchRealData } from '@/utils/dataUtils';
 
 interface SocialPost {
@@ -182,7 +182,7 @@ export function SocialMediaManager() {
     {
       title: "Total Posts",
       value: filteredPosts.length.toString(),
-      icon: Share2,
+      icon: Share,
       color: "text-blue-600",
       trend: "Ready for content"
     },
@@ -468,7 +468,7 @@ export function SocialMediaManager() {
       <div className="flex gap-4 items-center">
         <Select value={platformFilter} onValueChange={setPlatformFilter}>
           <SelectTrigger className="w-48">
-            <SelectValue placeholder="Filter by platform" />
+            <SelectValue placeholder="Search by platform" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Platforms</SelectItem>
@@ -482,7 +482,7 @@ export function SocialMediaManager() {
 
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger className="w-48">
-            <SelectValue placeholder="Filter by status" />
+            <SelectValue placeholder="Search by status" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">All Statuses</SelectItem>

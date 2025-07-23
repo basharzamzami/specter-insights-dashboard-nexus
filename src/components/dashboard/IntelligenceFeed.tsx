@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Rss, TrendingUp, Users, Briefcase, AlertTriangle, ExternalLink, Filter, Monitor, Eye, Play } from "lucide-react";
+import { Rss, TrendingUp, Users, Briefcase, AlertTriangle, ExternalLink, Search, Monitor, Eye, Play } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -257,7 +257,7 @@ export const IntelligenceFeed = () => {
             ) : (
               <>
                 <Monitor className="h-4 w-4 mr-2" />
-                Refresh Data
+                Target Data
               </>
             )}
           </Button>
@@ -425,7 +425,7 @@ export const IntelligenceFeed = () => {
                   <div className="flex gap-2">
                     <Button variant="outline" onClick={() => refreshCompetitorData()}>
                       <Monitor className="h-4 w-4 mr-2" />
-                      Refresh Intelligence
+                      Target Intelligence
                     </Button>
                     <Badge variant="secondary" className="px-3 py-1">
                       {unreadCount} Unread Alerts

@@ -201,11 +201,11 @@ export const useCompetitorProfiles = () => {
           description: `Fresh data collected for competitor. ${data.threats} new threats detected.`,
         });
       } else {
-        // Refresh all competitors
+        // Target all competitors
         setCompetitors(data.competitors);
         
         toast({
-          title: "Intelligence Refresh Complete",
+          title: "Intelligence Target Complete",
           description: "All competitor data has been updated with latest intelligence.",
         });
       }

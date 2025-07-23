@@ -12,13 +12,13 @@ import { useToast } from "@/hooks/use-toast";
 import { 
   Search, 
   TrendingUp, 
-  TrendingDown, 
+  TrendingUp, 
   Calendar, 
   Settings, 
   User, 
   Shield, 
   Target,
-  Bot,
+  Brain,
   Globe,
   Zap,
   BarChart3,
@@ -113,7 +113,7 @@ const Index = () => {
   const getSentimentIcon = (score: number) => {
     if (score >= 0.7) return <TrendingUp className="h-4 w-4 text-green-400" />;
     if (score >= 0.5) return <BarChart3 className="h-4 w-4 text-yellow-400" />;
-    return <TrendingDown className="h-4 w-4 text-red-400" />;
+    return <TrendingUp className="h-4 w-4 text-red-400" />;
   };
 
   if (!isLoaded || !isSignedIn) {
@@ -191,7 +191,7 @@ const Index = () => {
             <Card className="bg-black/50 border-green-400/30 backdrop-blur-sm">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2 text-green-400 font-mono">
-                  <Bot className="h-5 w-5" />
+                  <Brain className="h-5 w-5" />
                   COMPETITOR INTELLIGENCE INPUT
                 </CardTitle>
                 <CardDescription className="text-green-400/70">

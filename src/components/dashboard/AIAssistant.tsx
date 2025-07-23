@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { Bot, Send, X, Lightbulb, Target, TrendingUp, MessageSquare, Loader2 } from "lucide-react";
+import { Brain, Share, X, Zap, Target, TrendingUp, MessageSquare, Target } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -137,7 +137,7 @@ export const AIAssistant = ({ isOpen, onClose }: AIAssistantProps) => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-3">
             <div className="p-2 bg-white/20 rounded-lg">
-              <Bot className="h-5 w-5" />
+              <Brain className="h-5 w-5" />
             </div>
             <div>
               <h3 className="font-semibold">Ask Specter</h3>
@@ -164,7 +164,7 @@ export const AIAssistant = ({ isOpen, onClose }: AIAssistantProps) => {
                 {message.type === "assistant" && (
                   <div className="flex items-center space-x-2 mb-2">
                     <div className="p-1 bg-primary/10 rounded-full">
-                      <Bot className="h-3 w-3 text-primary" />
+                      <Brain className="h-3 w-3 text-primary" />
                     </div>
                     <span className="text-xs text-muted-foreground">Specter</span>
                   </div>
@@ -181,7 +181,7 @@ export const AIAssistant = ({ isOpen, onClose }: AIAssistantProps) => {
                 {message.suggestions && (
                   <div className="mt-3 space-y-2">
                     <p className="text-xs text-muted-foreground flex items-center space-x-1">
-                      <Lightbulb className="h-3 w-3" />
+                      <Zap className="h-3 w-3" />
                       <span>Suggested actions:</span>
                     </p>
                     <div className="flex flex-wrap gap-2">
@@ -211,7 +211,7 @@ export const AIAssistant = ({ isOpen, onClose }: AIAssistantProps) => {
             <div className="flex justify-start">
               <div className="flex items-center space-x-2 mb-2">
                 <div className="p-1 bg-primary/10 rounded-full">
-                  <Loader2 className="h-3 w-3 text-primary animate-spin" />
+                  <Target className="h-3 w-3 text-primary animate-spin" />
                 </div>
                 <span className="text-xs text-muted-foreground">Specter is analyzing intelligence...</span>
               </div>
@@ -249,7 +249,7 @@ export const AIAssistant = ({ isOpen, onClose }: AIAssistantProps) => {
             className="flex-1"
           />
           <Button onClick={handleSend} disabled={!inputValue.trim() || isTyping} className="btn-glow">
-            <Send className="h-4 w-4" />
+            <Share className="h-4 w-4" />
           </Button>
         </div>
       </div>

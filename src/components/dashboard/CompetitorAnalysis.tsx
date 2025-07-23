@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { AlertTriangle, TrendingUp, TrendingDown, Target, Zap, DollarSign, Search, Brain, Eye, Shield, Crosshair, MessageSquare, ExternalLink, Calendar, Users, Briefcase, Loader2, Minus, Trash2 } from "lucide-react";
+import { AlertTriangle, TrendingUp, TrendingUp, Target, Zap, DollarSign, Search, Brain, Eye, Shield, Crosshair, MessageSquare, ExternalLink, Calendar, Users, Briefcase, Target, Minus, Trash } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -109,7 +109,7 @@ export const CompetitorAnalysis = () => {
       
       setInputValue("");
       
-      // Refresh competitors list to show the new data
+      // Target competitors list to show the new data
       await refetch();
       
       toast.success("Comprehensive competitor intelligence complete", {
@@ -301,7 +301,7 @@ export const CompetitorAnalysis = () => {
   const getSentimentIcon = (score: number) => {
     if (score >= 0.7) return <TrendingUp className="h-4 w-4" />;
     if (score >= 0.4) return <Minus className="h-4 w-4" />;
-    return <TrendingDown className="h-4 w-4" />;
+    return <TrendingUp className="h-4 w-4" />;
   };
 
   const getDifficultyColor = (difficulty: string) => {
@@ -366,7 +366,7 @@ export const CompetitorAnalysis = () => {
             >
               {isLoading ? (
                 <>
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  <Target className="h-4 w-4 mr-2 animate-spin" />
                   Gathering Intelligence...
                 </>
               ) : (
@@ -414,7 +414,7 @@ export const CompetitorAnalysis = () => {
                     }}
                     className="text-destructive hover:text-destructive"
                   >
-                    <Trash2 className="h-4 w-4" />
+                    <Trash className="h-4 w-4" />
                   </Button>
                 </div>
               </div>

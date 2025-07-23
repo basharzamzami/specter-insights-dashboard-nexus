@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useUser } from "@clerk/clerk-react";
-import { Settings, Shield, Users, Key, Zap, Clock, Bell, Database, Upload, Trash2, Edit, Plus } from "lucide-react";
+import { Settings, Shield, Users, Lock, Zap, Clock, AlertTriangle, Database, Upload, Trash, Edit, Plus } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -238,7 +238,7 @@ export const IntelligenceSettings = () => {
                   Export Intelligence Data
                 </Button>
                 <Button variant="outline" className="justify-start">
-                  <Bell className="h-4 w-4 mr-2" />
+                  <AlertTriangle className="h-4 w-4 mr-2" />
                   Configure Alerts
                 </Button>
               </div>
@@ -286,7 +286,7 @@ export const IntelligenceSettings = () => {
                         size="sm"
                         onClick={() => handleDeletePersona(persona.id)}
                       >
-                        <Trash2 className="h-3 w-3" />
+                        <Trash className="h-3 w-3" />
                       </Button>
                     </div>
                   </div>
@@ -385,7 +385,7 @@ export const IntelligenceSettings = () => {
           <Card className="card-hover">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Key className="h-5 w-5 text-accent" />
+                <Lock className="h-5 w-5 text-accent" />
                 API Integrations
               </CardTitle>
               <CardDescription>
@@ -405,7 +405,7 @@ export const IntelligenceSettings = () => {
                   <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center gap-3">
                       <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
-                        <Key className="h-4 w-4" />
+                        <Lock className="h-4 w-4" />
                       </div>
                       <div>
                         <p className="font-medium">{integration.name}</p>

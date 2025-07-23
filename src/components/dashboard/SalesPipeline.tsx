@@ -10,7 +10,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
-import { Plus, DollarSign, Calendar, User, Percent, Target, TrendingUp, BarChart } from 'lucide-react';
+import { Plus, DollarSign, Calendar, User, Target, Target, TrendingUp, BarChart3 } from 'lucide-react';
 import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 
 interface Deal {
@@ -246,7 +246,7 @@ export function SalesPipeline() {
     {
       title: "Total Deals",
       value: deals.length,
-      icon: BarChart,
+      icon: BarChart3,
       color: "text-purple-600"
     },
     {
@@ -487,7 +487,7 @@ export function SalesPipeline() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <BarChart className="h-5 w-5" />
+              <BarChart3 className="h-5 w-5" />
               <span>Pipeline Distribution</span>
             </CardTitle>
             <CardDescription>Deals by stage breakdown</CardDescription>

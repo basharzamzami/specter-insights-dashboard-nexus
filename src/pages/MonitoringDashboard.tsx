@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Eye, TrendingUp, TrendingDown, AlertTriangle, CheckCircle, Activity } from "lucide-react";
+import { ChevronLeft, Eye, TrendingUp, TrendingUp, AlertTriangle, Check, Activity } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { LineChart, Line, AreaChart, Area, BarChart3, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 interface MonitoringData {
   execution_id: string;
@@ -280,7 +280,7 @@ export default function MonitoringDashboard() {
   const getTrendIcon = (trend: string) => {
     switch (trend) {
       case "up": return <TrendingUp className="h-4 w-4 text-success" />;
-      case "down": return <TrendingDown className="h-4 w-4 text-destructive" />;
+      case "down": return <TrendingUp className="h-4 w-4 text-destructive" />;
       case "stable": return <Activity className="h-4 w-4 text-muted-foreground" />;
       default: return <Activity className="h-4 w-4 text-muted-foreground" />;
     }
@@ -311,7 +311,7 @@ export default function MonitoringDashboard() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-4 mb-8">
             <Button variant="ghost" onClick={() => navigate('/')}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ChevronLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
           </div>
@@ -347,13 +347,13 @@ export default function MonitoringDashboard() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate('/')}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ChevronLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
           </div>
           <Button onClick={loadMonitoringData} variant="outline">
             <Activity className="h-4 w-4 mr-2" />
-            Refresh Data
+            Target Data
           </Button>
         </div>
 
@@ -461,7 +461,7 @@ export default function MonitoringDashboard() {
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
-                    <BarChart data={mockPerformanceData}>
+                    <BarChart3 data={mockPerformanceData}>
                       <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                       <XAxis dataKey="week" className="fill-muted-foreground" />
                       <YAxis className="fill-muted-foreground" />
@@ -477,7 +477,7 @@ export default function MonitoringDashboard() {
                         fill="hsl(var(--primary))"
                         name="Efficiency %"
                       />
-                    </BarChart>
+                    </BarChart3>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
@@ -486,7 +486,7 @@ export default function MonitoringDashboard() {
                 <CardHeader>
                   <CardTitle>Milestone Progress</CardTitle>
                   <CardDescription>
-                    Key milestones achieved vs planned
+                    Lock milestones achieved vs planned
                   </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -582,7 +582,7 @@ export default function MonitoringDashboard() {
                             {alert.type.replace('_', ' ').toUpperCase()}
                           </Badge>
                           {alert.resolved && (
-                            <CheckCircle className="h-4 w-4 text-success" />
+                            <Check className="h-4 w-4 text-success" />
                           )}
                         </div>
                         <span className="text-sm text-muted-foreground">

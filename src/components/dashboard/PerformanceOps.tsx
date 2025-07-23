@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { TrendingUp, TrendingDown, Target, Users, DollarSign, Eye, Database, AlertTriangle } from "lucide-react";
+import { TrendingUp, TrendingUp, Target, Users, DollarSign, Eye, Database, AlertTriangle } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -9,7 +9,7 @@ import { DataConnectionPlaceholder, NoDataState } from "@/components/ui/data-con
 import { 
   LineChart, 
   Line, 
-  BarChart, 
+  BarChart3, 
   Bar, 
   XAxis, 
   YAxis, 

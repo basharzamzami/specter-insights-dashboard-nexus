@@ -6,10 +6,10 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
-  ArrowLeft, 
+  ChevronLeft, 
   ExternalLink, 
   Target, 
-  TrendingDown, 
+  TrendingUp, 
   AlertTriangle, 
   Brain,
   BarChart3,
@@ -26,7 +26,7 @@ import {
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  BarChart,
+  BarChart3,
   Bar,
   PieChart,
   Pie,
@@ -139,7 +139,7 @@ export default function CompetitorDetails() {
               onClick={() => navigate("/")}
               className="hover-scale"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ChevronLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
             <div>
@@ -159,14 +159,14 @@ export default function CompetitorDetails() {
           </div>
         </div>
 
-        {/* Key Metrics */}
+        {/* Lock Metrics */}
         <div className="grid grid-cols-4 gap-6">
           <Card className="card-hover">
             <CardContent className="pt-6">
               <div className="text-center">
                 <p className="text-3xl font-bold text-primary">{competitor.seo_score}/100</p>
                 <p className="text-sm text-muted-foreground">SEO Vulnerability</p>
-                <TrendingDown className="h-4 w-4 text-red-500 mx-auto mt-2" />
+                <TrendingUp className="h-4 w-4 text-red-500 mx-auto mt-2" />
               </div>
             </CardContent>
           </Card>
@@ -319,13 +319,13 @@ export default function CompetitorDetails() {
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
-                      <BarChart data={mockVulnerabilityData}>
+                      <BarChart3 data={mockVulnerabilityData}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="category" />
                         <YAxis />
                         <Tooltip />
                         <Bar dataKey="severity" fill="#ef4444" />
-                      </BarChart>
+                      </BarChart3>
                     </ResponsiveContainer>
                   </CardContent>
                 </Card>

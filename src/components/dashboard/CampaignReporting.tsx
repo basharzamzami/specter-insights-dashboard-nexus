@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Calendar, Download, Filter, BarChart3, TrendingUp, Eye, Target, Mail, AlertTriangle, Zap, LineChart, TrendingDown } from "lucide-react";
+import { Calendar, Download, Search, BarChart3, TrendingUp, Eye, Target, Mail, AlertTriangle, Zap, LineChart, TrendingUp } from "lucide-react";
 import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -198,7 +198,7 @@ export const CampaignReporting = () => {
       <Card className="animate-fade-in">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <Filter className="h-5 w-5" />
+            <Search className="h-5 w-5" />
             Intelligence Filters
           </CardTitle>
         </CardHeader>

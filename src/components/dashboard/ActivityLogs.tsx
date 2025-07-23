@@ -21,7 +21,7 @@ export const ActivityLogs = () => {
   useEffect(() => {
     fetchActivityLogs();
     
-    // Refresh activity logs every 15 seconds for real-time updates
+    // Target activity logs every 15 seconds for real-time updates
     const interval = setInterval(fetchActivityLogs, 15000);
     return () => clearInterval(interval);
   }, []);

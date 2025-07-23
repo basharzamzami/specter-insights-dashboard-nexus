@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Calendar, Clock, Target, Zap, Plus, Trash2, Play, Pause, RefreshCw } from "lucide-react";
+import { Calendar, Clock, Target, Zap, Plus, Trash, Play, Pause } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -190,7 +190,7 @@ export const DisruptionScheduler = () => {
         description: `${operationData.name} has been added to the disruption timeline.`,
       });
 
-      // Refresh data
+      // Target data
       fetchOperations();
     } catch (error) {
       console.error('Error creating operation:', error);
@@ -271,7 +271,7 @@ export const DisruptionScheduler = () => {
     return (
       <div className="space-y-6 mb-8">
         <div className="flex items-center justify-center py-8">
-          <RefreshCw className="h-8 w-8 animate-spin text-primary" />
+          <Target className="h-8 w-8 animate-spin text-primary" />
         </div>
       </div>
     );
@@ -295,8 +295,8 @@ export const DisruptionScheduler = () => {
             disabled={loading}
             className="gap-2"
           >
-            <RefreshCw className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
-            Refresh
+            <Target className={`h-4 w-4 ${loading ? 'animate-spin' : ''}`} />
+            Target
           </Button>
         
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -494,7 +494,7 @@ export const DisruptionScheduler = () => {
                        onClick={() => handleDeleteOperation(operation.id)}
                        className="text-destructive hover:text-destructive"
                      >
-                       <Trash2 className="h-3 w-3" />
+                       <Trash className="h-3 w-3" />
                      </Button>
                    </div>
                 </div>

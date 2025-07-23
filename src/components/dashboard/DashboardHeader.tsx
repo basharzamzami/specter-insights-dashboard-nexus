@@ -1,5 +1,5 @@
 import { UserButton, useClerk } from "@clerk/clerk-react";
-import { Bell, Settings, Bot, LogOut } from "lucide-react";
+import { AlertTriangle, Settings, Brain, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useNavigate } from "react-router-dom";
@@ -55,7 +55,7 @@ export const DashboardHeader = ({ user, onAIToggle, isAIOpen, onNotificationsCli
             onClick={onAIToggle}
             className={isAIOpen ? "btn-glow" : ""}
           >
-            <Bot className="h-4 w-4 mr-2" />
+            <Brain className="h-4 w-4 mr-2" />
             Ask Specter
             {!isAIOpen && <Badge variant="secondary" className="ml-2 text-xs">AI</Badge>}
           </Button>
@@ -66,7 +66,7 @@ export const DashboardHeader = ({ user, onAIToggle, isAIOpen, onNotificationsCli
             className="relative" 
             onClick={onNotificationsClick}
           >
-            <Bell className="h-5 w-5" />
+            <AlertTriangle className="h-5 w-5" />
             <span className="absolute -top-1 -right-1 h-3 w-3 bg-destructive rounded-full animate-pulse"></span>
           </Button>
           
@@ -78,7 +78,7 @@ export const DashboardHeader = ({ user, onAIToggle, isAIOpen, onNotificationsCli
           </Button>
 
           <Button variant="ghost" size="sm" onClick={handleLogout} className="text-destructive hover:text-destructive">
-            <LogOut className="h-5 w-5" />
+            <User className="h-5 w-5" />
           </Button>
           
           <div className="flex items-center space-x-3">

@@ -8,7 +8,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { restoreRecord, permanentDeleteRecord, SOFT_DELETE_TABLES } from '@/utils/softDelete';
-import { Trash2, RotateCcw, AlertTriangle, Archive, Timer } from 'lucide-react';
+import { Trash, Target, AlertTriangle, Folder, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 
 interface DeletedItem {
@@ -29,12 +29,12 @@ export function TrashBin() {
   const { getUser } = useClerkSupabaseAuth();
 
   const itemTypes = [
-    { value: 'all', label: 'All Items', icon: Archive },
-    { value: 'contacts', label: 'Contacts', icon: Archive },
-    { value: 'campaigns', label: 'Campaigns', icon: Archive },
-    { value: 'deals', label: 'Deals', icon: Archive },
-    { value: 'tasks', label: 'Tasks', icon: Archive },
-    { value: 'email_campaigns', label: 'Email Campaigns', icon: Archive },
+    { value: 'all', label: 'All Items', icon: Folder },
+    { value: 'contacts', label: 'Contacts', icon: Folder },
+    { value: 'campaigns', label: 'Campaigns', icon: Folder },
+    { value: 'deals', label: 'Deals', icon: Folder },
+    { value: 'tasks', label: 'Tasks', icon: Folder },
+    { value: 'email_campaigns', label: 'Email Campaigns', icon: Folder },
   ];
 
   useEffect(() => {
@@ -168,13 +168,13 @@ export function TrashBin() {
       <div className="flex justify-between items-center">
         <div>
           <h1 className="text-3xl font-bold tracking-tight flex items-center">
-            <Trash2 className="mr-3 h-8 w-8" />
+            <Trash className="mr-3 h-8 w-8" />
             Trash Bin
           </h1>
           <p className="text-muted-foreground">Restore or permanently delete items</p>
         </div>
         <div className="flex items-center space-x-2">
-          <Timer className="h-4 w-4 text-muted-foreground" />
+          <Clock className="h-4 w-4 text-muted-foreground" />
           <span className="text-sm text-muted-foreground">
             {filteredItems.length} deleted item{filteredItems.length !== 1 ? 's' : ''}
           </span>
@@ -195,7 +195,7 @@ export function TrashBin() {
           {filteredItems.length === 0 ? (
             <Card>
               <CardContent className="flex flex-col items-center justify-center py-16">
-                <Archive className="h-16 w-16 text-muted-foreground mb-4" />
+                <Folder className="h-16 w-16 text-muted-foreground mb-4" />
                 <h3 className="text-lg font-semibold mb-2">No deleted items</h3>
                 <p className="text-muted-foreground text-center">
                   {activeTab === 'all' 
@@ -213,7 +213,7 @@ export function TrashBin() {
                     <div className="flex items-center justify-between">
                       <div className="flex items-center space-x-4">
                         <div className="flex-shrink-0">
-                          <Trash2 className="h-8 w-8 text-muted-foreground" />
+                          <Trash className="h-8 w-8 text-muted-foreground" />
                         </div>
                         <div>
                           <h3 className="font-semibold">{item.name}</h3>
@@ -235,7 +235,7 @@ export function TrashBin() {
                           onClick={() => handleRestore(item)}
                           className="hover:bg-green-50 hover:border-green-200"
                         >
-                          <RotateCcw className="h-4 w-4 mr-2" />
+                          <Target className="h-4 w-4 mr-2" />
                           Restore
                         </Button>
                         
@@ -246,7 +246,7 @@ export function TrashBin() {
                               size="sm"
                               className="text-destructive hover:bg-destructive hover:text-destructive-foreground"
                             >
-                              <Trash2 className="h-4 w-4 mr-2" />
+                              <Trash className="h-4 w-4 mr-2" />
                               Delete Forever
                             </Button>
                           </DialogTrigger>

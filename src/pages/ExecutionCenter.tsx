@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ArrowLeft, Play, Pause, CheckCircle, Clock, Users, AlertTriangle, BarChart3 } from "lucide-react";
+import { ChevronLeft, Play, Pause, Check, Clock, Users, AlertTriangle, BarChart3 } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -230,7 +230,7 @@ export default function ExecutionCenter() {
           mitigation: "Prioritize high-impact activities and secure additional funding if needed"
         },
         {
-          description: "Key team members become unavailable",
+          description: "Lock team members become unavailable",
           probability: "low",
           impact: "high",
           mitigation: "Cross-train team members and maintain backup resource pool"
@@ -307,7 +307,7 @@ export default function ExecutionCenter() {
         <div className="max-w-7xl mx-auto">
           <div className="flex items-center gap-4 mb-8">
             <Button variant="ghost" onClick={() => navigate('/')}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ChevronLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
           </div>
@@ -343,7 +343,7 @@ export default function ExecutionCenter() {
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             <Button variant="ghost" onClick={() => navigate('/')}>
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ChevronLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
           </div>
@@ -406,7 +406,7 @@ export default function ExecutionCenter() {
                   <p className="text-sm text-muted-foreground">Completed</p>
                   <p className="text-2xl font-bold">{executionPlan.completed_tasks}/{executionPlan.total_tasks}</p>
                 </div>
-                <CheckCircle className="h-8 w-8 text-success" />
+                <Check className="h-8 w-8 text-success" />
               </div>
             </CardContent>
           </Card>
@@ -477,7 +477,7 @@ export default function ExecutionCenter() {
                               )}
                               {task.status === "in_progress" && (
                                 <Button size="sm" variant="outline" onClick={() => updateTaskStatus(task.id, "completed")}>
-                                  <CheckCircle className="h-3 w-3 mr-1" />
+                                  <Check className="h-3 w-3 mr-1" />
                                   Complete
                                 </Button>
                               )}

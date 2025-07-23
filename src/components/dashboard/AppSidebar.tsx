@@ -17,9 +17,9 @@ import {
   Users,
   CheckSquare,
   Mail,
-  Share2,
-  Cog,
-  Trash2
+  Share,
+  Settings,
+  Trash
 } from "lucide-react";
 import {
   Sidebar,
@@ -58,13 +58,13 @@ const mainItems: SidebarItem[] = [
 
 const analyticsItems: SidebarItem[] = [
   { name: "Performance", icon: BarChart3, key: "analytics" },
-  { name: "Operations Manager", icon: Cog, key: "operations", badge: "NEW" },
+  { name: "Operations Manager", icon: Settings, key: "operations", badge: "NEW" },
   { name: "Campaign Reports", icon: FileText, key: "reporting" },
   { name: "Activity Log", icon: Activity, key: "activity" },
   { name: "Email Marketing", icon: Mail, key: "email" },
-  { name: "Social Media", icon: Share2, key: "social" },
+  { name: "Social Media", icon: Share, key: "social" },
   { name: "Calendar", icon: Calendar, key: "calendar" },
-  { name: "Trash Bin", icon: Trash2, key: "trash" },
+  { name: "Trash Bin", icon: Trash, key: "trash" },
 ];
 
 const systemItems: SidebarItem[] = [

@@ -10,17 +10,17 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
 import { 
-  ArrowLeft, 
-  ArrowRight,
+  ChevronLeft, 
+  ChevronRight,
   Target, 
   Zap,
   Calendar,
   Users,
   DollarSign,
   BarChart3,
-  CheckCircle,
+  Check,
   AlertTriangle,
-  Rocket
+  Zap
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -230,7 +230,7 @@ export default function CampaignBuilder() {
               onClick={() => navigate("/")}
               className="hover-scale"
             >
-              <ArrowLeft className="h-4 w-4 mr-2" />
+              <ChevronLeft className="h-4 w-4 mr-2" />
               Back to Dashboard
             </Button>
             <div>
@@ -464,7 +464,7 @@ export default function CampaignBuilder() {
             {currentStep === 4 && (
               <div className="space-y-6">
                 <div className="text-center">
-                  <Rocket className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <Zap className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h2 className="text-2xl font-bold mb-2">Launch Campaign</h2>
                   <p className="text-muted-foreground">Review and deploy your strategic operation</p>
                 </div>
@@ -534,7 +534,7 @@ export default function CampaignBuilder() {
             onClick={handlePrev}
             disabled={currentStep === 1}
           >
-            <ArrowLeft className="h-4 w-4 mr-2" />
+            <ChevronLeft className="h-4 w-4 mr-2" />
             Previous
           </Button>
 
@@ -544,7 +544,7 @@ export default function CampaignBuilder() {
               disabled={!isStepValid()}
             >
               Next
-              <ArrowRight className="h-4 w-4 ml-2" />
+              <ChevronRight className="h-4 w-4 ml-2" />
             </Button>
           ) : (
             <Button 
@@ -559,7 +559,7 @@ export default function CampaignBuilder() {
                 </>
               ) : (
                 <>
-                  <Rocket className="h-4 w-4 mr-2" />
+                  <Zap className="h-4 w-4 mr-2" />
                   Launch Campaign
                 </>
               )}

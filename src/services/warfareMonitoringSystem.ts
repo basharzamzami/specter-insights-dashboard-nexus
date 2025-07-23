@@ -288,7 +288,7 @@ export class WarfareMonitoringSystem {
             
             exploitation: {
               method: `Target "${keyword.keyword}" with superior content and SEO strategy`,
-              resources: ['Content team', 'SEO specialist', 'Link building'],
+              resources: ['Content team', 'SEO specialist', 'ExternalLink building'],
               timeline: '2-4 months',
               estimatedCost: keyword.difficulty * 50,
               expectedROI: this.calculateKeywordROI(keyword.searchVolume, businessInfo.industry)
