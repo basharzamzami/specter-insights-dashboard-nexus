@@ -1,7 +1,7 @@
 {
   "name": "specter-insights-dashboard-nexus",
   "private": true,
-  "version": "1.0.0",
+  "version": "1.0.1",
   "type": "module",
   "description": "Specter Net - AI-Powered Competitive Intelligence Platform",
   "scripts": {
