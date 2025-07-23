@@ -39,13 +39,32 @@ const Dashboard = () => {
   useEffect(() => {
     if (isLoaded && !isSignedIn) {
       navigate("/auth");
-    } else if (isLoaded && isSignedIn && user) {
-      // Redirect to user-specific dashboard if not already there
-      if (!userId || userId !== user.id) {
-        navigate(`/dashboard/${user.id}`, { replace: true });
-      }
     }
-  }, [isLoaded, isSignedIn, user, userId, navigate]);
+    
+    // Set active view based on current path
+    const path = window.location.pathname;
+    if (path.includes('target-analysis') || path.includes('competitors')) {
+      setActiveView('competitors');
+    } else if (path.includes('ai-reports') || path.includes('intelligence')) {
+      setActiveView('intelligence');
+    } else if (path.includes('operations')) {
+      setActiveView('operations');
+    } else if (path.includes('campaign-insights') || path.includes('campaigns')) {
+      setActiveView('campaigns');
+    } else if (path.includes('task-flow') || path.includes('tasks')) {
+      setActiveView('tasks');
+    } else if (path.includes('disruption-schedule') || path.includes('scheduler')) {
+      setActiveView('scheduler');
+    } else if (path.includes('calendar')) {
+      setActiveView('calendar');
+    } else if (path.includes('email-marketing') || path.includes('email')) {
+      setActiveView('email');
+    } else if (path.includes('trash-bin') || path.includes('trash')) {
+      setActiveView('trash');
+    } else if (path.includes('intel-feed')) {
+      setActiveView('intelligence');
+    }
+  }, [isLoaded, isSignedIn, navigate]);
 
   if (!isLoaded || !isSignedIn) {
     return (

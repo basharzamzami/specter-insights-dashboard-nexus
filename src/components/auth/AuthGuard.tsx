@@ -9,9 +9,8 @@ interface AuthGuardProps {
   requireOnboarding?: boolean;
 }
 
-export const AuthGuard = ({ children, requireOnboarding = true }: AuthGuardProps) => {
+export const AuthGuard = ({ children, requireOnboarding = false }: AuthGuardProps) => {
   const { isLoaded, isSignedIn, user } = useUser();
-  const { hasCompletedOnboarding, loading } = useClientData();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -19,22 +18,14 @@ export const AuthGuard = ({ children, requireOnboarding = true }: AuthGuardProps
       navigate("/auth", { replace: true });
       return;
     }
+  }, [isLoaded, isSignedIn, navigate]);
 
-    if (isLoaded && isSignedIn && !loading && requireOnboarding) {
-      if (!hasCompletedOnboarding) {
-        navigate("/onboarding", { replace: true });
-      }
-    }
-  }, [isLoaded, isSignedIn, hasCompletedOnboarding, loading, requireOnboarding, navigate]);
-
-  if (!isLoaded || (requireOnboarding && loading)) {
+  if (!isLoaded) {
     return (
       <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
         <div className="text-center space-y-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-          <p className="text-muted-foreground">
-            {!isLoaded ? "Authenticating..." : "Loading profile..."}
-          </p>
+          <p className="text-muted-foreground">Authenticating...</p>
         </div>
       </div>
     );
@@ -46,17 +37,6 @@ export const AuthGuard = ({ children, requireOnboarding = true }: AuthGuardProps
         <div className="text-center space-y-4">
           <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
           <p className="text-muted-foreground">Redirecting to login...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (requireOnboarding && !hasCompletedOnboarding) {
-    return (
-      <div className="min-h-screen bg-gradient-subtle flex items-center justify-center">
-        <div className="text-center space-y-4">
-          <Loader2 className="h-8 w-8 animate-spin text-primary mx-auto" />
-          <p className="text-muted-foreground">Redirecting to onboarding...</p>
         </div>
       </div>
     );
