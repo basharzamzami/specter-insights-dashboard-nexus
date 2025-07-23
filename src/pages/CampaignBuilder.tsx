@@ -17,7 +17,7 @@ import {
   Calendar,
   Users,
   DollarSign,
-  BarChart3,
+  BarChart,
   Check,
   AlertTriangle,
   Zap
@@ -374,7 +374,7 @@ export default function CampaignBuilder() {
             {currentStep === 3 && (
               <div className="space-y-6">
                 <div className="text-center">
-                  <BarChart3 className="h-12 w-12 text-primary mx-auto mb-4" />
+                  <BarChart className="h-12 w-12 text-primary mx-auto mb-4" />
                   <h2 className="text-2xl font-bold mb-2">Campaign Parameters</h2>
                   <p className="text-muted-foreground">Set budget, timeline, and success metrics</p>
                 </div>

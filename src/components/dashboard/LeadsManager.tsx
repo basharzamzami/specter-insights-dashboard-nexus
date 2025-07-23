@@ -11,8 +11,8 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
-import { Plus, Search, Phone, Mail, Building, Calendar, MoreHorizontal, Star, TrendingUp, Users, Target, BarChart3, User } from 'lucide-react';
-import { BarChart3, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { Plus, Search, Phone, Mail, Building, Calendar, MoreHorizontal, Star, TrendingUp, Users, Target, BarChart, User } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 
 interface Contact {
   id: string;
@@ -497,14 +497,14 @@ export function LeadsManager() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <BarChart3 className="h-5 w-5" />
+              <BarChart className="h-5 w-5" />
               <span>Lead Sources</span>
             </CardTitle>
             <CardDescription>Lead generation by source and conversion rates</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart3 data={leadSourceData}>
+              <BarChart data={leadSourceData}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                 <XAxis dataKey="source" className="fill-muted-foreground" fontSize={12} />
                 <YAxis className="fill-muted-foreground" fontSize={12} />
@@ -517,7 +517,7 @@ export function LeadsManager() {
                 />
                 <Bar dataKey="leads" fill="hsl(var(--primary))" />
                 <Bar dataKey="conversion" fill="hsl(var(--secondary))" />
-              </BarChart3>
+              </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>

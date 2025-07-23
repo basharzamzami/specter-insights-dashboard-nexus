@@ -16,7 +16,7 @@ import {
 import {
   LineChart,
   Line,
-  BarChart3,
+  BarChart,
   Bar,
   XAxis,
   YAxis,

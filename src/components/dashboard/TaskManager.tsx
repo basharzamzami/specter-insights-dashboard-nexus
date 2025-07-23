@@ -12,8 +12,8 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
-import { Plus, Calendar, Clock, User, AlertTriangle, Check, Target, Search, BarChart3, Target, Activity, TrendingUp } from 'lucide-react';
-import { BarChart3, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { Plus, Calendar, Clock, User, AlertTriangle, Check, Target, Search, BarChart, Target, Activity, TrendingUp } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
 import { fetchRealData } from '@/utils/dataUtils';
 
 interface Task {
@@ -499,14 +499,14 @@ export function TaskManager() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <BarChart3 className="h-5 w-5" />
+              <BarChart className="h-5 w-5" />
               <span>Task Completion Trend</span>
             </CardTitle>
             <CardDescription>Weekly task completion patterns</CardDescription>
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart3 data={taskCompletionTrend}>
+              <BarChart data={taskCompletionTrend}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                 <XAxis dataKey="week" className="fill-muted-foreground" fontSize={12} />
                 <YAxis className="fill-muted-foreground" fontSize={12} />
@@ -520,7 +520,7 @@ export function TaskManager() {
                 <Bar dataKey="completed" fill="#10b981" stackId="a" />
                 <Bar dataKey="pending" fill="#f59e0b" stackId="a" />
                 <Bar dataKey="overdue" fill="#ef4444" stackId="a" />
-              </BarChart3>
+              </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>

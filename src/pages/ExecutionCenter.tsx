@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { ChevronLeft, Play, Pause, Check, Clock, Users, AlertTriangle, BarChart3 } from "lucide-react";
+import { ChevronLeft, Play, Pause, Check, Clock, Users, AlertTriangle, BarChart } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -381,7 +381,7 @@ export default function ExecutionCenter() {
                   <p className="text-sm text-muted-foreground">Overall Progress</p>
                   <p className="text-2xl font-bold">{executionPlan.overall_progress}%</p>
                 </div>
-                <BarChart3 className="h-8 w-8 text-primary" />
+                <BarChart className="h-8 w-8 text-primary" />
               </div>
               <Progress value={executionPlan.overall_progress} className="mt-3" />
             </CardContent>

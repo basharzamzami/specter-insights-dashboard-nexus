@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Calendar, Download, Search, BarChart3, TrendingUp, Eye, Target, Mail, AlertTriangle, Zap, LineChart, TrendingUp } from "lucide-react";
+import { Calendar, Download, Search, BarChart, TrendingUp, Eye, Target, Mail, AlertTriangle, Zap, LineChart, TrendingUp } from "lucide-react";
 import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -167,7 +167,7 @@ export const CampaignReporting = () => {
       <div className="flex items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold flex items-center gap-2">
-            <BarChart3 className="h-6 w-6" />
+            <BarChart className="h-6 w-6" />
             Intelligence Analytics
           </h2>
           <p className="text-muted-foreground">Comprehensive analysis of strategic operations and market dominance</p>
@@ -281,7 +281,7 @@ export const CampaignReporting = () => {
       <Card className="animate-fade-in">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
-            <BarChart3 className="h-5 w-5" />
+            <BarChart className="h-5 w-5" />
             Intelligence Analytics
           </CardTitle>
           <CardDescription>Real-time campaign data will appear here as operations are launched</CardDescription>

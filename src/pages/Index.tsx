@@ -21,7 +21,7 @@ import {
   Brain,
   Globe,
   Zap,
-  BarChart3,
+  BarChart,
   Eye,
   Clock,
   Activity
@@ -112,7 +112,7 @@ const Index = () => {
 
   const getSentimentIcon = (score: number) => {
     if (score >= 0.7) return <TrendingUp className="h-4 w-4 text-green-400" />;
-    if (score >= 0.5) return <BarChart3 className="h-4 w-4 text-yellow-400" />;
+    if (score >= 0.5) return <BarChart className="h-4 w-4 text-yellow-400" />;
     return <TrendingUp className="h-4 w-4 text-red-400" />;
   };
 

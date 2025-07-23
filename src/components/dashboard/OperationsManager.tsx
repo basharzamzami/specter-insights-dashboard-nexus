@@ -428,7 +428,7 @@ export const OperationsManager = () => {
         <DialogContent className="max-w-4xl">
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
-              <BarChart3 className="h-5 w-5" />
+              <BarChart className="h-5 w-5" />
               Operations Analytics Dashboard
             </DialogTitle>
           </DialogHeader>

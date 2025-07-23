@@ -11,7 +11,7 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
-import { Plus, Mail, Share, Eye, Target, Users, Calendar, BarChart3, TrendingUp, Trash } from 'lucide-react';
+import { Plus, Mail, Share, Eye, Target, Users, Calendar, BarChart, TrendingUp, Trash } from 'lucide-react';
 import { fetchRealData } from '@/utils/dataUtils';
 import { softDeleteRecord, excludeDeleted } from '@/utils/softDelete';
 
@@ -776,7 +776,7 @@ export function EmailMarketing() {
                   Close
                 </Button>
                 <Button>
-                  <BarChart3 className="h-4 w-4 mr-2" />
+                  <BarChart className="h-4 w-4 mr-2" />
                   Export Report
                 </Button>
               </div>

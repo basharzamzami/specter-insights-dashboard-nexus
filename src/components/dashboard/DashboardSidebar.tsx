@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { 
-  BarChart3, 
+  BarChart, 
   Calendar, 
   Target, 
   Activity,
@@ -30,7 +30,7 @@ const sidebarItems: SidebarItem[] = [
   { name: "Operations", icon: Calendar, key: "campaigns" },
   { name: "Disruption Schedule", icon: Clock, key: "scheduler" },
   { name: "Intel Feed", icon: Rss, key: "intelligence" },
-  { name: "Performance", icon: BarChart3, key: "analytics" },
+  { name: "Performance", icon: BarChart, key: "analytics" },
   { name: "Campaign Reports", icon: FileText, key: "reporting" },
   { name: "Activity Log", icon: Activity, key: "activity" },
 ];

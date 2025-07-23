@@ -10,7 +10,7 @@ import {
   ChevronLeft, 
   Play,
   Pause,
-  BarChart3,
+  BarChart,
   Target,
   Calendar,
   Users,
@@ -31,7 +31,7 @@ import {
   ResponsiveContainer,
   AreaChart,
   Area,
-  BarChart3,
+  BarChart,
   Bar
 } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
@@ -295,7 +295,7 @@ export default function CampaignDetails() {
             <CardHeader>
               <div className="flex items-center justify-between">
                 <CardTitle className="flex items-center space-x-2">
-                  <BarChart3 className="h-5 w-5" />
+                  <BarChart className="h-5 w-5" />
                   <span>Campaign Intelligence</span>
                 </CardTitle>
                 <TabsList>
@@ -431,14 +431,14 @@ export default function CampaignDetails() {
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={400}>
-                      <BarChart3 data={mockProgressData}>
+                      <BarChart data={mockProgressData}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="day" />
                         <YAxis />
                         <Tooltip />
                         <Bar dataKey="reach" fill="#8884d8" name="Reach" />
                         <Bar dataKey="engagement" fill="#82ca9d" name="Engagement" />
-                      </BarChart3>
+                      </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
                 </Card>

@@ -11,8 +11,8 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
-import { Plus, Search, Calendar, MoreHorizontal, TrendingUp, Users, Heart, Share, Eye, BarChart3, Target, Share, MessageCircle } from 'lucide-react';
-import { BarChart3, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
+import { Plus, Search, Calendar, MoreHorizontal, TrendingUp, Users, Heart, Share, Eye, BarChart, Target, Share, MessageCircle } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 import { fetchRealData } from '@/utils/dataUtils';
 
 interface SocialPost {
@@ -267,7 +267,7 @@ export function SocialMediaManager() {
     {
       title: "Total Posts",
       value: posts.length,
-      icon: BarChart3,
+      icon: BarChart,
       change: "+12 this week",
       color: "text-blue-600"
     },
@@ -414,7 +414,7 @@ export function SocialMediaManager() {
         </CardHeader>
         <CardContent className="flex items-center justify-center py-12">
           <div className="text-center space-y-3">
-            <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto" />
+            <BarChart className="h-12 w-12 text-muted-foreground mx-auto" />
             <p className="text-lg font-medium">Analytics Ready</p>
             <p className="text-sm text-muted-foreground max-w-md">
               Create and publish social media posts to see live engagement analytics, platform performance, and content insights.
@@ -588,7 +588,7 @@ export function SocialMediaManager() {
             
             {filteredPosts.length === 0 && (
               <div className="text-center py-8">
-                <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
+                <BarChart className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                 <p className="text-muted-foreground">No social media posts found</p>
                 <p className="text-sm text-muted-foreground">Create your first post to get started</p>
               </div>

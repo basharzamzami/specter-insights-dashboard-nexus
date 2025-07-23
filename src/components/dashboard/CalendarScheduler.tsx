@@ -10,8 +10,8 @@ import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
-import { Plus, Calendar, Clock, MapPin, Video, User, Phone, TrendingUp, BarChart3, Users, Target } from 'lucide-react';
-import { BarChart3, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
+import { Plus, Calendar, Clock, MapPin, Video, User, Phone, TrendingUp, BarChart, Users, Target } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 import { fetchRealData } from '@/utils/dataUtils';
 
 interface Appointment {
@@ -478,7 +478,7 @@ export function CalendarScheduler() {
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <BarChart3 className="h-5 w-5" />
+              <BarChart className="h-5 w-5" />
               <span>Appointment Trends</span>
             </CardTitle>
             <CardDescription>Monthly appointment performance</CardDescription>
@@ -557,7 +557,7 @@ export function CalendarScheduler() {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={250}>
-              <BarChart3 data={timeUtilization}>
+              <BarChart data={timeUtilization}>
                 <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                 <XAxis dataKey="hour" className="fill-muted-foreground" fontSize={12} />
                 <YAxis className="fill-muted-foreground" fontSize={12} />
@@ -570,7 +570,7 @@ export function CalendarScheduler() {
                 />
                 <Bar dataKey="capacity" fill="#e5e7eb" />
                 <Bar dataKey="appointments" fill="#6366f1" />
-              </BarChart3>
+              </BarChart>
             </ResponsiveContainer>
           </CardContent>
         </Card>

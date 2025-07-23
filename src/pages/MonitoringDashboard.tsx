@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
-import { LineChart, Line, AreaChart, Area, BarChart3, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { LineChart, Line, AreaChart, Area, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 
 interface MonitoringData {
   execution_id: string;
@@ -461,7 +461,7 @@ export default function MonitoringDashboard() {
                 </CardHeader>
                 <CardContent>
                   <ResponsiveContainer width="100%" height={300}>
-                    <BarChart3 data={mockPerformanceData}>
+                    <BarChart data={mockPerformanceData}>
                       <CartesianGrid strokeDasharray="3 3" className="stroke-border" />
                       <XAxis dataKey="week" className="fill-muted-foreground" />
                       <YAxis className="fill-muted-foreground" />
@@ -477,7 +477,7 @@ export default function MonitoringDashboard() {
                         fill="hsl(var(--primary))"
                         name="Efficiency %"
                       />
-                    </BarChart3>
+                    </BarChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>

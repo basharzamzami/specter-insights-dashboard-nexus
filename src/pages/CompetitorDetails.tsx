@@ -12,7 +12,7 @@ import {
   TrendingUp, 
   AlertTriangle, 
   Brain,
-  BarChart3,
+  BarChart,
   Users,
   Calendar,
   Activity,
@@ -26,7 +26,7 @@ import {
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  BarChart3,
+  BarChart,
   Bar,
   PieChart,
   Pie,
@@ -178,7 +178,7 @@ export default function CompetitorDetails() {
                   ${(competitor.estimated_ad_spend || 0).toLocaleString()}
                 </p>
                 <p className="text-sm text-muted-foreground">Monthly Ad Spend</p>
-                <BarChart3 className="h-4 w-4 text-orange-600 mx-auto mt-2" />
+                <BarChart className="h-4 w-4 text-orange-600 mx-auto mt-2" />
               </div>
             </CardContent>
           </Card>
@@ -319,13 +319,13 @@ export default function CompetitorDetails() {
                   </CardHeader>
                   <CardContent>
                     <ResponsiveContainer width="100%" height={300}>
-                      <BarChart3 data={mockVulnerabilityData}>
+                      <BarChart data={mockVulnerabilityData}>
                         <CartesianGrid strokeDasharray="3 3" />
                         <XAxis dataKey="category" />
                         <YAxis />
                         <Tooltip />
                         <Bar dataKey="severity" fill="#ef4444" />
-                      </BarChart3>
+                      </BarChart>
                     </ResponsiveContainer>
                   </CardContent>
                 </Card>

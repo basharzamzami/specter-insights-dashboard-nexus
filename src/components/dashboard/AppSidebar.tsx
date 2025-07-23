@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useLocation } from "react-router-dom";
 import { 
-  BarChart3, 
+  BarChart, 
   Calendar, 
   Target, 
   Activity,
@@ -57,7 +57,7 @@ const mainItems: SidebarItem[] = [
 ];
 
 const analyticsItems: SidebarItem[] = [
-  { name: "Performance", icon: BarChart3, key: "analytics" },
+  { name: "Performance", icon: BarChart, key: "analytics" },
   { name: "Operations Manager", icon: Settings, key: "operations", badge: "NEW" },
   { name: "Campaign Reports", icon: FileText, key: "reporting" },
   { name: "Activity Log", icon: Activity, key: "activity" },

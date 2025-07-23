@@ -9,7 +9,7 @@ import { DataConnectionPlaceholder, NoDataState } from "@/components/ui/data-con
 import { 
   LineChart, 
   Line, 
-  BarChart3, 
+  BarChart, 
   Bar, 
   XAxis, 
   YAxis, 
