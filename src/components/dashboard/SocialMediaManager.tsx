@@ -13,7 +13,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
 import { Plus, Search, Calendar, MoreHorizontal, TrendingUp, Users, Heart, Share2, Eye, BarChart3, Target, Share, MessageCircle } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
-import { populateWithDemoData, demoSocialPosts } from '@/utils/demoData';
+import { fetchRealData } from '@/utils/dataUtils';
 
 interface SocialPost {
   id: string;

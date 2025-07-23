@@ -1,14 +1,21 @@
 {
-  "name": "vite_react_shadcn_ts",
+  "name": "specter-insights-dashboard-nexus",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
+  "description": "Specter Net - AI-Powered Competitive Intelligence Platform",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
+    "build:production": "NODE_ENV=production vite build",
     "build:dev": "vite build --mode development",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "lint:fix": "eslint . --fix",
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf dist",
+    "verify": "node scripts/verify-production-ready.js",
+    "deploy": "npm run verify && npm run clean && npm run build:production"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.34.0",

@@ -111,30 +111,8 @@ export const CampaignReporting = () => {
   };
 
   const exportData = (format: string) => {
-    // Create demo data if no campaigns exist
-    const exportCampaigns = campaigns.length > 0 ? campaigns : [
-      {
-        target_company: "TechCorp Industries",
-        type: "seo",
-        status: "active",
-        created_at: new Date().toISOString(),
-        objective: "Disrupt their search rankings for key terms"
-      },
-      {
-        target_company: "DataSolutions Inc",
-        type: "social",
-        status: "completed",
-        created_at: new Date(Date.now() - 86400000).toISOString(),
-        objective: "Social media sentiment manipulation"
-      },
-      {
-        target_company: "CloudInnovate",
-        type: "whisper",
-        status: "paused",
-        created_at: new Date(Date.now() - 172800000).toISOString(),
-        objective: "Spread doubt about their new product launch"
-      }
-    ];
+    // Use real campaign data only
+    const exportCampaigns = campaigns;
 
     const csvData = exportCampaigns.map(campaign => ({
       Company: campaign.target_company,
@@ -379,12 +357,52 @@ export const CampaignReporting = () => {
                 </CardContent>
               </Card>
             )) : (
-              // Mock campaigns for demo
-              [
-                { id: 1, target: "TechCorp", type: "SEO Attack", status: "active", impact: "12.3%" },
-                { id: 2, target: "DataSolutions", type: "Social Disruption", status: "completed", impact: "8.7%" },
-                { id: 3, target: "CloudInnovate", type: "Whisper Campaign", status: "pending", impact: "15.2%" },
-              ].map((campaign) => (
+              <div className="text-center py-12">
+                <div className="text-muted-foreground">
+                  <p className="text-lg font-medium">No campaigns found</p>
+                  <p className="text-sm">Create your first campaign to see analytics here</p>
+                </div>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {campaigns.length === 0 && (
+        <Card>
+          <CardContent className="text-center py-12">
+            <div className="text-muted-foreground space-y-2">
+              <p className="text-lg font-medium">Ready for Campaign Analytics</p>
+              <p className="text-sm">Your campaign performance data will appear here once you start running campaigns</p>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+    </div>
+  );
+}
+
+// Placeholder for when there are no campaigns
+const NoCampaignsPlaceholder = () => (
+  <div className="space-y-6">
+    {[1, 2, 3].map((i) => (
+      <Card key={i}>
+        <CardContent className="p-6">
+          <div className="flex items-center justify-between">
+            <div className="space-y-2">
+              <div className="h-4 bg-muted rounded w-32"></div>
+              <div className="h-3 bg-muted rounded w-24"></div>
+            </div>
+            <div className="space-y-1 text-right">
+              <div className="h-4 bg-muted rounded w-16"></div>
+              <div className="h-3 bg-muted rounded w-12"></div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+    ))}
+  </div>
+);
                 <Card key={campaign.id} className="border-l-4 border-l-primary/50 hover:shadow-md transition-all duration-300">
                   <CardContent className="pt-4">
                     <div className="flex items-start justify-between">

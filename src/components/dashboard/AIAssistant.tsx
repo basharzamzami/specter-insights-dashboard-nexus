@@ -20,23 +20,21 @@ interface AIAssistantProps {
   onClose: () => void;
 }
 
-const mockMessages: Message[] = [
-  {
-    id: "1",
-    type: "assistant",
-    content: "Hello! I'm Specter, your strategic intelligence assistant. I can help you analyze competitors, optimize campaigns, and identify market opportunities. What would you like to explore?",
-    timestamp: new Date(),
-    suggestions: [
-      "Analyze TechCorp's recent changes",
-      "Find keyword opportunities",
-      "Review campaign performance",
-      "Competitor sentiment analysis"
-    ]
-  }
-];
+const getWelcomeMessage = (): Message => ({
+  id: "welcome",
+  type: "assistant",
+  content: "Hello! I'm Specter, your strategic intelligence assistant. I can help you analyze competitors, optimize campaigns, and identify market opportunities. What would you like to explore?",
+  timestamp: new Date(),
+  suggestions: [
+    "Analyze my competitors",
+    "Find market opportunities",
+    "Review my business strategy",
+    "Get industry insights"
+  ]
+});
 
 export const AIAssistant = ({ isOpen, onClose }: AIAssistantProps) => {
-  const [messages, setMessages] = useState<Message[]>(mockMessages);
+  const [messages, setMessages] = useState<Message[]>([getWelcomeMessage()]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const scrollAreaRef = useRef<HTMLDivElement>(null);

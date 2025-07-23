@@ -8,8 +8,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
-import { Shield, Building, Target, Zap, AlertTriangle } from 'lucide-react';
-import { supabase } from '@/integrations/supabase/client';
+import { Shield, Building, Target, Zap, AlertTriangle, Brain, Search, TrendingUp } from 'lucide-react';
+import { OnboardingProcessor } from '@/services/onboardingProcessor';
 
 interface ClientData {
   businessName: string;
@@ -73,48 +73,41 @@ export const ClientOnboarding = () => {
     console.log('Starting onboarding for user:', user.id);
 
     try {
-      // Debug: Log the data being inserted
-      const insertData = {
-        user_id: user.id,
-        business_name: clientData.businessName,
+      const onboardingData = {
+        businessName: clientData.businessName,
         industry: clientData.industry,
         email: clientData.email,
-        phone: clientData.phone || null,
+        phone: clientData.phone || undefined,
         city: clientData.city,
         state: clientData.state,
         zipcode: clientData.zipcode,
-        business_goals: clientData.businessGoals,
-        pain_points: clientData.painPoints || null
+        businessGoals: clientData.businessGoals,
+        painPoints: clientData.painPoints || undefined
       };
-      
-      console.log('Inserting client data:', insertData);
 
-      // Save client data to Supabase
-      const { data, error } = await supabase
-        .from('clients')
-        .insert(insertData)
-        .select()
-        .single();
+      console.log('Starting comprehensive onboarding process...');
 
-      if (error) {
-        console.error('Database error:', error);
-        throw error;
-      }
+      // Initialize onboarding processor
+      const processor = new OnboardingProcessor(user.id);
 
-      console.log('Successfully created client record:', data);
+      // Process complete onboarding workflow
+      await processor.processOnboarding(onboardingData);
 
       toast({
         title: "Welcome to Specter Net™",
-        description: "Your elite intelligence platform is now being configured for your business.",
+        description: "Your intelligence platform is now analyzing competitors and generating strategic insights.",
       });
 
-      // Trigger background data collection process
-      console.log('Starting background competitor scanning for:', clientData.industry, clientData.city, clientData.state);
+      // Show processing status
+      toast({
+        title: "Intelligence Analysis Started",
+        description: "We're collecting competitor data, analyzing market opportunities, and setting up monitoring systems.",
+      });
 
-      // Redirect to user-specific dashboard after successful onboarding
+      // Redirect to dashboard after successful onboarding
       setTimeout(() => {
         navigate(`/dashboard/${user.id}`);
-      }, 2000);
+      }, 3000);
 
     } catch (error) {
       console.error('Onboarding error:', error);
@@ -284,6 +277,51 @@ export const ClientOnboarding = () => {
                 />
                 <p className="text-sm text-muted-foreground mt-2">
                   This helps us tailor our competitive intelligence to address your specific challenges.
+                </p>
+              </div>
+            </div>
+
+            {/* Intelligence Preview */}
+            <div className="bg-gradient-to-r from-primary/5 to-secondary/5 p-6 rounded-lg border border-primary/20">
+              <div className="flex items-center space-x-2 mb-4">
+                <Brain className="h-5 w-5 text-primary" />
+                <h3 className="text-lg font-semibold">Your Intelligence Platform Will:</h3>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-4 text-sm">
+                <div className="space-y-3">
+                  <div className="flex items-start space-x-3">
+                    <Search className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                    <p><strong>Identify Competitors:</strong> Scan your industry and location for direct and indirect competitors</p>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <TrendingUp className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                    <p><strong>Analyze Performance:</strong> Collect SEO rankings, traffic data, and market share information</p>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <Target className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                    <p><strong>Find Vulnerabilities:</strong> Identify competitor weaknesses and market gaps</p>
+                  </div>
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-start space-x-3">
+                    <Zap className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                    <p><strong>Generate Strategies:</strong> Create actionable recommendations based on your goals</p>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <AlertTriangle className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                    <p><strong>Monitor Changes:</strong> Set up real-time alerts for competitor activities</p>
+                  </div>
+                  <div className="flex items-start space-x-3">
+                    <Building className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
+                    <p><strong>Track Sentiment:</strong> Monitor customer reviews and social media mentions</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-4 p-3 bg-primary/10 rounded border border-primary/20">
+                <p className="text-xs text-primary font-medium">
+                  ⚡ Analysis begins immediately after submission and continues 24/7
                 </p>
               </div>
             </div>

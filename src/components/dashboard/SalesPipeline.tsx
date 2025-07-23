@@ -257,23 +257,48 @@ export function SalesPipeline() {
     }
   ];
 
-  // Dummy analytics data
-  const salesTrendData = [
-    { month: 'Jan', deals: 45, value: 125000, conversion: 12 },
-    { month: 'Feb', deals: 52, value: 147000, conversion: 15 },
-    { month: 'Mar', deals: 38, value: 98000, conversion: 10 },
-    { month: 'Apr', deals: 67, value: 189000, conversion: 18 },
-    { month: 'May', deals: 71, value: 203000, conversion: 22 },
-    { month: 'Jun', deals: 84, value: 245000, conversion: 28 }
-  ];
+  // Calculate real analytics from deal data
+  const salesTrendData = React.useMemo(() => {
+    if (deals.length === 0) return [];
 
-  const stageDistribution = [
-    { name: 'Prospecting', value: 35, color: '#8b5cf6' },
-    { name: 'Qualification', value: 25, color: '#06b6d4' },
-    { name: 'Proposal', value: 20, color: '#10b981' },
-    { name: 'Negotiation', value: 15, color: '#f59e0b' },
-    { name: 'Closed Won', value: 5, color: '#ef4444' }
-  ];
+    // Group deals by month for the last 6 months
+    const months = [];
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date();
+      date.setMonth(date.getMonth() - i);
+      const monthName = date.toLocaleDateString('en-US', { month: 'short' });
+
+      const monthDeals = deals.filter(deal => {
+        const dealDate = new Date(deal.created_at);
+        return dealDate.getMonth() === date.getMonth() &&
+               dealDate.getFullYear() === date.getFullYear();
+      });
+
+      months.push({
+        month: monthName,
+        deals: monthDeals.length,
+        value: monthDeals.reduce((sum, deal) => sum + deal.value, 0),
+        conversion: monthDeals.filter(d => d.status === 'won').length
+      });
+    }
+    return months;
+  }, [deals]);
+
+  const stageDistribution = React.useMemo(() => {
+    if (deals.length === 0) return [];
+
+    const stages = deals.reduce((acc, deal) => {
+      acc[deal.stage] = (acc[deal.stage] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const colors = ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'];
+    return Object.entries(stages).map(([stage, count], index) => ({
+      name: stage,
+      value: count,
+      color: colors[index % colors.length]
+    }));
+  }, [deals]);
 
   if (loading) {
     return (

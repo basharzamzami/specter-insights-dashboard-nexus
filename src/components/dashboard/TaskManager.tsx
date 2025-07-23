@@ -14,7 +14,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
 import { Plus, Calendar, Clock, User, AlertCircle, CheckCircle, Circle, Filter, BarChart3, Target, Activity, TrendingUp } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
-import { populateWithDemoData, demoTasks } from '@/utils/demoData';
+import { fetchRealData } from '@/utils/dataUtils';
 
 interface Task {
   id: string;
@@ -92,7 +92,7 @@ export function TaskManager() {
           .order('title')
       ]);
 
-      // Fetch tasks with demo data fallback - FILTERED BY USER
+      // Fetch real tasks only - FILTERED BY USER
       const fetchTasks = async () => {
         const { data } = await supabase.from('tasks').select(`
           *,
@@ -104,7 +104,7 @@ export function TaskManager() {
         return data || [];
       };
 
-      const tasksData = await populateWithDemoData(fetchTasks, demoTasks, 8);
+      const tasksData = await fetchRealData(fetchTasks);
       
       setTasks(tasksData);
       setContacts(contactsResponse.data || []);
@@ -181,21 +181,66 @@ export function TaskManager() {
     }
   };
 
-  // Dummy analytics data
-  const taskCompletionTrend = [
-    { week: 'Week 1', completed: 24, pending: 18, overdue: 3 },
-    { week: 'Week 2', completed: 31, pending: 15, overdue: 2 },
-    { week: 'Week 3', completed: 28, pending: 22, overdue: 5 },
-    { week: 'Week 4', completed: 35, pending: 12, overdue: 1 },
-    { week: 'Week 5', completed: 42, pending: 16, overdue: 4 },
-    { week: 'Week 6', completed: 38, pending: 14, overdue: 2 }
-  ];
+  // Calculate real analytics from task data
+  const taskCompletionTrend = React.useMemo(() => {
+    if (tasks.length === 0) return [];
 
-  const priorityDistribution = [
-    { name: 'High', value: 25, color: '#ef4444', count: 12 },
-    { name: 'Medium', value: 45, color: '#f59e0b', count: 22 },
-    { name: 'Low', value: 30, color: '#10b981', count: 15 }
-  ];
+    // Group tasks by week for the last 6 weeks
+    const weeks = [];
+    for (let i = 5; i >= 0; i--) {
+      const weekStart = new Date();
+      weekStart.setDate(weekStart.getDate() - (i * 7));
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekEnd.getDate() + 6);
+
+      const weekTasks = tasks.filter(task => {
+        const taskDate = new Date(task.created_at);
+        return taskDate >= weekStart && taskDate <= weekEnd;
+      });
+
+      weeks.push({
+        week: `Week ${6 - i}`,
+        completed: weekTasks.filter(t => t.status === 'completed').length,
+        pending: weekTasks.filter(t => t.status === 'pending').length,
+        overdue: weekTasks.filter(t => {
+          const dueDate = new Date(t.due_date);
+          return t.status !== 'completed' && dueDate < new Date();
+        }).length
+      });
+    }
+    return weeks;
+  }, [tasks]);
+
+  const priorityDistribution = React.useMemo(() => {
+    if (tasks.length === 0) return [];
+
+    const priorities = tasks.reduce((acc, task) => {
+      acc[task.priority] = (acc[task.priority] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const total = tasks.length;
+    return [
+      {
+        name: 'High',
+        value: Math.round((priorities.high || 0) / total * 100),
+        color: '#ef4444',
+        count: priorities.high || 0
+      },
+      {
+        name: 'Medium',
+        value: Math.round((priorities.medium || 0) / total * 100),
+        color: '#f59e0b',
+        count: priorities.medium || 0
+      },
+      {
+        name: 'Low',
+        value: Math.round((priorities.low || 0) / total * 100),
+        color: '#10b981',
+        count: priorities.low || 0
+      }
+    ].filter(item => item.count > 0);
+  }, [tasks]);
 
   const productivityStats = [
     {

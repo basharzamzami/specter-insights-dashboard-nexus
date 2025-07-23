@@ -1,4 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { AnalyticsService } from "@/services/analyticsService";
+import { useUser } from "@clerk/clerk-react";
 import { Crown, ChevronDown, Target, Zap, TrendingUp, TrendingDown, Users, Eye, BarChart3, Activity, Gauge, FileText } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -30,75 +32,104 @@ interface WelcomeBannerProps {
   user: any;
 }
 
-// Sample data for analytics
-const competitorTrafficData = [
-  { month: "Jan", your: 8500, avg: 6200, competitors: 5800 },
-  { month: "Feb", your: 12000, avg: 6400, competitors: 5900 },
-  { month: "Mar", your: 15500, avg: 6800, competitors: 6100 },
-  { month: "Apr", your: 19200, avg: 7200, competitors: 6300 },
-  { month: "May", your: 24800, avg: 7800, competitors: 6500 },
-  { month: "Jun", your: 32500, avg: 8200, competitors: 6800 }
-];
-
-const campaignPerformance = [
-  { name: "Brand Awareness", active: 3, paused: 1, performance: "+24%" },
-  { name: "Lead Generation", active: 2, paused: 0, performance: "+41%" },
-  { name: "Competitor Intel", active: 3, paused: 1, performance: "+67%" }
-];
-
-const marketShareData = [
-  { name: "Your Brand", value: 28, color: "#6366f1" },
-  { name: "Competitor A", value: 22, color: "#8b5cf6" },
-  { name: "Competitor B", value: 18, color: "#06b6d4" },
-  { name: "Competitor C", value: 16, color: "#10b981" },
-  { name: "Others", value: 16, color: "#6b7280" }
-];
+// Real-time analytics data will be fetched from the database
+// This component now shows actual user data instead of static samples
 
 export const WelcomeBanner = ({ user }: WelcomeBannerProps) => {
   const [selectedClient, setSelectedClient] = useState("Specter Net");
   const [activeTab, setActiveTab] = useState("overview");
+  const [loading, setLoading] = useState(true);
   const { toast } = useToast();
-  
-  const clients = [
-    { name: "Specter Net", status: "active" },
-    { name: "TechCorp Solutions", status: "paused" },
-    { name: "Digital Dynamics", status: "active" }
-  ];
+  const { user: clerkUser } = useUser();
 
-  const stats = [
-    { 
-      label: "Competitors Tracked", 
-      value: "12", 
-      icon: Target, 
+  // Real stats will be calculated from actual user data
+  const [stats, setStats] = useState([
+    {
+      label: "Competitors Tracked",
+      value: "0",
+      icon: Target,
       color: "text-electric",
-      trend: "+3 this month",
-      trendUp: true 
+      trend: "Ready to analyze",
+      trendUp: true
     },
-    { 
-      label: "Active Campaigns", 
-      value: "8", 
-      icon: Zap, 
+    {
+      label: "Active Campaigns",
+      value: "0",
+      icon: Zap,
       color: "text-primary",
-      trend: "+2 since last week",
-      trendUp: true 
+      trend: "Ready to launch",
+      trendUp: true
     },
-    { 
-      label: "Market Share Gain", 
-      value: "+15%", 
-      icon: TrendingUp, 
+    {
+      label: "Market Insights",
+      value: "0",
+      icon: TrendingUp,
       color: "text-success",
-      trend: "+3% vs last quarter",
-      trendUp: true 
+      trend: "Ready to discover",
+      trendUp: true
     },
-    { 
-      label: "Engagement Rate", 
-      value: "67%", 
-      icon: Users, 
+    {
+      label: "Intelligence Score",
+      value: "0%",
+      icon: Users,
       color: "text-warning",
-      trend: "+8% improvement",
-      trendUp: true 
+      trend: "Building profile",
+      trendUp: true
     }
-  ];
+  ]);
+
+  // Fetch real analytics data
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      if (!clerkUser?.id) return;
+
+      try {
+        const analyticsService = new AnalyticsService(clerkUser.id);
+        const dashboardStats = await analyticsService.getDashboardStats();
+
+        setStats([
+          {
+            label: "Competitors Tracked",
+            value: dashboardStats.competitorsTracked.toString(),
+            icon: Target,
+            color: "text-electric",
+            trend: dashboardStats.competitorsTracked > 0 ? `${dashboardStats.competitorsTracked} active` : "Ready to analyze",
+            trendUp: true
+          },
+          {
+            label: "Active Campaigns",
+            value: dashboardStats.activeCampaigns.toString(),
+            icon: Zap,
+            color: "text-primary",
+            trend: dashboardStats.activeCampaigns > 0 ? `${dashboardStats.activeCampaigns} running` : "Ready to launch",
+            trendUp: true
+          },
+          {
+            label: "Market Insights",
+            value: dashboardStats.marketInsights.toString(),
+            icon: TrendingUp,
+            color: "text-success",
+            trend: dashboardStats.marketInsights > 0 ? `${dashboardStats.marketInsights} insights` : "Ready to discover",
+            trendUp: true
+          },
+          {
+            label: "Intelligence Score",
+            value: `${dashboardStats.intelligenceScore}%`,
+            icon: Users,
+            color: "text-warning",
+            trend: dashboardStats.intelligenceScore > 0 ? "Growing" : "Building profile",
+            trendUp: true
+          }
+        ]);
+      } catch (error) {
+        console.error('Error fetching analytics:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalytics();
+  }, [clerkUser?.id]);
 
   return (
     <div className="space-y-6">

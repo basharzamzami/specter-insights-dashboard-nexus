@@ -12,7 +12,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
 import { Plus, Calendar, Clock, MapPin, Video, User, Phone, TrendingUp, BarChart3, Users, Target } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
-import { populateWithDemoData, demoAppointments } from '@/utils/demoData';
+import { fetchRealData } from '@/utils/dataUtils';
 
 interface Appointment {
   id: string;
@@ -87,7 +87,7 @@ export function CalendarScheduler() {
         return data || [];
       };
 
-      const appointmentsData = await populateWithDemoData(fetchAppointments, demoAppointments, 6);
+      const appointmentsData = await fetchRealData(fetchAppointments);
       
       setAppointments(appointmentsData);
       setContacts(contactsResponse.data || []);

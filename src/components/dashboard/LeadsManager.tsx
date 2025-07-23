@@ -175,22 +175,51 @@ export function LeadsManager() {
     { source: 'Events', leads: 12, conversion: 28 }
   ];
 
-  const conversionTrendData = [
-    { month: 'Jan', leads: 124, qualified: 78, converted: 23 },
-    { month: 'Feb', leads: 142, qualified: 89, converted: 31 },
-    { month: 'Mar', leads: 118, qualified: 72, converted: 18 },
-    { month: 'Apr', leads: 156, qualified: 102, converted: 38 },
-    { month: 'May', leads: 178, qualified: 125, converted: 45 },
-    { month: 'Jun', leads: 195, qualified: 142, converted: 52 }
-  ];
+  const conversionTrendData = React.useMemo(() => {
+    if (contacts.length === 0) return [];
 
-  const statusDistribution = [
-    { name: 'New', value: 35, color: '#8b5cf6', count: 68 },
-    { name: 'Qualified', value: 28, color: '#06b6d4', count: 54 },
-    { name: 'Nurturing', value: 22, color: '#10b981', count: 42 },
-    { name: 'Converted', value: 10, color: '#f59e0b', count: 19 },
-    { name: 'Lost', value: 5, color: '#ef4444', count: 12 }
-  ];
+    // Group contacts by month for the last 6 months
+    const months = [];
+    for (let i = 5; i >= 0; i--) {
+      const date = new Date();
+      date.setMonth(date.getMonth() - i);
+      const monthName = date.toLocaleDateString('en-US', { month: 'short' });
+
+      const monthContacts = contacts.filter(contact => {
+        const contactDate = new Date(contact.created_at);
+        return contactDate.getMonth() === date.getMonth() &&
+               contactDate.getFullYear() === date.getFullYear();
+      });
+
+      months.push({
+        month: monthName,
+        leads: monthContacts.length,
+        qualified: monthContacts.filter(c => c.lead_status === 'qualified').length,
+        converted: monthContacts.filter(c => c.lead_status === 'converted').length
+      });
+    }
+    return months;
+  }, [contacts]);
+
+  const statusDistribution = React.useMemo(() => {
+    if (contacts.length === 0) return [];
+
+    const statuses = contacts.reduce((acc, contact) => {
+      const status = contact.lead_status || 'new';
+      acc[status] = (acc[status] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    const total = contacts.length;
+    const colors = ['#8b5cf6', '#06b6d4', '#10b981', '#f59e0b', '#ef4444'];
+
+    return Object.entries(statuses).map(([status, count], index) => ({
+      name: status.charAt(0).toUpperCase() + status.slice(1),
+      value: Math.round((count / total) * 100),
+      color: colors[index % colors.length],
+      count
+    }));
+  }, [contacts]);
 
   const leadStats = [
     {

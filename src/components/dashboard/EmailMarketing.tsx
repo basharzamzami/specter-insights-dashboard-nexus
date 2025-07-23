@@ -12,7 +12,7 @@ import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { useClerkSupabaseAuth } from '@/hooks/useClerkSupabaseAuth';
 import { Plus, Mail, Send, Eye, MousePointer, Users, Calendar, BarChart3, TrendingUp, Trash2 } from 'lucide-react';
-import { populateWithDemoData, demoEmailCampaigns } from '@/utils/demoData';
+import { fetchRealData } from '@/utils/dataUtils';
 import { softDeleteRecord, excludeDeleted } from '@/utils/softDelete';
 
 interface EmailTemplate {
