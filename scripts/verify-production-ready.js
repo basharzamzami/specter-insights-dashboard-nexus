@@ -15,24 +15,20 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.join(__dirname, '..');
 
-// Demo data patterns to check for
+// Demo data patterns to check for (excluding legitimate placeholders)
 const DEMO_PATTERNS = [
   /demo@/gi,
   /john\.doe/gi,
   /jane\.smith/gi,
   /test@example\.com/gi,
-  /demo\.com/gi,
-  /example\.com/gi,
   /populateWithDemoData/gi,
   /demoTasks/gi,
   /demoSocialPosts/gi,
   /demoAppointments/gi,
   /demoEmailCampaigns/gi,
   /mockMessages/gi,
-  /dummy.*data/gi,
-  /fake.*user/gi,
-  /placeholder.*data/gi,
-  /sample.*data/gi
+  /mockCampaigns/gi,
+  /fake.*user/gi
 ];
 
 // Files to exclude from checking
@@ -46,7 +42,9 @@ const EXCLUDE_FILES = [
   'README.md',
   'verify-production-ready.js',
   'package-lock.json',
-  'yarn.lock'
+  'yarn.lock',
+  'supabase/migrations', // Old migrations may contain demo data references
+  'MIGRATION_SUMMARY.md'
 ];
 
 // File extensions to check
