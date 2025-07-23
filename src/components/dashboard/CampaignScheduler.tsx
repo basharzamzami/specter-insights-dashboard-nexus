@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { CampaignForm } from "./CampaignForm";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
-import { populateWithDemoData } from "@/utils/demoData";
+import { fetchRealData } from "@/utils/dataUtils";
 
 interface Campaign {
   id: string;
@@ -24,35 +24,7 @@ interface Campaign {
   posts: number;
 }
 
-const mockCampaigns: Campaign[] = [
-  {
-    id: "1",
-    name: "Q1 Product Launch",
-    description: "Comprehensive marketing campaign for our new AI features",
-    startDate: "2024-03-01",
-    endDate: "2024-03-31",
-    status: "active",
-    posts: 12
-  },
-  {
-    id: "2", 
-    name: "Customer Success Stories",
-    description: "Highlighting client testimonials and case studies",
-    startDate: "2024-02-15",
-    endDate: "2024-04-15",
-    status: "scheduled",
-    posts: 8
-  },
-  {
-    id: "3",
-    name: "Industry Conference Prep",
-    description: "Pre-event marketing and thought leadership content",
-    startDate: "2024-04-01",
-    endDate: "2024-05-01",
-    status: "draft",
-    posts: 5
-  }
-];
+// Real campaigns will be fetched from the database
 
 export const CampaignScheduler = () => {
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
@@ -101,11 +73,11 @@ export const CampaignScheduler = () => {
         }));
       };
 
-      const campaignsData = await populateWithDemoData(fetchRealCampaigns, mockCampaigns, 3);
+      const campaignsData = await fetchRealData(fetchRealCampaigns);
       setCampaigns(campaignsData as Campaign[]);
     } catch (error) {
       console.error('Error fetching campaigns:', error);
-      setCampaigns(mockCampaigns);
+      setCampaigns([]);
     } finally {
       setLoading(false);
     }
