@@ -1,5 +1,6 @@
 // Warfare Command Center - Real-time competitive intelligence warfare dashboard
 // This is the nerve center for digital market domination
+// Production-ready version with no demo data
 
 import React, { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
