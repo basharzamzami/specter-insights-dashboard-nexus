@@ -1,5 +1,7 @@
 import { CompetitorAnalysisService, BusinessInfo } from './competitorAnalysis';
 import { RealTimeDataCollector } from './realTimeDataCollector';
+import { StrategicInsightEngine } from './strategicInsightEngine';
+import { WarfareMonitoringSystem } from './warfareMonitoringSystem';
 import { supabase } from '@/integrations/supabase/client';
 
 export interface OnboardingData {
@@ -22,38 +24,40 @@ export class OnboardingProcessor {
   }
 
   /**
-   * Process complete onboarding workflow
+   * 🎯 WARFARE SYSTEM ACTIVATION - Complete competitive intelligence deployment
    */
   async processOnboarding(onboardingData: OnboardingData): Promise<void> {
     try {
-      console.log('Starting onboarding process for user:', this.userId);
+      console.log(`🚀 ACTIVATING SPECTER NET WARFARE SYSTEM FOR: ${onboardingData.businessName}`);
+      console.log(`📍 TARGET MARKET: ${onboardingData.industry} in ${onboardingData.city}, ${onboardingData.state}`);
 
-      // Step 1: Store client data
-      await this.storeClientData(onboardingData);
+      // PHASE 1: ESTABLISH COMMAND CENTER
+      await this.establishCommandCenter(onboardingData);
 
-      // Step 2: Start competitor analysis
-      await this.initiateCompetitorAnalysis(onboardingData);
+      // PHASE 2: DEPLOY INTELLIGENCE GATHERING
+      await this.deployIntelligenceGathering(onboardingData);
 
-      // Step 3: Generate initial insights
-      await this.generateInitialInsights(onboardingData);
+      // PHASE 3: ACTIVATE WARFARE ANALYSIS
+      await this.activateWarfareAnalysis(onboardingData);
 
-      // Step 4: Set up monitoring
-      await this.setupMonitoring(onboardingData);
+      // PHASE 4: INITIALIZE REAL-TIME MONITORING
+      await this.initializeRealTimeMonitoring(onboardingData);
 
-      // Step 5: Start real-time data collection
-      await this.startRealTimeDataCollection(onboardingData);
+      // PHASE 5: GENERATE INITIAL ATTACK STRATEGIES
+      await this.generateInitialAttackStrategies(onboardingData);
 
-      console.log('Onboarding process completed successfully');
+      console.log(`⚔️ SPECTER NET WARFARE SYSTEM FULLY OPERATIONAL FOR: ${onboardingData.businessName}`);
+      console.log(`🎯 READY TO DOMINATE: ${onboardingData.industry} MARKET`);
     } catch (error) {
-      console.error('Error in onboarding process:', error);
+      console.error('❌ WARFARE SYSTEM ACTIVATION FAILED:', error);
       throw error;
     }
   }
 
   /**
-   * Store client business data
+   * PHASE 1: ESTABLISH COMMAND CENTER - Set up secure client workspace
    */
-  private async storeClientData(data: OnboardingData): Promise<void> {
+  private async establishCommandCenter(data: OnboardingData): Promise<void> {
     try {
       const { error } = await supabase
         .from('clients')
@@ -72,10 +76,132 @@ export class OnboardingProcessor {
         });
 
       if (error) throw error;
-      console.log('Client data stored successfully');
+      console.log('🏗️ COMMAND CENTER ESTABLISHED - Client workspace secured');
     } catch (error) {
-      console.error('Error storing client data:', error);
+      console.error('❌ COMMAND CENTER SETUP FAILED:', error);
       throw error;
+    }
+  }
+
+  /**
+   * PHASE 2: DEPLOY INTELLIGENCE GATHERING - Start comprehensive competitor surveillance
+   */
+  private async deployIntelligenceGathering(data: OnboardingData): Promise<void> {
+    try {
+      console.log('🛰️ DEPLOYING INTELLIGENCE GATHERING SYSTEMS...');
+
+      const dataCollector = new RealTimeDataCollector(this.userId);
+
+      await dataCollector.startDataCollection({
+        businessName: data.businessName,
+        industry: data.industry,
+        city: data.city,
+        state: data.state,
+        zipcode: data.zipcode
+      });
+
+      console.log('🔍 INTELLIGENCE GATHERING DEPLOYED - Surveillance systems active');
+    } catch (error) {
+      console.error('❌ INTELLIGENCE DEPLOYMENT FAILED:', error);
+      // Don't throw - allow warfare system to continue
+    }
+  }
+
+  /**
+   * PHASE 3: ACTIVATE WARFARE ANALYSIS - Deep competitor vulnerability assessment
+   */
+  private async activateWarfareAnalysis(data: OnboardingData): Promise<void> {
+    try {
+      console.log('⚔️ ACTIVATING WARFARE ANALYSIS SYSTEMS...');
+
+      const competitorService = new CompetitorAnalysisService(this.userId);
+
+      const businessInfo: BusinessInfo = {
+        businessName: data.businessName,
+        industry: data.industry,
+        city: data.city,
+        state: data.state,
+        zipcode: data.zipcode,
+        businessGoals: data.businessGoals,
+        painPoints: data.painPoints
+      };
+
+      await competitorService.executeCompetitorWarfareAnalysis(businessInfo);
+      console.log('🎯 WARFARE ANALYSIS COMPLETE - Competitor vulnerabilities identified');
+    } catch (error) {
+      console.error('❌ WARFARE ANALYSIS FAILED:', error);
+      // Don't throw - allow system to continue
+    }
+  }
+
+  /**
+   * PHASE 4: INITIALIZE REAL-TIME MONITORING - 24/7 competitive surveillance
+   */
+  private async initializeRealTimeMonitoring(data: OnboardingData): Promise<void> {
+    try {
+      console.log('👁️ INITIALIZING 24/7 SURVEILLANCE SYSTEMS...');
+
+      const monitoringSystem = new WarfareMonitoringSystem(this.userId);
+
+      // Get competitor list from analysis
+      const { data: competitors, error } = await supabase
+        .from('competitor_profiles')
+        .select('name')
+        .eq('user_id', this.userId);
+
+      if (error) throw error;
+
+      const competitorNames = competitors?.map(c => c.name) || [];
+
+      await monitoringSystem.startContinuousSurveillance({
+        name: data.businessName,
+        industry: data.industry,
+        location: `${data.city}, ${data.state}`,
+        competitors: competitorNames
+      });
+
+      console.log('🛰️ SURVEILLANCE SYSTEMS ONLINE - 24/7 monitoring active');
+    } catch (error) {
+      console.error('❌ SURVEILLANCE INITIALIZATION FAILED:', error);
+      // Don't throw - allow system to continue
+    }
+  }
+
+  /**
+   * PHASE 5: GENERATE INITIAL ATTACK STRATEGIES - Create warfare plans
+   */
+  private async generateInitialAttackStrategies(data: OnboardingData): Promise<void> {
+    try {
+      console.log('🗡️ GENERATING INITIAL ATTACK STRATEGIES...');
+
+      const insightEngine = new StrategicInsightEngine(this.userId);
+
+      // Get competitor intelligence
+      const { data: competitorIntel, error } = await supabase
+        .from('competitive_intelligence')
+        .select('*')
+        .eq('user_id', this.userId);
+
+      if (error) throw error;
+
+      if (competitorIntel && competitorIntel.length > 0) {
+        const strategies = await insightEngine.generateWarfareStrategies(
+          {
+            name: data.businessName,
+            industry: data.industry,
+            location: `${data.city}, ${data.state}`,
+            goals: [data.businessGoals]
+          },
+          competitorIntel as any
+        );
+
+        console.log(`⚔️ GENERATED ${strategies.length} WARFARE STRATEGIES - Ready for execution`);
+      } else {
+        console.log('📊 COMPETITOR INTELLIGENCE PENDING - Strategies will be generated as data arrives');
+      }
+    } catch (error) {
+      console.error('❌ STRATEGY GENERATION FAILED:', error);
+      // Don't throw - allow system to continue
     }
   }
 

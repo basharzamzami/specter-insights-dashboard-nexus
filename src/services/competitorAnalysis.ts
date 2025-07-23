@@ -52,6 +52,38 @@ export class CompetitorAnalysisService {
   }
 
   /**
+   * WARFARE MODE: Comprehensive competitor destruction analysis
+   */
+  async executeCompetitorWarfareAnalysis(businessInfo: BusinessInfo): Promise<CompetitorData[]> {
+    console.log(`🎯 INITIATING COMPETITIVE WARFARE ANALYSIS FOR: ${businessInfo.businessName}`);
+
+    try {
+      // Step 1: IDENTIFY ALL THREATS in the battlefield
+      const competitors = await this.identifyAllCompetitiveThreats(businessInfo);
+
+      // Step 2: DEEP INTELLIGENCE GATHERING on each threat
+      const competitorIntelligence = await Promise.all(
+        competitors.map(competitor => this.gatherDeepIntelligence(competitor, businessInfo))
+      );
+
+      // Step 3: VULNERABILITY ASSESSMENT - Find their weaknesses
+      const vulnerabilityAssessments = await Promise.all(
+        competitorIntelligence.map(intel => this.assessCompetitorVulnerabilities(intel))
+      );
+
+      // Step 4: STORE INTELLIGENCE for warfare planning
+      await this.storeWarfareIntelligence(vulnerabilityAssessments);
+
+      console.log(`🔥 WARFARE ANALYSIS COMPLETE: ${vulnerabilityAssessments.length} threats analyzed`);
+      return vulnerabilityAssessments;
+
+    } catch (error) {
+      console.error('❌ WARFARE ANALYSIS FAILED:', error);
+      throw error;
+    }
+  }
+
+  /**
    * Analyze competitors based on business information
    */
   async analyzeCompetitors(businessInfo: BusinessInfo): Promise<CompetitorData[]> {
@@ -77,18 +109,39 @@ export class CompetitorAnalysisService {
   }
 
   /**
-   * Identify potential competitors based on business info
+   * WARFARE INTELLIGENCE: Identify ALL competitive threats in the battlefield
    */
-  private async identifyCompetitors(businessInfo: BusinessInfo): Promise<string[]> {
-    // In production, this would use APIs like:
-    // - Google Places API for local competitors
-    // - Industry databases
-    // - Web scraping for competitor identification
-    
-    const industryCompetitors = this.getIndustryCompetitors(businessInfo.industry);
-    const localCompetitors = await this.getLocalCompetitors(businessInfo);
-    
-    return [...new Set([...industryCompetitors, ...localCompetitors])];
+  private async identifyAllCompetitiveThreats(businessInfo: BusinessInfo): Promise<Array<{
+    name: string;
+    website: string;
+    threatLevel: 'critical' | 'high' | 'medium' | 'low';
+    source: string;
+  }>> {
+    console.log(`🔍 SCANNING FOR THREATS: ${businessInfo.industry} in ${businessInfo.city}, ${businessInfo.state}`);
+
+    const threats: Array<{name: string, website: string, threatLevel: any, source: string}> = [];
+
+    // THREAT SOURCE 1: Local market dominators
+    const localThreats = await this.scanLocalMarketThreats(businessInfo);
+    threats.push(...localThreats);
+
+    // THREAT SOURCE 2: Industry giants
+    const industryThreats = await this.scanIndustryGiants(businessInfo);
+    threats.push(...industryThreats);
+
+    // THREAT SOURCE 3: Digital-first competitors
+    const digitalThreats = await this.scanDigitalCompetitors(businessInfo);
+    threats.push(...digitalThreats);
+
+    // THREAT SOURCE 4: Emerging threats (new businesses, funded startups)
+    const emergingThreats = await this.scanEmergingThreats(businessInfo);
+    threats.push(...emergingThreats);
+
+    // Remove duplicates and rank by threat level
+    const uniqueThreats = this.deduplicateAndRankThreats(threats);
+
+    console.log(`⚔️ IDENTIFIED ${uniqueThreats.length} COMPETITIVE THREATS`);
+    return uniqueThreats;
   }
 
   /**

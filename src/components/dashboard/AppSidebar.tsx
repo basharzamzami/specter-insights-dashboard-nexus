@@ -46,6 +46,7 @@ interface SidebarItem {
 
 const mainItems: SidebarItem[] = [
   { name: "Mission Control", icon: Home, key: "overview" },
+  { name: "Warfare Command", icon: Target, key: "warfare", badge: "LIVE" },
   { name: "Target Analysis", icon: Target, key: "competitors", badge: "AI" },
   { name: "Operations", icon: Calendar, key: "campaigns" },
   { name: "Sales Pipeline", icon: DollarSign, key: "sales" },

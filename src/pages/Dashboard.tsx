@@ -5,6 +5,7 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/dashboard/AppSidebar";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { WelcomeBanner } from "@/components/dashboard/WelcomeBanner";
+import { WarfareCommandCenter } from "@/components/dashboard/WarfareCommandCenter";
 import { CompetitorAnalysis } from "@/components/dashboard/CompetitorAnalysis";
 import { CampaignScheduler } from "@/components/dashboard/CampaignScheduler";
 import { ActivityLogs } from "@/components/dashboard/ActivityLogs";
@@ -92,6 +93,8 @@ const Dashboard = () => {
             </div>
           </div>
         );
+      case "warfare":
+        return <WarfareCommandCenter />;
       case "competitors":
         return <CompetitorAnalysis />;
       case "campaigns":
