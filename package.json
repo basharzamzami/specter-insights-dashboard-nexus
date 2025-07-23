@@ -15,7 +15,8 @@
     "type-check": "tsc --noEmit",
     "clean": "rm -rf dist",
     "verify": "node scripts/verify-production-ready.js",
-    "deploy": "npm run verify && npm run clean && npm run build:production"
+    "verify:icons": "node scripts/verify-icon-imports.js",
+    "deploy": "npm run verify && npm run verify:icons && npm run clean && npm run build:production"
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.34.0",
