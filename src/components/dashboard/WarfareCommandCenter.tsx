@@ -22,7 +22,7 @@ import {
   Skull,
   Crown,
   Bomb,
-  Scope
+  Focus
 } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -178,7 +178,7 @@ export const WarfareCommandCenter = () => {
       case 'review_warfare': return <Crown className="h-4 w-4" />;
       case 'content_domination': return <Sword className="h-4 w-4" />;
       case 'social_disruption': return <Bomb className="h-4 w-4" />;
-      default: return <Scope className="h-4 w-4" />;
+      default: return <Focus className="h-4 w-4" />;
     }
   };
 
