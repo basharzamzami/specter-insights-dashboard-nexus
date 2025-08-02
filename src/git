@@ -1,0 +1,5 @@
+git config --global user.name "Bashar Zamzami"
+git config --global user.email "novumallego@gmail.com"
+echo "✅ Git has been configured:"
+echo "Name  : $(git config --global user.name)"
+echo "Email : $(git config --global user.email)"
