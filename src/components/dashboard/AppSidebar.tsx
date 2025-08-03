@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import {
   BarChart3,
   Calendar,
@@ -83,15 +83,43 @@ interface AppSidebarProps {
 export const AppSidebar = ({ activeView, onViewChange }: AppSidebarProps) => {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
+  const navigate = useNavigate();
+  const location = useLocation();
   
-  const isActive = (key: string) => activeView === key;
+  const isActive = (key: string) => {
+    // Check if this key should navigate to a dedicated page
+    const dedicatedPageRoutes = {
+      "warm-lead-seizure": "/warm-lead-seizure",
+      "advanced-intelligence": "/advanced-intelligence", 
+      "competitive-crm": "/competitive-crm"
+    };
+    
+    if (dedicatedPageRoutes[key as keyof typeof dedicatedPageRoutes]) {
+      return location.pathname === dedicatedPageRoutes[key as keyof typeof dedicatedPageRoutes];
+    }
+    
+    return activeView === key;
+  };
   
   const renderMenuItems = (items: SidebarItem[]) => (
     <SidebarMenu>
       {items.map((item) => (
         <SidebarMenuItem key={item.key}>
           <SidebarMenuButton
-            onClick={() => onViewChange(item.key)}
+            onClick={() => {
+              // Handle dedicated page navigation
+              const dedicatedPageRoutes = {
+                "warm-lead-seizure": "/warm-lead-seizure",
+                "advanced-intelligence": "/advanced-intelligence", 
+                "competitive-crm": "/competitive-crm"
+              };
+              
+              if (dedicatedPageRoutes[item.key as keyof typeof dedicatedPageRoutes]) {
+                navigate(dedicatedPageRoutes[item.key as keyof typeof dedicatedPageRoutes]);
+              } else {
+                onViewChange(item.key);
+              }
+            }}
             className={cn(
               "group transition-all duration-300 cursor-pointer",
               isActive(item.key) 
