@@ -382,7 +382,7 @@ export const CompetitorAnalysis = () => {
 
       {/* Competitor Intelligence Cards */}
       <div className="grid gap-4">
-        {competitors.map((competitor, index) => (
+        {competitors.map((competitor) => (
           <Card 
             key={competitor.id} 
             className="hover:shadow-lg transition-all duration-300 border-l-4 border-l-primary/50 cursor-pointer"

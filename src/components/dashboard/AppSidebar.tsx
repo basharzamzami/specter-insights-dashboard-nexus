@@ -1,26 +1,11 @@
-import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import {
-  BarChart3,
-  Calendar,
   Target,
-  Activity,
-  User,
-  Settings,
-  Zap,
-  Clock,
-  Rss,
-  FileText,
-  Home,
   Shield,
-  DollarSign,
-  Users,
-  CheckSquare,
-  Mail,
-  Share2,
-  Cog,
-  Trash2,
-  Brain
+  MapPin,
+  TrendingUp,
+  Bell,
+  Calendar
 } from "lucide-react";
 import {
   Sidebar,
@@ -32,7 +17,6 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarHeader,
-  SidebarFooter,
   useSidebar,
 } from "@/components/ui/sidebar";
 import { Badge } from "@/components/ui/badge";
@@ -45,34 +29,14 @@ interface SidebarItem {
   badge?: string;
 }
 
+// Only the 6 requested features
 const mainItems: SidebarItem[] = [
-  { name: "Mission Control", icon: Home, key: "overview" },
-  { name: "Target Analysis", icon: Target, key: "competitors", badge: "AI" },
-  { name: "Warm Lead Seizure", icon: Target, key: "warm-lead-seizure", badge: "🔥" },
-  { name: "Advanced Intelligence", icon: Brain, key: "advanced-intelligence", badge: "🔒" },
-  { name: "Competitive CRM", icon: Shield, key: "competitive-crm", badge: "⚔️" },
-  { name: "Operations", icon: Calendar, key: "campaigns" },
-  { name: "Sales Pipeline", icon: DollarSign, key: "sales" },
-  { name: "Leads Manager", icon: Users, key: "leads" },
-  { name: "Task Manager", icon: CheckSquare, key: "tasks" },
-  { name: "Disruption Schedule", icon: Clock, key: "scheduler" },
-  { name: "Intel Feed", icon: Rss, key: "intelligence", badge: "LIVE" },
-];
-
-const analyticsItems: SidebarItem[] = [
-  { name: "Performance", icon: BarChart3, key: "analytics" },
-  { name: "Operations Manager", icon: Cog, key: "operations", badge: "NEW" },
-  { name: "Campaign Reports", icon: FileText, key: "reporting" },
-  { name: "Activity Log", icon: Activity, key: "activity" },
-  { name: "Email Marketing", icon: Mail, key: "email" },
-  { name: "Social Media", icon: Share2, key: "social" },
-  { name: "Calendar", icon: Calendar, key: "calendar" },
-  { name: "Trash Bin", icon: Trash2, key: "trash" },
-];
-
-const systemItems: SidebarItem[] = [
-  { name: "Agent Profile", icon: User, key: "profile" },
-  { name: "Control Center", icon: Settings, key: "settings" },
+  { name: "Ad Signal Hijack", icon: Target, key: "ad-hijack", badge: "🎯" },
+  { name: "Warm Lead Locator", icon: Target, key: "warm-lead-seizure", badge: "🔥" },
+  { name: "Dominance Map", icon: MapPin, key: "dominance-map", badge: "📍" },
+  { name: "Target Analysis Generator", icon: TrendingUp, key: "competitors", badge: "AI" },
+  { name: "Change Alerts", icon: Bell, key: "intelligence", badge: "LIVE" },
+  { name: "Campaign Manager", icon: Calendar, key: "campaigns", badge: "📊" },
 ];
 
 interface AppSidebarProps {
@@ -90,8 +54,6 @@ export const AppSidebar = ({ activeView, onViewChange }: AppSidebarProps) => {
     // Check if this key should navigate to a dedicated page
     const dedicatedPageRoutes = {
       "warm-lead-seizure": "/warm-lead-seizure",
-      "advanced-intelligence": "/advanced-intelligence", 
-      "competitive-crm": "/competitive-crm"
     };
     
     if (dedicatedPageRoutes[key as keyof typeof dedicatedPageRoutes]) {
@@ -110,8 +72,6 @@ export const AppSidebar = ({ activeView, onViewChange }: AppSidebarProps) => {
               // Handle dedicated page navigation
               const dedicatedPageRoutes = {
                 "warm-lead-seizure": "/warm-lead-seizure",
-                "advanced-intelligence": "/advanced-intelligence", 
-                "competitive-crm": "/competitive-crm"
               };
               
               if (dedicatedPageRoutes[item.key as keyof typeof dedicatedPageRoutes]) {
@@ -177,47 +137,13 @@ export const AppSidebar = ({ activeView, onViewChange }: AppSidebarProps) => {
             "px-3 text-xs font-semibold text-muted-foreground/80 tracking-wider uppercase",
             collapsed && "hidden"
           )}>
-            Operations
+            Core Features
           </SidebarGroupLabel>
           <SidebarGroupContent>
             {renderMenuItems(mainItems)}
           </SidebarGroupContent>
         </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel className={cn(
-            "px-3 text-xs font-semibold text-muted-foreground/80 tracking-wider uppercase",
-            collapsed && "hidden"
-          )}>
-            Intelligence
-          </SidebarGroupLabel>
-          <SidebarGroupContent>
-            {renderMenuItems(analyticsItems)}
-          </SidebarGroupContent>
-        </SidebarGroup>
       </SidebarContent>
-
-      <SidebarFooter className="border-t border-border/50 p-2">
-        <SidebarGroup>
-          <SidebarGroupContent>
-            {renderMenuItems(systemItems)}
-          </SidebarGroupContent>
-        </SidebarGroup>
-        
-        {!collapsed && (
-          <div className="px-3 py-2 animate-fade-in">
-            <div className="text-xs text-muted-foreground">
-              <div className="flex items-center space-x-1 mb-1">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <span>System Status: OPERATIONAL</span>
-              </div>
-              <div className="text-[10px] opacity-60">
-                Last sync: {new Date().toLocaleTimeString()}
-              </div>
-            </div>
-          </div>
-        )}
-      </SidebarFooter>
     </Sidebar>
   );
 };
