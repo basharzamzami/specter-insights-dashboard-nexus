@@ -6,7 +6,13 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "preview": "vite preview" "scripts": {
+  "dev": "vite",
+  "build": "tsc && vite build",
+  "build:dev": "vite build --mode development",
+  "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
+  "preview": "vite preview"
+},
   },
   "dependencies": {
     "@clerk/clerk-react": "^5.34.0",
@@ -81,7 +87,4 @@
     "typescript-eslint": "^8.0.1",
     "vite": "^5.4.1"
   }
-}
-"scripts": {
-  "build:dev": "vite build --mode development"
 }

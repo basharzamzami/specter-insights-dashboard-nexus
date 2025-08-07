@@ -22,3 +22,11 @@
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
+
+{
+  "compilerOptions": {
+    // ... keep all existing options
+  },
+  "include": ["src"]
+  // Remove the "references" line entirely
+}
