@@ -1,4 +1,4 @@
-import { useUser, UserButton } from "@clerk/clerk-react";
+import { useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -145,16 +145,6 @@ const Index = () => {
             <div className="text-sm text-green-400/80 font-mono">
               WELCOME, <span className="text-green-400 font-bold">{user?.firstName?.toUpperCase() || "AGENT"}</span>
             </div>
-            <UserButton 
-              afterSignOutUrl="/auth"
-              appearance={{
-                elements: {
-                  userButtonAvatarBox: "w-8 h-8 border border-green-400/30",
-                  userButtonPopoverCard: "bg-black border-green-400/30",
-                  userButtonPopoverText: "text-green-400",
-                }
-              }}
-            />
           </div>
         </div>
       </header>

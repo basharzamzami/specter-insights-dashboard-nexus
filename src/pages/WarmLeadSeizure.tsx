@@ -1,386 +1,403 @@
-/**
- * 🔥 WARM LEAD SEIZURE SYSTEM PAGE
- * 
- * Main page for the Warm Lead Seizure System - Specter Net's core module
- * Provides comprehensive lead intelligence and conversion domination
- */
-
-import React, { useState, useEffect } from 'react';
-import { useUser } from '@clerk/clerk-react';
+import { useState, useEffect } from "react";
+import { useUser } from "@clerk/clerk-react";
+import { useNavigate } from "react-router-dom";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { SeizureDashboard } from '@/components/WarmLeadSeizure/SeizureDashboard';
+import { useToast } from "@/hooks/use-toast";
 import { 
   Target, 
-  Zap, 
-  Shield, 
+  Search, 
+  Clock, 
   TrendingUp, 
-  AlertTriangle,
-  CheckCircle,
-  Play,
-  Settings,
-  BarChart3
-} from 'lucide-react';
+  AlertTriangle, 
+  Users, 
+  Globe, 
+  Star,
+  Phone,
+  Mail,
+  MapPin,
+  DollarSign
+} from "lucide-react";
+import { 
+  ResponsiveContainer, 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip,
+  PieChart,
+  Pie,
+  Cell
+} from "recharts";
 
-export default function WarmLeadSeizure() {
-  const { user } = useUser();
-  const [systemStatus, setSystemStatus] = useState<'loading' | 'active' | 'inactive' | 'error'>('loading');
-  const [testResults, setTestResults] = useState<any>(null);
-  const [isRunningTest, setIsRunningTest] = useState(false);
+const WarmLeadSeizure = () => {
+  const { isLoaded, isSignedIn, user } = useUser();
+  const navigate = useNavigate();
+  const { toast } = useToast();
+
+  const [activeTab, setActiveTab] = useState("overview");
+  const [leadInput, setLeadInput] = useState("");
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [leadData, setLeadData] = useState({
+    name: "Potential Lead",
+    contactInfo: {
+      phone: "123-456-7890",
+      email: "lead@example.com",
+      location: "New York, NY"
+    },
+    engagementScore: 0.75,
+    seizureProbability: 0.88,
+    keyIndicators: ["Visited pricing page", "Downloaded whitepaper", "Requested demo"],
+    recentActivity: [
+      { type: "page_view", description: "Viewed pricing page", timestamp: "2 hours ago" },
+      { type: "download", description: "Downloaded AI ebook", timestamp: "5 hours ago" }
+    ],
+    marketTrends: {
+      demand: 0.85,
+      competition: 0.60
+    }
+  });
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
   useEffect(() => {
-    checkSystemStatus();
-  }, []);
-
-  const checkSystemStatus = async () => {
-    try {
-      // Check if the system is operational
-      setSystemStatus('active'); // For demo purposes
-    } catch (error) {
-      console.error('Failed to check system status:', error);
-      setSystemStatus('error');
+    if (isLoaded && !isSignedIn) {
+      navigate("/auth");
     }
-  };
+  }, [isSignedIn, isLoaded, navigate]);
 
-  const runSystemTest = async () => {
-    if (!user) return;
+  const handleLeadAnalysis = async () => {
+    if (!leadInput.trim()) {
+      toast({
+        title: "Input Required",
+        description: "Please enter lead details to analyze.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setIsAnalyzing(true);
     
-    setIsRunningTest(true);
-    try {
-      const response = await fetch('/functions/v1/test-warm-seizure', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
+    // Simulate API call
+    setTimeout(() => {
+      setLeadData({
+        name: leadInput,
+        contactInfo: {
+          phone: "987-654-3210",
+          email: "newlead@example.com",
+          location: "San Francisco, CA"
         },
-        body: JSON.stringify({
-          testType: 'full_demo',
-          userId: user.id
-        })
+        engagementScore: Math.random() * 0.9 + 0.1,
+        seizureProbability: Math.random() * 0.9 + 0.1,
+        keyIndicators: ["Visited contact page", "Requested a call", "Signed up for newsletter"],
+        recentActivity: [
+          { type: "form_submit", description: "Submitted contact form", timestamp: "1 hour ago" },
+          { type: "email_open", description: "Opened welcome email", timestamp: "3 hours ago" }
+        ],
+        marketTrends: {
+          demand: Math.random() * 0.5 + 0.5,
+          competition: Math.random() * 0.5 + 0.5
+        }
       });
-
-      const result = await response.json();
-      setTestResults(result);
-    } catch (error) {
-      console.error('System test failed:', error);
-      setTestResults({
-        success: false,
-        error: 'System test failed'
+      
+      setLeadInput("");
+      setIsAnalyzing(false);
+      
+      toast({
+        title: "Analysis Complete",
+        description: `Lead analysis for ${leadInput} has been processed.`,
       });
-    } finally {
-      setIsRunningTest(false);
-    }
+    }, 3000);
   };
 
-  if (!user) {
+  const getIndicatorColor = (indicator: string) => {
+    if (indicator.includes("pricing")) return "text-green-400";
+    if (indicator.includes("demo")) return "text-blue-400";
+    return "text-yellow-400";
+  };
+
+  if (!isLoaded || !isSignedIn) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="min-h-screen flex items-center justify-center bg-black">
         <div className="text-center">
-          <Shield className="h-12 w-12 text-red-600 mx-auto mb-4" />
-          <h2 className="text-xl font-semibold mb-2">Access Restricted</h2>
-          <p className="text-gray-600">Please sign in to access the Warm Lead Seizure System</p>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-red-500 mx-auto"></div>
+          <p className="mt-4 text-red-500">Analyzing Lead Data...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 to-orange-50">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="text-center mb-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Target className="h-12 w-12 text-red-600" />
-            <h1 className="text-4xl font-bold text-gray-900">
-              Warm Lead Seizure System
-            </h1>
-            <Badge variant="destructive" className="text-lg px-4 py-2">
-              SPECTER NET
+    <div className="min-h-screen bg-black text-red-500">
+      {/* Header */}
+      <header className="border-b border-red-500/20 bg-black/50 backdrop-blur-sm sticky top-0 z-50">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center space-x-4">
+            <div className="flex items-center space-x-2">
+              <Target className="h-8 w-8 text-red-500" />
+              <h1 className="text-2xl font-bold text-red-500 font-mono">LEAD SEIZURE</h1>
+            </div>
+            <Badge variant="outline" className="text-xs border-red-500/30 text-red-500">
+              WARM LEAD INTELLIGENCE
             </Badge>
           </div>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            AI-powered competitive espionage and marketing dominance tool for B2B businesses.
-            Identifies, nurtures, and maximizes conversion of warm leads in high-ticket industries.
-          </p>
-        </div>
-
-        {/* System Status */}
-        <div className="mb-8">
-          <Alert className={`border-2 ${
-            systemStatus === 'active' ? 'border-green-200 bg-green-50' :
-            systemStatus === 'error' ? 'border-red-200 bg-red-50' :
-            'border-yellow-200 bg-yellow-50'
-          }`}>
-            <div className="flex items-center gap-2">
-              {systemStatus === 'active' && <CheckCircle className="h-5 w-5 text-green-600" />}
-              {systemStatus === 'error' && <AlertTriangle className="h-5 w-5 text-red-600" />}
-              {systemStatus === 'loading' && <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-yellow-600"></div>}
-              <AlertDescription className="font-medium">
-                {systemStatus === 'active' && '🔥 SYSTEM OPERATIONAL - All subsystems active and ready for lead domination'}
-                {systemStatus === 'error' && '⚠️ SYSTEM ERROR - Please check configuration and try again'}
-                {systemStatus === 'loading' && '🔄 INITIALIZING - Warming up the seizure systems...'}
-              </AlertDescription>
+          <div className="flex items-center space-x-4">
+            <div className="text-sm text-red-500/80 font-mono">
+              WELCOME, <span className="text-red-500 font-bold">{user?.firstName?.toUpperCase() || "AGENT"}</span>
             </div>
-          </Alert>
+            {/* UserButton */}
+          </div>
         </div>
+      </header>
 
-        <Tabs defaultValue="dashboard" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
-            <TabsTrigger value="dashboard">📊 Dashboard</TabsTrigger>
-            <TabsTrigger value="subsystems">🔧 Subsystems</TabsTrigger>
-            <TabsTrigger value="test">🧪 System Test</TabsTrigger>
-            <TabsTrigger value="settings">⚙️ Settings</TabsTrigger>
+      {/* Main Dashboard */}
+      <main className="container mx-auto px-4 py-8">
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+          <TabsList className="grid w-full grid-cols-2 bg-red-500/10 border border-red-500/30">
+            <TabsTrigger 
+              value="overview" 
+              className="data-[state=active]:bg-red-500/20 data-[state=active]:text-red-500 text-red-500/70"
+            >
+              <Search className="h-4 w-4 mr-2" />
+              LEAD OVERVIEW
+            </TabsTrigger>
+            <TabsTrigger 
+              value="trends" 
+              className="data-[state=active]:bg-red-500/20 data-[state=active]:text-red-500 text-red-500/70"
+            >
+              <TrendingUp className="h-4 w-4 mr-2" />
+              MARKET TRENDS
+            </TabsTrigger>
           </TabsList>
 
-          <TabsContent value="dashboard">
-            {systemStatus === 'active' ? (
-              <SeizureDashboard userId={user.id} />
-            ) : (
-              <Card>
-                <CardHeader>
-                  <CardTitle>Dashboard Unavailable</CardTitle>
-                  <CardDescription>
-                    System must be operational to access the dashboard
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <Button onClick={checkSystemStatus}>
-                    Retry System Check
-                  </Button>
-                </CardContent>
-              </Card>
-            )}
-          </TabsContent>
-
-          <TabsContent value="subsystems">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Detection Layer */}
-              <Card className="border-red-200">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="h-5 w-5 text-red-600" />
-                    Detection Layer - "Thermal Radar"
-                  </CardTitle>
-                  <CardDescription>
-                    Scans CRM, ad pixels, website heatmaps, and behavior analytics
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Visitors &gt;45s on pricing pages</span>
-                      <Badge variant="outline" className="text-green-600">ACTIVE</Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Quote clicks without submit</span>
-                      <Badge variant="outline" className="text-green-600">ACTIVE</Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Email opens &gt;2 without booking</span>
-                      <Badge variant="outline" className="text-green-600">ACTIVE</Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Ad clicks without conversion</span>
-                      <Badge variant="outline" className="text-green-600">ACTIVE</Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Qualification Layer */}
-              <Card className="border-orange-200">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Zap className="h-5 w-5 text-orange-600" />
-                    Qualification & Scoring - "Warm Index Engine"
-                  </CardTitle>
-                  <CardDescription>
-                    Assigns Warmth Index Score from 0 to 100
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Qualification Threshold</span>
-                      <Badge className="bg-orange-600 text-white">≥65</Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">High Priority Threshold</span>
-                      <Badge className="bg-red-600 text-white">≥85</Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Scoring Factors</span>
-                      <Badge variant="outline">8 Metrics</Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Real-time Updates</span>
-                      <Badge variant="outline" className="text-green-600">LIVE</Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Seizure Triggers */}
-              <Card className="border-yellow-200">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Target className="h-5 w-5 text-yellow-600" />
-                    Seizure Triggers - "Operation Snapback"
-                  </CardTitle>
-                  <CardDescription>
-                    Smart reconversion campaigns with timed attacks
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Day 1: Personalized Email</span>
-                      <Badge variant="outline" className="text-blue-600">READY</Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Day 2: Retargeted Ad</span>
-                      <Badge variant="outline" className="text-blue-600">READY</Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Day 3: Social Proof</span>
-                      <Badge variant="outline" className="text-blue-600">READY</Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Day 5: Urgency Offer</span>
-                      <Badge variant="outline" className="text-blue-600">READY</Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              {/* Conversion Infrastructure */}
-              <Card className="border-green-200">
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <TrendingUp className="h-5 w-5 text-green-600" />
-                    Conversion Infrastructure - "The Closer Grid"
-                  </CardTitle>
-                  <CardDescription>
-                    Modular landing pages optimized for warm leads
-                  </CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Dynamic Landing Pages</span>
-                      <Badge variant="outline" className="text-green-600">ACTIVE</Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">Scarcity Countdowns</span>
-                      <Badge variant="outline" className="text-green-600">ACTIVE</Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">1-Click Booking</span>
-                      <Badge variant="outline" className="text-green-600">ACTIVE</Badge>
-                    </div>
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm">AI Case Studies</span>
-                      <Badge variant="outline" className="text-green-600">ACTIVE</Badge>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </TabsContent>
-
-          <TabsContent value="test">
-            <Card>
+          <TabsContent value="overview" className="space-y-6 mt-6">
+            {/* Lead Analysis Input */}
+            <Card className="bg-black/50 border-red-500/30 backdrop-blur-sm">
               <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Play className="h-5 w-5 text-blue-600" />
-                  System Test & Demo
+                <CardTitle className="flex items-center gap-2 text-red-500 font-mono">
+                  <Star className="h-5 w-5" />
+                  LEAD INTELLIGENCE INPUT
                 </CardTitle>
-                <CardDescription>
-                  Run comprehensive tests of all seizure system components
+                <CardDescription className="text-red-500/70">
+                  Enter lead details for AI-powered analysis
                 </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-center gap-4">
+              <CardContent className="space-y-4">
+                <div className="flex gap-2">
+                  <Input
+                    placeholder="Enter lead name or identifier..."
+                    value={leadInput}
+                    onChange={(e) => setLeadInput(e.target.value)}
+                    className="bg-black/50 border-red-500/30 text-red-500 placeholder:text-red-500/50"
+                    disabled={isAnalyzing}
+                  />
                   <Button 
-                    onClick={runSystemTest}
-                    disabled={isRunningTest}
-                    className="bg-red-600 hover:bg-red-700"
+                    onClick={handleLeadAnalysis}
+                    disabled={isAnalyzing}
+                    className="bg-red-500/20 hover:bg-red-500/30 text-red-500 border border-red-500/30"
                   >
-                    {isRunningTest ? (
-                      <>
-                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
-                        Running Test...
-                      </>
+                    {isAnalyzing ? (
+                      <div className="flex items-center gap-2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-red-500"></div>
+                        ANALYZING...
+                      </div>
                     ) : (
-                      <>
-                        <Play className="h-4 w-4 mr-2" />
-                        Run Full System Test
-                      </>
+                      <div className="flex items-center gap-2">
+                        <Search className="h-4 w-4" />
+                        ANALYZE
+                      </div>
                     )}
                   </Button>
-                  <p className="text-sm text-gray-600">
-                    Tests all 4 subsystems with simulated lead data
-                  </p>
                 </div>
-
-                {testResults && (
-                  <div className="mt-6 p-4 border rounded-lg bg-gray-50">
-                    <h4 className="font-semibold mb-3">Test Results:</h4>
-                    <pre className="text-sm overflow-auto max-h-96">
-                      {JSON.stringify(testResults, null, 2)}
-                    </pre>
+                {isAnalyzing && (
+                  <div className="space-y-2">
+                    <Progress value={66} className="h-2" />
+                    <p className="text-sm text-red-500/70 font-mono">Processing intelligence data...</p>
                   </div>
                 )}
               </CardContent>
             </Card>
-          </TabsContent>
 
-          <TabsContent value="settings">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <Settings className="h-5 w-5 text-gray-600" />
-                  System Configuration
-                </CardTitle>
-                <CardDescription>
-                  Configure seizure system parameters and integrations
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  <Alert>
-                    <AlertTriangle className="h-4 w-4" />
-                    <AlertDescription>
-                      Settings panel coming soon. System is currently running with optimal default configurations.
-                    </AlertDescription>
-                  </Alert>
+            {/* Lead Data Cards */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <Card className="bg-black/50 border-red-500/30 backdrop-blur-sm hover:bg-red-500/5 transition-all">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center justify-between text-red-500 font-mono text-sm">
+                    <div className="flex items-center gap-2">
+                      <Users className="h-4 w-4" />
+                      {leadData.name.toUpperCase()}
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs text-red-400">
+                        {leadData.seizureProbability * 100}%
+                      </span>
+                      <TrendingUp className="h-4 w-4 text-red-400" />
+                    </div>
+                  </CardTitle>
+                  <CardDescription className="text-red-500/70 text-xs">
+                    Seizure Probability
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div>
+                    <p className="text-xs text-red-500/70 mb-1 font-mono">ENGAGEMENT SCORE</p>
+                    <Progress 
+                      value={leadData.engagementScore * 100} 
+                      className="h-2"
+                    />
+                  </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="p-4 border rounded-lg">
-                      <h4 className="font-semibold mb-2">Warmth Threshold</h4>
-                      <p className="text-sm text-gray-600">Current: 65 (Recommended)</p>
-                    </div>
-                    <div className="p-4 border rounded-lg">
-                      <h4 className="font-semibold mb-2">Ad Channels</h4>
-                      <p className="text-sm text-gray-600">Facebook, Google, LinkedIn</p>
-                    </div>
-                    <div className="p-4 border rounded-lg">
-                      <h4 className="font-semibold mb-2">Auto-Dialer</h4>
-                      <p className="text-sm text-gray-600">Enabled for scores ≥85</p>
-                    </div>
-                    <div className="p-4 border rounded-lg">
-                      <h4 className="font-semibold mb-2">A/B Testing</h4>
-                      <p className="text-sm text-gray-600">Email vs SMS follow-ups</p>
+                  <div>
+                    <p className="text-xs text-red-500/70 mb-2 font-mono">KEY INDICATORS</p>
+                    <div className="flex flex-wrap gap-1">
+                      {leadData.keyIndicators.map((indicator, index) => (
+                        <Badge key={index} variant="outline" className={`text-xs border-red-500/30 text-red-500/80 ${getIndicatorColor(indicator)}`}>
+                          {indicator}
+                        </Badge>
+                      ))}
                     </div>
                   </div>
+                  
+                  <div>
+                    <p className="text-xs text-red-500/70 mb-1 font-mono">RECENT ACTIVITY</p>
+                    {leadData.recentActivity.map((activity, index) => (
+                      <div key={index} className="flex items-center gap-2 text-xs text-red-500/80">
+                        <Clock className="h-3 w-3" />
+                        {activity.description} - <span className="text-red-500/50">{activity.timestamp}</span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-black/50 border-red-500/30 backdrop-blur-sm hover:bg-red-500/5 transition-all">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center text-red-500 font-mono text-sm">
+                    <Globe className="h-4 w-4 mr-2" />
+                    CONTACT INFORMATION
+                  </CardTitle>
+                  <CardDescription className="text-red-500/70 text-xs">
+                    Lead contact details
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="flex items-center gap-2 text-xs text-red-500/80">
+                    <Phone className="h-3 w-3" />
+                    {leadData.contactInfo.phone}
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-red-500/80">
+                    <Mail className="h-3 w-3" />
+                    {leadData.contactInfo.email}
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-red-500/80">
+                    <MapPin className="h-3 w-3" />
+                    {leadData.contactInfo.location}
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="bg-black/50 border-red-500/30 backdrop-blur-sm hover:bg-red-500/5 transition-all">
+                <CardHeader className="pb-3">
+                  <CardTitle className="flex items-center text-red-500 font-mono text-sm">
+                    <DollarSign className="h-4 w-4 mr-2" />
+                    POTENTIAL REVENUE
+                  </CardTitle>
+                  <CardDescription className="text-red-500/70 text-xs">
+                    Estimated revenue from lead
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div className="text-center">
+                    <p className="text-2xl font-bold text-red-500">$5,000</p>
+                    <p className="text-xs text-red-500/70">Based on similar lead conversions</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="trends" className="space-y-6 mt-6">
+            <Card className="bg-black/50 border-red-500/30 backdrop-blur-sm">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-red-500 font-mono">
+                  <TrendingUp className="h-5 w-5" />
+                  MARKET TRENDS
+                </CardTitle>
+                <CardDescription className="text-red-500/70">
+                  Analyze market demand and competition
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid gap-4 md:grid-cols-2">
+                  <div>
+                    <p className="text-sm font-mono text-red-500/70">DEMAND</p>
+                    <Progress value={leadData.marketTrends.demand * 100} className="h-2" />
+                    <p className="text-xs text-red-500/50 mt-1">Market demand for product/service</p>
+                  </div>
+                  <div>
+                    <p className="text-sm font-mono text-red-500/70">COMPETITION</p>
+                    <Progress value={leadData.marketTrends.competition * 100} className="h-2" />
+                    <p className="text-xs text-red-500/50 mt-1">Competitive intensity in the market</p>
+                  </div>
+                </div>
+                
+                <div className="h-[200px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={[
+                      { name: 'Jan', demand: 60, competition: 40 },
+                      { name: 'Feb', demand: 70, competition: 30 },
+                      { name: 'Mar', demand: 80, competition: 20 },
+                      { name: 'Apr', demand: 75, competition: 25 },
+                      { name: 'May', demand: 85, competition: 15 },
+                      { name: 'Jun', demand: 90, competition: 10 },
+                    ]}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="#374151"/>
+                      <XAxis dataKey="name" stroke="#9CA3AF"/>
+                      <YAxis stroke="#9CA3AF"/>
+                      <Tooltip />
+                      <Line type="monotone" dataKey="demand" stroke="#F43F5E" strokeWidth={2} />
+                      <Line type="monotone" dataKey="competition" stroke="#EAB308" strokeWidth={2} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+
+                <div className="h-[200px]">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={[
+                          { name: 'Demand', value: leadData.marketTrends.demand * 100 },
+                          { name: 'Competition', value: leadData.marketTrends.competition * 100 },
+                        ]}
+                        cx="50%"
+                        cy="50%"
+                        labelLine={false}
+                        outerRadius={80}
+                        fill="#8884d8"
+                        dataKey="value"
+                      >
+                        {
+                          [...Array(2)].map((_, index) => (
+                            <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                          ))
+                        }
+                      </Pie>
+                      <Tooltip />
+                    </PieChart>
+                  </ResponsiveContainer>
                 </div>
               </CardContent>
             </Card>
           </TabsContent>
         </Tabs>
-      </div>
+      </main>
     </div>
   );
-}
+};
+
+export default WarmLeadSeizure;
