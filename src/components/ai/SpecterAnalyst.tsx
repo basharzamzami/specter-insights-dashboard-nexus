@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useUser } from "@clerk/clerk-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -48,6 +48,7 @@ interface IntelligenceAlert {
 
 export const SpecterAnalyst: React.FC = () => {
   const { user } = useUser();
+  const { toast } = useToast();
   const [reports, setReports] = useState<AnalysisReport[]>([]);
   const [alerts, setAlerts] = useState<IntelligenceAlert[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
@@ -176,9 +177,9 @@ Our comprehensive market intelligence indicates significant disruption opportuni
         "Establish rapid response team for competitive opportunities"
       ],
       source_data: {
-        market_segments: 3,
-        competitors_tracked: 8,
-        intelligence_points: 5420
+        competitors_analyzed: 8,
+        data_points: 5420,
+        confidence_sources: ["Market research", "Competitor analysis", "Intelligence gathering"]
       },
       confidence_score: 92,
       created_at: new Date(Date.now() - 172800000).toISOString(),
@@ -222,7 +223,8 @@ Our comprehensive market intelligence indicates significant disruption opportuni
 
     try {
       // Simulate AI analysis generation
-      toast.success("Initiating comprehensive market analysis...", {
+      toast({
+        title: "Initiating comprehensive market analysis...",
         description: "Specter AI is analyzing competitor data, market conditions, and strategic opportunities."
       });
 
@@ -266,13 +268,16 @@ Our comprehensive market intelligence indicates significant disruption opportuni
 
       setReports(prev => [newReport, ...prev]);
 
-      toast.success("Analysis complete", {
+      toast({
+        title: "Analysis complete",
         description: `New intelligence report generated with ${newReport.source_data.data_points} data points and ${newReport.confidence_score}% confidence.`
       });
 
     } catch (error) {
       console.error('Error generating analysis:', error);
-      toast.error("Analysis generation failed", {
+      toast({
+        title: "Analysis generation failed",
+        variant: "destructive",
         description: "Unable to complete market intelligence analysis. Please try again."
       });
     } finally {
@@ -302,12 +307,16 @@ Our comprehensive market intelligence indicates significant disruption opportuni
 
       if (error) throw error;
 
-      toast.success("Published to Intelligence Feed", {
+      toast({
+        title: "Published to Intelligence Feed",
         description: "Analysis is now available in the Intel Feed for strategic review."
       });
     } catch (error) {
       console.error('Error publishing to feed:', error);
-      toast.error("Publishing failed");
+      toast({
+        title: "Publishing failed",
+        variant: "destructive"
+      });
     }
   };
 

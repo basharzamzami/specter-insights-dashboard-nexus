@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { User, Mail, Badge as BadgeIcon, Edit3, Save, X, Camera, Signature } from "lucide-react";
+import { User, Mail, Badge as BadgeIcon, Edit3, Save, X, Camera, Edit } from "lucide-react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -251,7 +251,7 @@ export const AgentProfile = ({ user }: AgentProfileProps) => {
         <Card className="card-hover">
           <CardHeader>
             <CardTitle className="flex items-center space-x-2">
-              <Signature className="h-5 w-5" />
+              <Edit className="h-5 w-5" />
               <span>Agent Configuration</span>
             </CardTitle>
             <CardDescription>

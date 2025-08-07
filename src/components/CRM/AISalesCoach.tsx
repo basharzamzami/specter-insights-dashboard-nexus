@@ -5,7 +5,7 @@
  * and provides competitive intelligence during sales conversations
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -14,18 +14,11 @@ import { Progress } from "@/components/ui/progress";
 import { 
   Brain, 
   Mic, 
-  MessageSquare, 
-  Target,
-  TrendingUp,
-  AlertTriangle,
   CheckCircle,
-  Clock,
-  Zap,
-  Shield,
-  Crown,
   Phone,
-  Mail,
-  FileText
+  FileText,
+  Zap,
+  TrendingUp
 } from 'lucide-react';
 
 interface CallAnalysis {

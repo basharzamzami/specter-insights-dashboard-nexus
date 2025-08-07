@@ -5,28 +5,21 @@
  * and real-time market signals for maximum sales performance
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
 import { 
   Target, 
   TrendingUp, 
   Users,
-  DollarSign,
-  AlertTriangle,
   Brain,
   Zap,
-  Shield,
   Crown,
   Flame,
   Activity,
-  MapPin,
-  Clock,
-  Phone,
-  Mail
+  MapPin
 } from 'lucide-react';
 
 import { EnhancedLeadCard } from './EnhancedLeadCard';
