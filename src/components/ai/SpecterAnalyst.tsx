@@ -52,7 +52,7 @@ export const SpecterAnalyst: React.FC = () => {
   const [reports, setReports] = useState<AnalysisReport[]>([]);
   const [alerts, setAlerts] = useState<IntelligenceAlert[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [selectedReport, setSelectedReport] = useState<AnalysisReport | null>(null);
+  const [activeTab, setActiveTab] = useState("reports");
   const [activeTab, setActiveTab] = useState("reports");
 
   useEffect(() => {

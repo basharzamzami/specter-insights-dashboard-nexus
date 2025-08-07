@@ -75,7 +75,7 @@ interface ApiResponse<T = unknown> {
 export function SeizureDashboard({ userId }: SeizureDashboardProps) {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'thermal-radar' | 'warm-index' | 'seizure-ops' | 'closer-grid'>('thermal-radar');
+  const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'thermal-radar' | 'warm-index' | 'seizure-ops' | 'closer-grid'>('thermal-radar');
 
   useEffect(() => {
