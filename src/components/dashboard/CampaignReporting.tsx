@@ -5,8 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Input } from "@/components/ui/input";
-import { Calendar, Download, Filter, BarChart3, TrendingUp, Eye, Target, Mail, AlertTriangle, Zap, LineChart, TrendingDown } from "lucide-react";
-import { LineChart as RechartsLineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell, AreaChart, Area } from "recharts";
+import { Download, Filter, BarChart3, TrendingUp, Eye, Target, Mail, AlertTriangle } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -14,28 +13,20 @@ interface Campaign {
   id: string;
   type: string;
   target_company: string;
-  objective: string;
-  status: string;
-  scheduled_date: string;
-  created_at: string;
+  objective: string | null;
+  status: string | null;
+  scheduled_date: string | null;
+  created_at: string | null;
   actions: any;
 }
 
-interface ActionLog {
-  id: string;
-  action_type: string;
-  timestamp: string;
-  details: any;
-}
 
 
 export const CampaignReporting = () => {
   const { user } = useUser();
   const [campaigns, setCampaigns] = useState<Campaign[]>([]);
-  const [actionLogs, setActionLogs] = useState<ActionLog[]>([]);
   const [timeframe, setTimeframe] = useState("7d");
   const [campaignType, setCampaignType] = useState("all");
-  const [isLoading, setIsLoading] = useState(false);
   const [viewMode, setViewMode] = useState("overview");
 
   useEffect(() => {
@@ -44,7 +35,6 @@ export const CampaignReporting = () => {
 
   const loadData = async () => {
     if (!user) return;
-    setIsLoading(true);
 
     try {
       // Load campaigns with filters
@@ -61,21 +51,21 @@ export const CampaignReporting = () => {
 
       if (campaignsError) throw campaignsError;
 
-      // Load action logs
-      const { data: logsData, error: logsError } = await supabase
-        .from('action_logs')
-        .select('*')
-        .order('timestamp', { ascending: false })
-        .limit(50);
+      // Map and validate the data
+      const validatedCampaigns: Campaign[] = (campaignsData || []).map(item => ({
+        id: item.id,
+        type: item.type || 'unknown',
+        target_company: item.target_company || 'Unknown Target',
+        objective: item.objective || 'Strategic operation',
+        status: item.status || 'pending',
+        scheduled_date: item.scheduled_date || new Date().toISOString(),
+        created_at: item.created_at || new Date().toISOString(),
+        actions: item.actions
+      }));
 
-      if (logsError) throw logsError;
-
-      setCampaigns(campaignsData || []);
-      setActionLogs(logsData || []);
+      setCampaigns(validatedCampaigns);
     } catch (error) {
       console.error('Error loading data:', error);
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -140,7 +130,7 @@ export const CampaignReporting = () => {
       Company: campaign.target_company,
       Type: campaign.type,
       Status: campaign.status,
-      Created: new Date(campaign.created_at).toLocaleDateString(),
+      Created: campaign.created_at ? new Date(campaign.created_at).toLocaleDateString() : 'Unknown',
       Objective: campaign.objective || "Strategic intelligence operation"
     }));
 
@@ -337,8 +327,8 @@ export const CampaignReporting = () => {
                       <div className="flex items-center gap-2 mb-2">
                         <span className="text-lg">{getTypeIcon(campaign.type)}</span>
                         <h4 className="font-semibold">{campaign.target_company}</h4>
-                        <Badge className={getStatusColor(campaign.status)}>
-                          {campaign.status}
+                        <Badge className={getStatusColor(campaign.status || 'pending')}>
+                          {campaign.status || 'pending'}
                         </Badge>
                         <Badge variant="outline">{campaign.type}</Badge>
                       </div>
@@ -346,7 +336,7 @@ export const CampaignReporting = () => {
                       <div className="grid grid-cols-4 gap-4 text-sm">
                         <div>
                           <p className="text-muted-foreground">Initiated</p>
-                          <p className="font-medium">{new Date(campaign.created_at).toLocaleDateString()}</p>
+                          <p className="font-medium">{campaign.created_at ? new Date(campaign.created_at).toLocaleDateString() : 'Unknown'}</p>
                         </div>
                         <div>
                           <p className="text-muted-foreground">Reach</p>

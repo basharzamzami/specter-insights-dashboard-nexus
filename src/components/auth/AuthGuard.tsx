@@ -2,15 +2,13 @@ import { useEffect } from "react";
 import { useUser } from "@clerk/clerk-react";
 import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
-import { useClientData } from "@/hooks/useClientData";
 
 interface AuthGuardProps {
   children: React.ReactNode;
-  requireOnboarding?: boolean;
 }
 
-export const AuthGuard = ({ children, requireOnboarding = false }: AuthGuardProps) => {
-  const { isLoaded, isSignedIn, user } = useUser();
+export const AuthGuard = ({ children }: AuthGuardProps) => {
+  const { isLoaded, isSignedIn } = useUser();
   const navigate = useNavigate();
 
   useEffect(() => {

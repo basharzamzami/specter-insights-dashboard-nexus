@@ -1,9 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { Bot, Send, X, Lightbulb, Target, TrendingUp, MessageSquare, Loader2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -78,7 +78,7 @@ export const AIAssistant = ({ isOpen, onClose }: AIAssistantProps) => {
         type: "assistant",
         content: data.response || getAIResponse(currentInput),
         timestamp: new Date(),
-        suggestions: data.suggestions || getSuggestions(currentInput)
+        suggestions: data.suggestions || getSuggestions()
       };
       
       setMessages(prev => [...prev, assistantMessage]);
@@ -90,7 +90,7 @@ export const AIAssistant = ({ isOpen, onClose }: AIAssistantProps) => {
         type: "assistant",
         content: getAIResponse(currentInput),
         timestamp: new Date(),
-        suggestions: getSuggestions(currentInput)
+        suggestions: getSuggestions()
       };
       
       setMessages(prev => [...prev, assistantMessage]);
@@ -117,7 +117,7 @@ export const AIAssistant = ({ isOpen, onClose }: AIAssistantProps) => {
     return "Based on current market data, I recommend focusing on competitor sentiment analysis and identifying content gaps. Your market position is strong, but there are opportunities to capture more share in the enterprise segment.";
   };
 
-  const getSuggestions = (input: string): string[] => {
+  const getSuggestions = (): string[] => {
     return [
       "Show me competitor weakness report",
       "Generate campaign strategy", 

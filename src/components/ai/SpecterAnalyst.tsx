@@ -53,7 +53,6 @@ export const SpecterAnalyst: React.FC = () => {
   const [alerts, setAlerts] = useState<IntelligenceAlert[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [activeTab, setActiveTab] = useState("reports");
-  const [activeTab, setActiveTab] = useState("reports");
 
   useEffect(() => {
     loadAnalysisData();
@@ -433,7 +432,7 @@ Our comprehensive market intelligence indicates significant disruption opportuni
                       <div className="flex gap-2">
                         <Dialog>
                           <DialogTrigger asChild>
-                            <Button size="sm" variant="outline" onClick={() => setSelectedReport(report)}>
+                            <Button size="sm" variant="outline">
                               <Eye className="h-3 w-3 mr-1" />
                               View Full Report
                             </Button>

@@ -1,4 +1,4 @@
-import { UserButton, useClerk } from "@clerk/clerk-react";
+
 import { Bell, Settings, Bot, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -13,13 +13,12 @@ interface DashboardHeaderProps {
 }
 
 export const DashboardHeader = ({ user, onAIToggle, isAIOpen, onNotificationsClick }: DashboardHeaderProps) => {
-  const { signOut } = useClerk();
   const navigate = useNavigate();
   const { toast } = useToast();
 
   const handleLogout = async () => {
     try {
-      await signOut();
+      // For now, just navigate to auth
       navigate("/auth");
       toast({
         title: "Logged out successfully",
@@ -90,13 +89,11 @@ export const DashboardHeader = ({ user, onAIToggle, isAIOpen, onNotificationsCli
                 {user?.primaryEmailAddress?.emailAddress}
               </p>
             </div>
-            <UserButton 
-              appearance={{
-                elements: {
-                  avatarBox: "w-10 h-10",
-                }
-              }}
-            />
+            <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+              <span className="text-sm font-semibold text-primary">
+                {user?.firstName?.charAt(0) || user?.emailAddresses?.[0]?.emailAddress?.charAt(0) || 'U'}
+              </span>
+            </div>
           </div>
         </div>
       </div>
