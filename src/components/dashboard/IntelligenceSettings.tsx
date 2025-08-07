@@ -45,8 +45,8 @@ export const IntelligenceSettings = () => {
       .single();
 
     if (data) {
-      setAggressiveMode(data.aggressive_mode);
-      setStealthMode(data.stealth_mode);
+      setAggressiveMode(data.aggressive_mode ?? false);
+      setStealthMode(data.stealth_mode ?? false);
       const notifications = data.notifications as any;
       setRealTimeAlerts(notifications?.real_time_alerts ?? true);
       setAutoResponse(notifications?.auto_response ?? false);

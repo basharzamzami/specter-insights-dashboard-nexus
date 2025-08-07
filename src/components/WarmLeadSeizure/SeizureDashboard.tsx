@@ -75,7 +75,7 @@ interface ApiResponse<T = unknown> {
 export function SeizureDashboard({ userId }: SeizureDashboardProps) {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  // Error handling is done within try/catch blocks
   const [activeTab, setActiveTab] = useState<'thermal-radar' | 'warm-index' | 'seizure-ops' | 'closer-grid'>('thermal-radar');
 
   useEffect(() => {
@@ -85,7 +85,6 @@ export function SeizureDashboard({ userId }: SeizureDashboardProps) {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      setError(null);
 
       // Validate userId
       if (!userId || typeof userId !== 'string' || userId.length < 10) {
@@ -154,9 +153,7 @@ export function SeizureDashboard({ userId }: SeizureDashboardProps) {
       }
 
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
       console.error('Failed to load seizure dashboard:', error);
-      setError(errorMessage);
 
       // Don't set dashboardData to null if we already have data (allows for graceful degradation)
       if (!dashboardData) {
@@ -235,11 +232,7 @@ export function SeizureDashboard({ userId }: SeizureDashboardProps) {
       }
 
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : 'Failed to execute seizure';
       console.error('Seizure execution error:', error);
-
-      // You might want to show this error to the user via a toast or alert
-      setError(`Seizure execution failed: ${errorMessage}`);
     }
   };
 

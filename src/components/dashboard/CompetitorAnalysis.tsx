@@ -174,7 +174,7 @@ export const CompetitorAnalysis = () => {
   const getVulnerabilityActions = (competitor: CompetitorProfile): ActionItem[] => {
     const actions: ActionItem[] = [];
     
-    competitor.vulnerabilities.forEach((vuln, index) => {
+    (competitor.vulnerabilities || []).forEach((vuln, index) => {
       if (vuln.includes('mobile') || vuln.includes('speed')) {
         actions.push({
           id: `speed-${index}`,
@@ -392,12 +392,12 @@ export const CompetitorAnalysis = () => {
               <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-3">
                   <CardTitle className="text-lg">{competitor.company_name}</CardTitle>
-                  <Badge variant="outline" className={`flex items-center space-x-1 ${getSentimentColor(competitor.sentiment_score)}`}>
-                    {getSentimentIcon(competitor.sentiment_score)}
-                    <span>{(competitor.sentiment_score * 100).toFixed(0)}% sentiment</span>
+                  <Badge variant="outline" className={`flex items-center space-x-1 ${getSentimentColor(competitor.sentiment_score || 0)}`}>
+                    {getSentimentIcon(competitor.sentiment_score || 0)}
+                    <span>{((competitor.sentiment_score || 0) * 100).toFixed(0)}% sentiment</span>
                   </Badge>
                   <Badge variant="secondary">
-                    {competitor.vulnerabilities.length} vulnerabilities
+                    {(competitor.vulnerabilities || []).length} vulnerabilities
                   </Badge>
                 </div>
                 <div className="flex items-center justify-between">
@@ -436,7 +436,7 @@ export const CompetitorAnalysis = () => {
                     <p className="text-xs text-muted-foreground">Negative Sentiment</p>
                   </div>
                   <div className="text-center">
-                    <p className="text-2xl font-bold text-red-600">{competitor.vulnerabilities.length}</p>
+                    <p className="text-2xl font-bold text-red-600">{(competitor.vulnerabilities || []).length}</p>
                     <p className="text-xs text-muted-foreground">Attack Vectors</p>
                   </div>
                 </div>
@@ -448,7 +448,7 @@ export const CompetitorAnalysis = () => {
                     Critical Vulnerabilities
                   </h4>
                   <div className="space-y-1">
-                    {competitor.vulnerabilities.slice(0, 3).map((vuln, i) => (
+                    {(competitor.vulnerabilities || []).slice(0, 3).map((vuln, i) => (
                       <div key={i} className="flex items-center text-xs text-red-600 bg-red-50 p-2 rounded">
                         <Target className="h-3 w-3 mr-2" />
                         {vuln}
@@ -461,7 +461,7 @@ export const CompetitorAnalysis = () => {
                 <div>
                   <h4 className="text-sm font-medium mb-2">Target Keywords</h4>
                   <div className="flex flex-wrap gap-2">
-                    {competitor.top_keywords.slice(0, 4).map((keyword, i) => (
+                    {(competitor.top_keywords || []).slice(0, 4).map((keyword, i) => (
                       <Badge key={i} variant="outline" className="text-xs">
                         {keyword}
                       </Badge>
@@ -519,7 +519,7 @@ export const CompetitorAnalysis = () => {
                 <CardContent className="pt-4">
                   <div className="grid grid-cols-3 gap-4 text-center">
                     <div>
-                      <p className="text-2xl font-bold text-red-600">{selectedCompetitor.vulnerabilities.length}</p>
+                      <p className="text-2xl font-bold text-red-600">{(selectedCompetitor.vulnerabilities || []).length}</p>
                       <p className="text-xs text-muted-foreground">Attack Vectors</p>
                     </div>
                     <div>

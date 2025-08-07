@@ -81,7 +81,21 @@ export function LeadsManager() {
         .order('created_at', { ascending: false });
 
       if (error) throw error;
-      setContacts(data || []);
+      setContacts(data?.map(item => ({
+        ...item,
+        first_name: item.first_name || '',
+        last_name: item.last_name || '',
+        email: item.email || '',
+        phone: item.phone || '',
+        company: item.company || '',
+        job_title: item.job_title || '',
+        lead_source: item.lead_source || 'unknown',
+        lead_status: item.lead_status || 'new',
+        lead_score: item.lead_score || 0,
+        tags: item.tags || [],
+        notes: item.notes || '',
+        last_contacted_at: item.last_contacted_at || new Date().toISOString()
+      })) || []);
     } catch (error) {
       console.error('Error fetching contacts:', error);
       toast({

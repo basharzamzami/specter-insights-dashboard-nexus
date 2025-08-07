@@ -92,10 +92,10 @@ export const CampaignScheduler = () => {
           id: campaign.id,
           name: `${campaign.type} - ${campaign.target_company}`,
           description: campaign.objective || 'Strategic campaign',
-          startDate: campaign.scheduled_date || campaign.created_at,
+          startDate: campaign.scheduled_date || campaign.created_at || new Date().toISOString(),
           endDate: campaign.scheduled_date ? 
             new Date(new Date(campaign.scheduled_date).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString() : 
-            new Date(new Date(campaign.created_at).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+            new Date(new Date(campaign.created_at || new Date()).getTime() + 30 * 24 * 60 * 60 * 1000).toISOString(),
           status: campaign.status as Campaign['status'],
           posts: Array.isArray(campaign.actions) ? campaign.actions.length : 0
         }));

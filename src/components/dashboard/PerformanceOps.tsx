@@ -49,7 +49,7 @@ export const PerformanceOps = () => {
       const hasConnections = settings?.integrations && 
         Object.values(settings.integrations).some((integration: any) => integration?.connected);
       
-      setHasConnectedSources(hasConnections);
+      setHasConnectedSources(!!hasConnections);
     } catch (error) {
       console.error('Error checking data sources:', error);
       setHasConnectedSources(false);

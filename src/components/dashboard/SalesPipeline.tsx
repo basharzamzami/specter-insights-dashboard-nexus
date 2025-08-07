@@ -16,20 +16,20 @@ import { LineChart, Line, AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip,
 interface Deal {
   id: string;
   title: string;
-  description: string;
-  value: number;
-  stage: string;
-  probability: number;
-  expected_close_date: string;
-  status: string;
-  contact_id: string;
+  description: string | null;
+  value: number | null;
+  stage: string | null;
+  probability: number | null;
+  expected_close_date: string | null;
+  status: string | null;
+  contact_id: string | null;
   created_at: string;
   contact?: {
-    first_name: string;
-    last_name: string;
-    email: string;
-    company: string;
-  };
+    first_name: string | null;
+    last_name: string | null;
+    email: string | null;
+    company: string | null;
+  } | null;
 }
 
 interface Pipeline {
@@ -207,15 +207,15 @@ export function SalesPipeline() {
   };
 
   const getStageValue = (stageName: string) => {
-    return getStageDeals(stageName).reduce((sum, deal) => sum + deal.value, 0);
+    return getStageDeals(stageName).reduce((sum, deal) => sum + (deal.value || 0), 0);
   };
 
   const getTotalPipelineValue = () => {
-    return deals.reduce((sum, deal) => sum + deal.value, 0);
+    return deals.reduce((sum, deal) => sum + (deal.value || 0), 0);
   };
 
   const getWeightedPipelineValue = () => {
-    return deals.reduce((sum, deal) => sum + (deal.value * deal.probability / 100), 0);
+    return deals.reduce((sum, deal) => sum + ((deal.value || 0) * (deal.probability || 0) / 100), 0);
   };
 
   const getConversionRate = () => {
@@ -525,13 +525,13 @@ export function SalesPipeline() {
                       <div className="space-y-2">
                         <div className="flex justify-between items-start">
                           <h4 className="font-medium text-sm leading-tight">{deal.title}</h4>
-                          <Badge className={getProbabilityColor(deal.probability)}>
-                            {deal.probability}%
+                          <Badge className={getProbabilityColor(deal.probability || 0)}>
+                            {deal.probability || 0}%
                           </Badge>
                         </div>
                         
                         <div className="text-lg font-bold text-primary">
-                          ${deal.value.toLocaleString()}
+                          ${(deal.value || 0).toLocaleString()}
                         </div>
                         
                         {deal.contact && (
@@ -549,7 +549,7 @@ export function SalesPipeline() {
                           </div>
                         )}
 
-                        <Select value={deal.stage} onValueChange={(value) => updateDealStage(deal.id, value)}>
+                        <Select value={deal.stage || undefined} onValueChange={(value) => updateDealStage(deal.id, value)}>
                           <SelectTrigger className="h-8 text-xs">
                             <SelectValue />
                           </SelectTrigger>
