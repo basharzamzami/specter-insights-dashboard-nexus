@@ -5,7 +5,7 @@
  * Shows where competitors are weak and demand is high for strategic market entry
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -13,16 +13,12 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Progress } from "@/components/ui/progress";
 import {
   MapPin,
-  TrendingUp,
-  DollarSign,
-  Users,
   Focus,
   Radar,
   Target,
   Zap,
   AlertCircle,
-  Crown,
-  Map
+  Crown
 } from 'lucide-react';
 
 interface GeoOpportunity {
@@ -462,7 +458,7 @@ export function GeoRadarDashboard({ userId, businessId }: GeoRadarProps) {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Map className="h-5 w-5 text-blue-600" />
+                <MapPin className="h-5 w-5 text-blue-600" />
                 Opportunity Heatmap
               </CardTitle>
               <CardDescription>
@@ -473,7 +469,7 @@ export function GeoRadarDashboard({ userId, businessId }: GeoRadarProps) {
               <div className="space-y-4">
                 <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center border-2 border-dashed border-gray-300">
                   <div className="text-center text-gray-500">
-                    <Map className="h-12 w-12 mx-auto mb-2" />
+                    <MapPin className="h-12 w-12 mx-auto mb-2" />
                     <p>Interactive opportunity heatmap</p>
                     <p className="text-sm">Integration with mapping service required</p>
                   </div>

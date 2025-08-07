@@ -86,7 +86,7 @@ interface EnhancedLeadCardProps {
   readonly onViewFullIntel: (leadId: string) => void;
 }
 
-export function EnhancedLeadCard({ lead, onUpdateStage, onScheduleFollowUp, onViewFullIntel }: EnhancedLeadCardProps) {
+export function EnhancedLeadCard({ lead, onScheduleFollowUp, onViewFullIntel }: EnhancedLeadCardProps) {
   const [expanded, setExpanded] = useState(false);
 
   const getThreatColor = (urgency: string) => {

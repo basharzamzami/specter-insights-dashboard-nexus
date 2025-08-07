@@ -5,7 +5,7 @@
  * Displays thermal radar, warm index scores, and seizure operations
  */
 
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 // Extend Window interface for Clerk
@@ -75,7 +75,7 @@ interface ApiResponse<T = unknown> {
 export function SeizureDashboard({ userId }: SeizureDashboardProps) {
   const [dashboardData, setDashboardData] = useState<DashboardData | null>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [activeTab, setActiveTab] = useState<'thermal-radar' | 'warm-index' | 'seizure-ops' | 'closer-grid'>('thermal-radar');
   const [activeTab, setActiveTab] = useState<'thermal-radar' | 'warm-index' | 'seizure-ops' | 'closer-grid'>('thermal-radar');
 
   useEffect(() => {
@@ -340,7 +340,7 @@ export function SeizureDashboard({ userId }: SeizureDashboardProps) {
       </div>
 
       {/* Main Dashboard Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)} className="space-y-4">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="thermal-radar">🧠 Thermal Radar</TabsTrigger>
           <TabsTrigger value="warm-index">🔍 Warm Index</TabsTrigger>
