@@ -1,486 +1,296 @@
-/**
- * 🚨 COMPETITOR CRISIS DETECTOR
- * 
- * Monitors competitors for reputation drops, negative press, and legal issues
- * Provides instant "Attack Window" alerts with ready-to-deploy campaigns
- */
-
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
 import { 
-  AlertTriangle, 
-  TrendingDown, 
-  Newspaper, 
-  Scale,
-  MessageSquare,
-  Star,
-  Zap,
-  Target,
+  AlertTriangle,
+  Shield,
+  TrendingDown,
+  Activity,
   Clock,
-  Flame,
-  Shield
+  Eye,
+  RefreshCw,
+  Target,
+  Bell,
+  Zap
 } from 'lucide-react';
+import { useUser } from '@clerk/clerk-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
-interface CrisisEvent {
-  readonly id: string;
-  readonly competitor: string;
-  readonly type: 'reputation' | 'legal' | 'press' | 'reviews' | 'social';
-  readonly severity: 'low' | 'medium' | 'high' | 'critical';
-  readonly title: string;
-  readonly description: string;
-  readonly source: string;
-  readonly timestamp: string;
-  readonly impactScore: number; // 0-100
-  readonly opportunityWindow: number; // hours
-  readonly suggestedActions: readonly string[];
-  readonly readyToDeploy: boolean;
+interface CrisisAlert {
+  id: number;
+  title: string;
+  description: string;
+  severity: 'critical' | 'high' | 'medium' | 'low';
+  source: string;
+  detectedAt: string;
+  impact: number;
+  confidence: number;
+  category: string;
 }
 
-interface ReputationMetric {
-  readonly competitor: string;
-  readonly currentScore: number;
-  readonly previousScore: number;
-  readonly trend: 'up' | 'down' | 'stable';
-  readonly reviewCount: number;
-  readonly averageRating: number;
-  readonly sentimentScore: number;
-  readonly riskLevel: 'low' | 'medium' | 'high';
-}
-
-interface AttackWindow {
-  readonly id: string;
-  readonly competitor: string;
-  readonly opportunity: string;
-  readonly timeRemaining: number; // hours
-  readonly estimatedImpact: number;
-  readonly campaignReady: boolean;
-  readonly adCopy: string;
-  readonly landingPageUrl?: string;
-}
-
-interface CrisisDetectorProps {
-  readonly userId: string;
-  readonly businessId: string;
-}
-
-export function CrisisDetectorDashboard({ userId, businessId }: CrisisDetectorProps) {
-  const [crisisData, setCrisisData] = useState<{
-    events: readonly CrisisEvent[];
-    metrics: readonly ReputationMetric[];
-    attackWindows: readonly AttackWindow[];
-  } | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'alerts' | 'reputation' | 'opportunities' | 'monitoring'>('alerts');
+export const CrisisDetectorDashboard = () => {
+  const [crisisAlerts, setCrisisAlerts] = useState<CrisisAlert[]>([
+    {
+      id: 1,
+      title: 'Supply Chain Disruption',
+      description: 'Key supplier experiencing significant delays due to unforeseen circumstances.',
+      severity: 'high',
+      source: 'Supply Chain Monitoring',
+      detectedAt: '5 minutes ago',
+      impact: 75,
+      confidence: 88,
+      category: 'Operational'
+    },
+    {
+      id: 2,
+      title: 'Cybersecurity Threat Detected',
+      description: 'Unusual network activity indicates potential security breach.',
+      severity: 'critical',
+      source: 'Network Security System',
+      detectedAt: '10 minutes ago',
+      impact: 92,
+      confidence: 95,
+      category: 'Security'
+    },
+    {
+      id: 3,
+      title: 'Reputation Damage Alert',
+      description: 'Negative sentiment surge on social media platforms regarding product quality.',
+      severity: 'medium',
+      source: 'Social Media Monitoring',
+      detectedAt: '15 minutes ago',
+      impact: 60,
+      confidence: 79,
+      category: 'Reputation'
+    },
+    {
+      id: 4,
+      title: 'Sudden Market Shift',
+      description: 'Unexpected change in consumer preferences impacting demand for key products.',
+      severity: 'medium',
+      source: 'Market Analysis',
+      detectedAt: '20 minutes ago',
+      impact: 55,
+      confidence: 72,
+      category: 'Market'
+    },
+    {
+      id: 5,
+      title: 'Regulatory Change Imminent',
+      description: 'New regulations set to be enforced, potentially affecting business operations.',
+      severity: 'low',
+      source: 'Regulatory Updates',
+      detectedAt: '30 minutes ago',
+      impact: 40,
+      confidence: 65,
+      category: 'Compliance'
+    },
+    {
+      id: 6,
+      title: 'Competitor Aggressive Move',
+      description: 'Competitor launching a disruptive product at a significantly lower price point.',
+      severity: 'high',
+      source: 'Competitor Intelligence',
+      detectedAt: '45 minutes ago',
+      impact: 80,
+      confidence: 90,
+      category: 'Competitive'
+    },
+    {
+      id: 7,
+      title: 'Operational Failure',
+      description: 'Critical system failure causing disruption in service delivery.',
+      severity: 'critical',
+      source: 'System Monitoring',
+      detectedAt: '1 hour ago',
+      impact: 95,
+      confidence: 98,
+      category: 'Operational'
+    },
+    {
+      id: 8,
+      title: 'Financial Risk Detected',
+      description: 'Unusual financial transactions indicating potential fraud or mismanagement.',
+      severity: 'medium',
+      source: 'Financial Analysis',
+      detectedAt: '2 hours ago',
+      impact: 65,
+      confidence: 82,
+      category: 'Financial'
+    },
+    {
+      id: 9,
+      title: 'Public Health Crisis',
+      description: 'Outbreak of a contagious disease affecting workforce availability.',
+      severity: 'high',
+      source: 'Public Health Alerts',
+      detectedAt: '3 hours ago',
+      impact: 85,
+      confidence: 93,
+      category: 'External'
+    },
+    {
+      id: 10,
+      title: 'Environmental Disaster',
+      description: 'Natural disaster causing damage to infrastructure and supply routes.',
+      severity: 'low',
+      source: 'Environmental Monitoring',
+      detectedAt: '4 hours ago',
+      impact: 50,
+      confidence: 70,
+      category: 'External'
+    }
+  ]);
+  const [isLoading, setIsLoading] = useState(false);
+  const { user } = useUser();
+  const { toast } = useToast();
 
   useEffect(() => {
-    loadCrisisData();
-    
-    // Set up real-time monitoring
-    const interval = setInterval(loadCrisisData, 30000); // Check every 30 seconds
-    return () => clearInterval(interval);
-  }, [userId, businessId]);
+    // Simulate fetching crisis alerts from an API
+    const fetchCrisisAlerts = async () => {
+      setIsLoading(true);
+      await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate delay
+      setIsLoading(false);
+    };
 
-  const loadCrisisData = async () => {
-    try {
-      setLoading(true);
-      
-      // Mock data - replace with actual API call
-      const mockData = {
-        events: [
-          {
-            id: 'crisis_1',
-            competitor: 'Metro Plumbing Pro',
-            type: 'reviews' as const,
-            severity: 'high' as const,
-            title: 'Major Review Bombing - 47 Negative Reviews in 24 Hours',
-            description: 'Competitor received 47 one-star reviews citing "overcharging" and "poor service" after viral TikTok complaint.',
-            source: 'Google Reviews + TikTok',
-            timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(), // 2 hours ago
-            impactScore: 89,
-            opportunityWindow: 72,
-            suggestedActions: [
-              'Launch "Honest Pricing Guarantee" campaign',
-              'Target their customers with "Better Service" ads',
-              'Create comparison landing page highlighting reliability'
-            ],
-            readyToDeploy: true
-          },
-          {
-            id: 'crisis_2',
-            competitor: 'Quick Fix Solutions',
-            type: 'legal' as const,
-            severity: 'critical' as const,
-            title: 'Lawsuit Filed - Unlicensed Work Allegations',
-            description: 'Local news reports lawsuit alleging unlicensed plumbing work causing $50K in water damage.',
-            source: 'Channel 7 News',
-            timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString(), // 6 hours ago
-            impactScore: 95,
-            opportunityWindow: 168, // 7 days
-            suggestedActions: [
-              'Emphasize licensing and insurance in all ads',
-              'Create "Licensed & Bonded" trust campaign',
-              'Target their service area with credibility messaging'
-            ],
-            readyToDeploy: true
-          }
-        ] as readonly CrisisEvent[],
-        metrics: [
-          {
-            competitor: 'Metro Plumbing Pro',
-            currentScore: 2.1,
-            previousScore: 4.3,
-            trend: 'down' as const,
-            reviewCount: 234,
-            averageRating: 2.1,
-            sentimentScore: 23,
-            riskLevel: 'high' as const
-          },
-          {
-            competitor: 'Quick Fix Solutions',
-            currentScore: 1.8,
-            previousScore: 4.1,
-            trend: 'down' as const,
-            reviewCount: 156,
-            averageRating: 1.8,
-            sentimentScore: 18,
-            riskLevel: 'high' as const
-          }
-        ] as readonly ReputationMetric[],
-        attackWindows: [
-          {
-            id: 'window_1',
-            competitor: 'Metro Plumbing Pro',
-            opportunity: 'Review crisis - customers seeking alternatives',
-            timeRemaining: 70,
-            estimatedImpact: 340,
-            campaignReady: true,
-            adCopy: 'Tired of overpriced plumbing? Get honest, upfront pricing from licensed professionals. No surprises, just quality work.',
-            landingPageUrl: '/landing/honest-pricing'
-          },
-          {
-            id: 'window_2',
-            competitor: 'Quick Fix Solutions',
-            opportunity: 'Legal issues - trust and credibility gap',
-            timeRemaining: 166,
-            estimatedImpact: 280,
-            campaignReady: true,
-            adCopy: 'Choose licensed, bonded, and insured plumbers. Your home deserves professionals you can trust.',
-            landingPageUrl: '/landing/licensed-bonded'
-          }
-        ] as readonly AttackWindow[]
-      };
+    fetchCrisisAlerts();
+  }, [user?.id, toast]);
 
-      setCrisisData(mockData);
-    } catch (error) {
-      console.error('Failed to load crisis data:', error);
-    } finally {
-      setLoading(false);
+  const getSeverityColor = (value: string) => {
+    switch (value) {
+      case 'critical': return 'bg-red-500/20 text-red-400 border-red-500/30';
+      case 'high': return 'bg-orange-500/20 text-orange-400 border-orange-500/30';
+      case 'medium': return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+      case 'low': return 'bg-green-500/20 text-green-400 border-green-500/30';
+      default: return 'bg-gray-500/20 text-gray-400 border-gray-500/30';
     }
   };
-
-  const deployCampaign = async (windowId: string) => {
-    console.log('Deploying attack campaign for window:', windowId);
-    // Implement campaign deployment logic
-  };
-
-  const getSeverityColor = (severity: string) => {
-    switch (severity) {
-      case 'critical': return 'text-red-600 bg-red-100 border-red-200';
-      case 'high': return 'text-orange-600 bg-orange-100 border-orange-200';
-      case 'medium': return 'text-yellow-600 bg-yellow-100 border-yellow-200';
-      default: return 'text-blue-600 bg-blue-100 border-blue-200';
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <div className="text-center">
-          <Shield className="h-8 w-8 animate-pulse mx-auto mb-4" />
-          <p>Monitoring competitor vulnerabilities...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!crisisData) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <p className="text-center text-muted-foreground">Failed to load crisis monitoring data</p>
-        </CardContent>
-      </Card>
-    );
-  }
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <Card className="border-red-200 bg-gradient-to-r from-red-50 to-orange-50">
+      <Card className="bg-gradient-to-r from-red-500/10 to-orange-500/10 border-red-500/20">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <AlertTriangle className="h-6 w-6 text-red-600" />
-            Competitor Crisis Detector
+          <CardTitle className="text-2xl flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-red-500/20">
+              <AlertTriangle className="h-6 w-6 text-red-500" />
+            </div>
+            Crisis Detector
           </CardTitle>
           <CardDescription>
-            Real-time monitoring of competitor vulnerabilities and attack opportunities
+            Real-time monitoring and alerts for potential crises
           </CardDescription>
         </CardHeader>
       </Card>
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="alerts">🚨 Crisis Alerts</TabsTrigger>
-          <TabsTrigger value="reputation">📊 Reputation Intel</TabsTrigger>
-          <TabsTrigger value="opportunities">⚡ Attack Windows</TabsTrigger>
-          <TabsTrigger value="monitoring">👁️ Live Monitoring</TabsTrigger>
+      <Tabs defaultValue="monitor" className="space-y-4">
+        <TabsList className="bg-secondary/10 border border-secondary/30">
+          <TabsTrigger value="monitor" className="data-[state=active]:bg-secondary/20">
+            <Activity className="h-4 w-4 mr-2" />
+            Real-time Monitor
+          </TabsTrigger>
+          <TabsTrigger value="analysis" className="data-[state=active]:bg-secondary/20">
+            <TrendingDown className="h-4 w-4 mr-2" />
+            Trend Analysis
+          </TabsTrigger>
+          <TabsTrigger value="response" className="data-[state=active]:bg-secondary/20">
+            <Shield className="h-4 w-4 mr-2" />
+            Response Plans
+          </TabsTrigger>
         </TabsList>
-
-        <TabsContent value="alerts" className="space-y-4">
-          <div className="grid gap-4">
-            {crisisData.events.map((event) => (
-              <Card key={event.id} className={`border-2 ${getSeverityColor(event.severity)}`}>
-                <CardHeader>
+        
+        <TabsContent value="monitor" className="space-y-6">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {crisisAlerts.map((alert) => (
+              <Card key={alert.id} className={`bg-card/90 backdrop-blur-sm border-l-4 ${
+                alert.severity === 'critical' ? 'border-l-red-500' :
+                alert.severity === 'high' ? 'border-l-orange-500' :
+                alert.severity === 'medium' ? 'border-l-yellow-500' :
+                'border-l-green-500'
+              }`}>
+                <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      {event.type === 'legal' && <Scale className="h-5 w-5" />}
-                      {event.type === 'press' && <Newspaper className="h-5 w-5" />}
-                      {event.type === 'reviews' && <Star className="h-5 w-5" />}
-                      {event.type === 'social' && <MessageSquare className="h-5 w-5" />}
-                      {event.competitor}
+                    <CardTitle className="text-base flex items-center gap-2">
+                      <AlertTriangle className="h-4 w-4 text-destructive" />
+                      {alert.title}
                     </CardTitle>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="destructive" className="uppercase">
-                        {event.severity}
-                      </Badge>
-                      <Badge variant="outline">
-                        Impact: {event.impactScore}%
-                      </Badge>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <h4 className="font-semibold mb-2">{event.title}</h4>
-                      <p className="text-sm text-muted-foreground mb-2">{event.description}</p>
-                      <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                        <span>Source: {event.source}</span>
-                        <span>•</span>
-                        <span>{new Date(event.timestamp).toLocaleString()}</span>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4 text-orange-500" />
-                      <span className="text-sm">
-                        Opportunity window: <strong>{event.opportunityWindow} hours</strong>
-                      </span>
-                    </div>
-
-                    <div>
-                      <div className="text-sm font-medium mb-2">🎯 Suggested Actions</div>
-                      <ul className="text-sm space-y-1">
-                        {event.suggestedActions.map((action, idx) => (
-                          <li key={idx} className="text-muted-foreground">• {action}</li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    {event.readyToDeploy && (
-                      <Button className="w-full bg-red-600 hover:bg-red-700">
-                        <Zap className="h-4 w-4 mr-2" />
-                        Deploy Attack Campaign
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="reputation" className="space-y-4">
-          <div className="grid gap-4">
-            {crisisData.metrics.map((metric, idx) => (
-              <Card key={idx}>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <TrendingDown className="h-5 w-5 text-red-500" />
-                      {metric.competitor}
-                    </CardTitle>
-                    <Badge 
-                      variant={metric.riskLevel === 'high' ? 'destructive' : metric.riskLevel === 'medium' ? 'default' : 'secondary'}
-                    >
-                      {metric.riskLevel} risk
+                    <Badge className={getSeverityColor(alert.severity)}>
+                      {alert.severity}
                     </Badge>
                   </div>
+                  <Badge className="w-fit">
+                    {alert.source} • {alert.detectedAt}
+                  </Badge>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <div className="text-sm text-muted-foreground">Current Rating</div>
-                        <div className="text-2xl font-bold text-red-600">
-                          {metric.currentScore}/5.0
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          Down from {metric.previousScore}/5.0
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground">Sentiment Score</div>
-                        <div className="text-2xl font-bold text-red-600">
-                          {metric.sentimentScore}%
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {metric.reviewCount} reviews analyzed
-                        </div>
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="text-sm text-muted-foreground mb-2">Reputation Trend</div>
-                      <Progress 
-                        value={metric.sentimentScore} 
-                        className="h-3"
-                      />
-                    </div>
-
-                    <Button variant="outline" className="w-full">
-                      <Target className="h-4 w-4 mr-2" />
-                      Target Their Customers
-                    </Button>
+                <CardContent className="space-y-3">
+                  <p className="text-sm text-muted-foreground">{alert.description}</p>
+                  
+                  <div className="space-y-2">
+                    <div className="text-xs text-muted-foreground">Impact Level</div>
+                    <Progress value={alert.impact} className="h-2" />
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="opportunities" className="space-y-4">
-          <div className="grid gap-4">
-            {crisisData.attackWindows.map((window) => (
-              <Card key={window.id} className="border-green-200 bg-green-50">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2 text-green-800">
-                      <Flame className="h-5 w-5" />
-                      Attack Window Open
-                    </CardTitle>
-                    <Badge className="bg-green-600">
-                      {window.timeRemaining}h remaining
+                  
+                  <div className="flex justify-between items-center">
+                    <span className="text-xs text-muted-foreground">
+                      Confidence: {alert.confidence}%
+                    </span>
+                    <Badge className="text-xs">
+                      {alert.category}
                     </Badge>
                   </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="font-medium text-green-800">{window.competitor}</div>
-                      <div className="text-sm text-green-700">{window.opportunity}</div>
-                    </div>
-
-                    <div className="flex items-center gap-4">
-                      <div className="text-sm">
-                        <span className="text-muted-foreground">Est. Impact:</span>
-                        <span className="font-semibold text-green-600 ml-1">+{window.estimatedImpact}%</span>
-                      </div>
-                    </div>
-
-                    {window.campaignReady && (
-                      <div className="p-3 bg-white rounded-lg border border-green-200">
-                        <div className="text-sm font-medium text-green-800 mb-2">📝 Ready-to-Deploy Ad</div>
-                        <p className="text-sm text-gray-700 italic">"{window.adCopy}"</p>
-                        {window.landingPageUrl && (
-                          <div className="text-xs text-muted-foreground mt-1">
-                            Landing: {window.landingPageUrl}
-                          </div>
-                        )}
-                      </div>
-                    )}
-
-                    <Button 
-                      onClick={() => deployCampaign(window.id)}
-                      className="w-full bg-green-600 hover:bg-green-700"
-                    >
-                      <Zap className="h-4 w-4 mr-2" />
-                      Launch Attack Campaign
-                    </Button>
-                  </div>
+                  
+                  <Button className="w-full">
+                    <Eye className="h-4 w-4 mr-2" />
+                    Investigate
+                  </Button>
                 </CardContent>
               </Card>
             ))}
           </div>
         </TabsContent>
 
-        <TabsContent value="monitoring" className="space-y-4">
-          <Card>
+        <TabsContent value="analysis" className="space-y-6">
+          <Card className="bg-secondary/5 border-secondary/20">
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5 text-blue-600" />
-                Live Monitoring Status
+              <CardTitle className="text-lg flex items-center gap-2">
+                <TrendingDown className="h-5 w-5 text-primary" />
+                Trend Analysis
               </CardTitle>
               <CardDescription>
-                Real-time tracking of competitor vulnerabilities across all channels
+                Analyze historical data to identify emerging crisis trends
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="p-4 border rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      <span className="text-sm font-medium">Review Monitoring</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Scanning Google, Yelp, Facebook reviews every 5 minutes
-                    </div>
-                  </div>
-                  
-                  <div className="p-4 border rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      <span className="text-sm font-medium">News & Press</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Monitoring local news, press releases, legal filings
-                    </div>
-                  </div>
-                  
-                  <div className="p-4 border rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      <span className="text-sm font-medium">Social Sentiment</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Tracking mentions across Twitter, Facebook, Reddit
-                    </div>
-                  </div>
-                  
-                  <div className="p-4 border rounded-lg">
-                    <div className="flex items-center gap-2 mb-2">
-                      <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                      <span className="text-sm font-medium">Legal Filings</span>
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      Monitoring court records, BBB complaints, licensing issues
-                    </div>
-                  </div>
-                </div>
+              <p className="text-muted-foreground">
+                No trend data available at this time.
+              </p>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-                <div className="text-center text-sm text-muted-foreground">
-                  Last scan: {new Date().toLocaleTimeString()} • Next scan in 4:32
-                </div>
-              </div>
+        <TabsContent value="response" className="space-y-6">
+          <Card className="bg-secondary/5 border-secondary/20">
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Shield className="h-5 w-5 text-primary" />
+                Response Plans
+              </CardTitle>
+              <CardDescription>
+                Create and manage response plans for different crisis scenarios
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p className="text-muted-foreground">
+                No response plans available at this time.
+              </p>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
     </div>
   );
-}
+};

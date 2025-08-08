@@ -1,378 +1,250 @@
-/**
- * 🔥 DOMINANCE MAPPING™ SYSTEM
- * 
- * Visual competitive intelligence that maps business dominance and clout zones
- * Shows where clients hold attention vs competitors across all digital channels
- */
-
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  Target,
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Input } from '@/components/ui/input';
+import { 
   MapPin,
-  Zap,
-  Crown,
-  Focus,
+  Target,
+  TrendingUp,
   Activity,
-  Flame
+  Search,
+  Eye,
+  RefreshCw,
+  Shield,
+  Zap,
+  BarChart3
 } from 'lucide-react';
+import { useUser } from '@clerk/clerk-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
-interface DominanceZone {
-  readonly id: string;
-  readonly region: string;
-  readonly dominanceScore: number; // 0-100
-  readonly visibility: number; // 0-100
-  readonly competitorCount: number;
-  readonly opportunities: readonly string[];
-  readonly threats: readonly string[];
-  readonly cloutSpikes: readonly CloutSpike[];
+interface DominanceData {
+  id: number;
+  region: string;
+  dominanceScore: number;
+  marketPosition: number;
+  metrics: {
+    customerSatisfaction: number;
+    brandAwareness: number;
+    marketShare: number;
+  };
+  opportunities: string[];
+  threats: string[];
 }
 
-interface CloutSpike {
-  readonly id: string;
-  readonly competitor: string;
-  readonly platform: string;
-  readonly spike: number; // percentage increase
-  readonly reason: string;
-  readonly timestamp: string;
-  readonly actionable: boolean;
-}
+export const DominanceMapDashboard = () => {
+  const [dominanceData, setDominanceData] = useState<DominanceData[]>([
+    {
+      id: 1,
+      region: 'North America',
+      dominanceScore: 75,
+      marketPosition: 1,
+      metrics: {
+        customerSatisfaction: 88,
+        brandAwareness: 92,
+        marketShare: 35,
+      },
+      opportunities: [
+        'Expand into new market segments',
+        'Increase brand loyalty through customer engagement',
+      ],
+      threats: ['Increased competition', 'Changing consumer preferences'],
+    },
+    {
+      id: 2,
+      region: 'Europe',
+      dominanceScore: 60,
+      marketPosition: 2,
+      metrics: {
+        customerSatisfaction: 82,
+        brandAwareness: 85,
+        marketShare: 28,
+      },
+      opportunities: [
+        'Form strategic partnerships',
+        'Invest in localized marketing campaigns',
+      ],
+      threats: ['Economic downturn', 'Regulatory changes'],
+    },
+    {
+      id: 3,
+      region: 'Asia Pacific',
+      dominanceScore: 45,
+      marketPosition: 3,
+      metrics: {
+        customerSatisfaction: 78,
+        brandAwareness: 80,
+        marketShare: 20,
+      },
+      opportunities: [
+        'Enter emerging markets',
+        'Adapt products to local needs',
+      ],
+      threats: ['Intense price competition', 'Supply chain disruptions'],
+    },
+  ]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
+  const { user } = useUser();
+  const { toast } = useToast();
 
-interface CompetitorVisibility {
-  readonly competitor: string;
-  readonly visibility: number;
-  readonly trend: 'up' | 'down' | 'stable';
-  readonly platforms: readonly PlatformVisibility[];
-}
-
-interface PlatformVisibility {
-  readonly platform: string;
-  readonly score: number;
-  readonly change: number;
-}
-
-interface DominanceMappingProps {
-  readonly userId: string;
-  readonly businessId: string;
-}
-
-export function DominanceMappingDashboard({ userId, businessId }: DominanceMappingProps) {
-  const [dominanceData, setDominanceData] = useState<{
-    zones: readonly DominanceZone[];
-    competitors: readonly CompetitorVisibility[];
-    overallScore: number;
-  } | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'heatmap' | 'competitors' | 'opportunities' | 'alerts'>('heatmap');
-
-  useEffect(() => {
-    loadDominanceData();
-  }, [userId, businessId]);
-
-  const loadDominanceData = async () => {
+  const fetchDominanceData = async () => {
+    setIsLoading(true);
     try {
-      setLoading(true);
-      
-      // Simulate API call - replace with actual Supabase function
-      const mockData = {
-        zones: [
-          {
-            id: 'zone_1',
-            region: 'Downtown Metro',
-            dominanceScore: 78,
-            visibility: 85,
-            competitorCount: 12,
-            opportunities: ['Google Ads gap in "emergency plumbing"', 'Yelp reviews 40% below average'],
-            threats: ['Competitor increased ad spend 300%', 'New franchise opened 2 blocks away'],
-            cloutSpikes: [
-              {
-                id: 'spike_1',
-                competitor: 'Metro Plumbing Pro',
-                platform: 'Google Ads',
-                spike: 340,
-                reason: 'New "24/7 Emergency" campaign launched',
-                timestamp: new Date().toISOString(),
-                actionable: true
-              }
-            ]
-          },
-          {
-            id: 'zone_2',
-            region: 'Suburban North',
-            dominanceScore: 45,
-            visibility: 52,
-            competitorCount: 8,
-            opportunities: ['Zero local SEO competition', 'Facebook ads completely untapped'],
-            threats: ['HomeAdvisor dominates search results'],
-            cloutSpikes: []
-          }
-        ] as readonly DominanceZone[],
-        competitors: [
-          {
-            competitor: 'Metro Plumbing Pro',
-            visibility: 92,
-            trend: 'up' as const,
-            platforms: [
-              { platform: 'Google', score: 95, change: 12 },
-              { platform: 'Facebook', score: 88, change: 8 },
-              { platform: 'Yelp', score: 94, change: -2 }
-            ]
-          },
-          {
-            competitor: 'Quick Fix Solutions',
-            visibility: 67,
-            trend: 'down' as const,
-            platforms: [
-              { platform: 'Google', score: 72, change: -15 },
-              { platform: 'Facebook', score: 45, change: -8 },
-              { platform: 'Yelp', score: 84, change: 3 }
-            ]
-          }
-        ] as readonly CompetitorVisibility[],
-        overallScore: 63
-      };
-
-      setDominanceData(mockData);
+      // Simulate API call
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      toast({
+        title: "Dominance Data Updated",
+        description: "Successfully fetched the latest dominance data.",
+      });
     } catch (error) {
-      console.error('Failed to load dominance data:', error);
+      toast({
+        title: "Error Fetching Data",
+        description: "Failed to fetch dominance data. Please try again.",
+        variant: "destructive",
+      });
     } finally {
-      setLoading(false);
+      setIsLoading(false);
     }
   };
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <div className="text-center">
-          <Activity className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p>Mapping market dominance...</p>
-        </div>
-      </div>
-    );
-  }
+  useEffect(() => {
+    fetchDominanceData();
+  }, [user?.id, toast]);
 
-  if (!dominanceData) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <p className="text-center text-muted-foreground">Failed to load dominance data</p>
-        </CardContent>
-      </Card>
-    );
-  }
+  const getDominanceColor = (value: number) => {
+    if (value >= 80) return 'bg-green-500/20 text-green-400 border-green-500/30';
+    if (value >= 60) return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
+    if (value >= 40) return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
+    return 'bg-red-500/20 text-red-400 border-red-500/30';
+  };
 
   return (
     <div className="space-y-6">
-      {/* Header with Overall Score */}
-      <Card className="border-orange-200 bg-gradient-to-r from-orange-50 to-red-50">
+      <Card className="bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Crown className="h-6 w-6 text-orange-600" />
-                Dominance Mapping™
-              </CardTitle>
-              <CardDescription>
-                Your market position vs competitors across all channels
-              </CardDescription>
+          <CardTitle className="text-2xl flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/20">
+              <MapPin className="h-6 w-6 text-primary" />
             </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-orange-600">
-                {dominanceData.overallScore}%
-              </div>
-              <div className="text-sm text-muted-foreground">Overall Dominance</div>
-            </div>
-          </div>
+            Dominance Map
+          </CardTitle>
+          <CardDescription>
+            Visualize market dominance across key regions and identify strategic opportunities
+          </CardDescription>
         </CardHeader>
       </Card>
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="heatmap">🗺️ Clout Zones</TabsTrigger>
-          <TabsTrigger value="competitors">👥 Competitor Intel</TabsTrigger>
-          <TabsTrigger value="opportunities">🎯 Takeover Ops</TabsTrigger>
-          <TabsTrigger value="alerts">🚨 Clout Spikes</TabsTrigger>
+      <Tabs defaultValue="overview" className="space-y-4" onValueChange={setActiveTab}>
+        <TabsList>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="analysis">Regional Analysis</TabsTrigger>
+          <TabsTrigger value="strategy">Strategic Recommendations</TabsTrigger>
         </TabsList>
-
-        <TabsContent value="heatmap" className="space-y-4">
-          <div className="grid gap-4">
-            {dominanceData.zones.map((zone) => (
-              <Card key={zone.id} className="relative overflow-hidden">
-                <CardHeader>
+        
+        <TabsContent value="overview" className="space-y-6">
+          <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            {dominanceData.map((region) => (
+              <Card key={region.id} className="bg-card/90 backdrop-blur-sm border hover:shadow-lg transition-all">
+                <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <MapPin className="h-5 w-5" />
-                      {zone.region}
+                    <CardTitle className="text-lg flex items-center gap-2">
+                      <MapPin className="h-5 w-5 text-primary" />
+                      {region.region}
                     </CardTitle>
-                    <Badge 
-                      variant={zone.dominanceScore >= 70 ? "default" : zone.dominanceScore >= 50 ? "secondary" : "destructive"}
-                      className="text-sm"
-                    >
-                      {zone.dominanceScore}% Dominance
+                    <Badge className={getDominanceColor(region.dominanceScore)}>
+                      {region.dominanceScore}% Dominance
                     </Badge>
                   </div>
+                  <CardDescription className="text-sm">
+                    Market Position: #{region.marketPosition}
+                  </CardDescription>
                 </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <div className="text-sm text-muted-foreground mb-1">Visibility Score</div>
-                        <Progress value={zone.visibility} className="h-2" />
-                        <div className="text-xs text-muted-foreground mt-1">{zone.visibility}%</div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground mb-1">Competitors</div>
-                        <div className="text-2xl font-bold">{zone.competitorCount}</div>
-                      </div>
+                <CardContent className="space-y-4">
+                  <div className="grid grid-cols-2 gap-4">
+                    <div>
+                      <p className="text-xs uppercase text-muted-foreground">Customer Satisfaction</p>
+                      <Progress value={region.metrics.customerSatisfaction} className="h-2" />
+                      <div className="text-xs text-right">{region.metrics.customerSatisfaction}%</div>
                     </div>
-                    
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <div className="text-sm font-medium text-green-600 mb-2">🎯 Opportunities</div>
-                        <ul className="text-xs space-y-1">
-                          {zone.opportunities.map((opp, idx) => (
-                            <li key={idx} className="text-muted-foreground">• {opp}</li>
-                          ))}
-                        </ul>
-                      </div>
-                      <div>
-                        <div className="text-sm font-medium text-red-600 mb-2">⚠️ Threats</div>
-                        <ul className="text-xs space-y-1">
-                          {zone.threats.map((threat, idx) => (
-                            <li key={idx} className="text-muted-foreground">• {threat}</li>
-                          ))}
-                        </ul>
-                      </div>
+                    <div>
+                      <p className="text-xs uppercase text-muted-foreground">Brand Awareness</p>
+                      <Progress value={region.metrics.brandAwareness} className="h-2" />
+                      <div className="text-xs text-right">{region.metrics.brandAwareness}%</div>
+                    </div>
+                    <div>
+                      <p className="text-xs uppercase text-muted-foreground">Market Share</p>
+                      <Progress value={region.metrics.marketShare} className="h-2" />
+                      <div className="text-xs text-right">{region.metrics.marketShare}%</div>
                     </div>
                   </div>
+                  
+                  <div className="mt-4">
+                    <p className="text-xs uppercase text-muted-foreground">Opportunities</p>
+                    <ul className="list-disc pl-4 text-sm">
+                      {region.opportunities.map((opportunity, index) => (
+                        <li key={index}>{opportunity}</li>
+                      ))}
+                    </ul>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button className="flex-1">
+                      <Target className="h-4 w-4 mr-2" />
+                      Focus Campaign
+                    </Button>
+                    <Button variant="outline" size="sm">
+                      Status
+                    </Button>
+                  </div>
+                  
+                  <div className="flex gap-2">
+                    <Button size="sm">
+                      <Search className="h-4 w-4 mr-2" />
+                      Analyze
+                    </Button>
+                    <Badge>
+                      {region.threats.length} Threats
+                    </Badge>
+                  </div>
+
+                  <Button className="w-full" size="sm">
+                    <Eye className="h-4 w-4 mr-2" />
+                    View Details
+                  </Button>
                 </CardContent>
               </Card>
             ))}
           </div>
         </TabsContent>
 
-        <TabsContent value="competitors" className="space-y-4">
-          <div className="grid gap-4">
-            {dominanceData.competitors.map((comp, idx) => (
-              <Card key={idx}>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <Target className="h-5 w-5" />
-                      {comp.competitor}
-                    </CardTitle>
-                    <div className="flex items-center gap-2">
-                      <Badge variant={comp.trend === 'up' ? 'destructive' : comp.trend === 'down' ? 'default' : 'secondary'}>
-                        {comp.trend === 'up' ? '📈' : comp.trend === 'down' ? '📉' : '➡️'} {comp.visibility}%
-                      </Badge>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-3">
-                    {comp.platforms.map((platform, pidx) => (
-                      <div key={pidx} className="flex items-center justify-between">
-                        <span className="text-sm font-medium">{platform.platform}</span>
-                        <div className="flex items-center gap-2">
-                          <Progress value={platform.score} className="w-24 h-2" />
-                          <span className="text-sm w-12">{platform.score}%</span>
-                          <span className={`text-xs ${platform.change > 0 ? 'text-red-500' : platform.change < 0 ? 'text-green-500' : 'text-muted-foreground'}`}>
-                            {platform.change > 0 ? '+' : ''}{platform.change}%
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="opportunities" className="space-y-4">
+        <TabsContent value="analysis" className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Focus className="h-5 w-5 text-green-600" />
-                Predictive Takeover Opportunities
-              </CardTitle>
-              <CardDescription>
-                Low-cost, high-impact moves to steal market share
-              </CardDescription>
+              <CardTitle>Regional Analysis</CardTitle>
+              <CardDescription>Deep dive into each region's performance</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="p-4 border rounded-lg bg-green-50 border-green-200">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium text-green-800">🎯 Google Ads Gap - "Emergency Plumbing"</h4>
-                    <Badge className="bg-green-600">High Impact</Badge>
-                  </div>
-                  <p className="text-sm text-green-700 mb-3">
-                    Competitors are missing 67% of emergency plumbing searches. Estimated cost: $2,400/mo for dominance.
-                  </p>
-                  <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                    Launch Campaign
-                  </Button>
-                </div>
-                
-                <div className="p-4 border rounded-lg bg-blue-50 border-blue-200">
-                  <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium text-blue-800">📱 Social Media Vacuum - Suburban North</h4>
-                    <Badge variant="secondary">Medium Impact</Badge>
-                  </div>
-                  <p className="text-sm text-blue-700 mb-3">
-                    Zero local competition on Facebook/Instagram. 12,000 homeowners in target demo.
-                  </p>
-                  <Button size="sm" variant="outline">
-                    Build Strategy
-                  </Button>
-                </div>
-              </div>
+              <p>Detailed analysis and insights for each region will be displayed here.</p>
             </CardContent>
           </Card>
         </TabsContent>
 
-        <TabsContent value="alerts" className="space-y-4">
-          <div className="space-y-4">
-            {dominanceData.zones.flatMap(zone => zone.cloutSpikes).map((spike) => (
-              <Card key={spike.id} className="border-red-200 bg-red-50">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2 text-red-800">
-                      <Flame className="h-5 w-5" />
-                      Clout Spike Alert
-                    </CardTitle>
-                    <Badge variant="destructive">+{spike.spike}%</Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2">
-                    <p className="text-sm">
-                      <strong>{spike.competitor}</strong> spiked {spike.spike}% on {spike.platform}
-                    </p>
-                    <p className="text-sm text-muted-foreground">
-                      Reason: {spike.reason}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {new Date(spike.timestamp).toLocaleString()}
-                    </p>
-                    {spike.actionable && (
-                      <Button size="sm" className="mt-2">
-                        <Zap className="h-4 w-4 mr-1" />
-                        Counter-Attack
-                      </Button>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+        <TabsContent value="strategy" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Strategic Recommendations</CardTitle>
+              <CardDescription>AI-driven strategic recommendations</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <p>AI-driven strategic recommendations for improving market dominance will be displayed here.</p>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
   );
-}
+};

@@ -1,617 +1,376 @@
-
-/**
- * 🔥 AD SIGNAL HIJACK DASHBOARD
- * 
- * Real-time competitive advertising intelligence system that monitors competitor ad activities,
- * identifies warm leads, and provides instant counter-strike recommendations for maximum market dominance.
- */
-
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Progress } from "@/components/ui/progress";
-import { useToast } from "@/hooks/use-toast";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Progress } from '@/components/ui/progress';
 import { 
   Target, 
   TrendingUp, 
+  AlertTriangle, 
   Zap, 
+  Search,
+  RefreshCw,
   Eye,
-  AlertTriangle,
-  Activity,
-  Clock,
-  MapPin,
-  DollarSign,
-  Users,
-  Flame
+  Shield,
+  Activity
 } from 'lucide-react';
+import { useUser } from '@clerk/clerk-react';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
-interface AdIntelligenceData {
-  readonly competitorAds: readonly CompetitorAd[];
-  readonly warmLeads: readonly WarmLead[];
-  readonly marketSignals: readonly MarketSignal[];
-  readonly counterStrikes: readonly CounterStrike[];
+interface AdSignal {
+  id: number;
+  keyword: string;
+  volume: number;
+  cpc: number;
+  competition: number;
+  trend: number;
+  lastUpdated: string;
 }
 
 interface CompetitorAd {
-  readonly id: string;
-  readonly competitor: string;
-  readonly adTitle: string;
-  readonly adDescription: string;
-  readonly targetKeywords: readonly string[];
-  readonly estimatedBudget: number;
-  readonly impressions: number;
-  readonly ctr: number;
-  readonly adStrength: number;
-  readonly platform: 'google' | 'facebook' | 'instagram' | 'linkedin';
-  readonly isActive: boolean;
-  readonly firstSeen: string;
-  readonly lastSeen: string;
-  readonly threatLevel: 'low' | 'medium' | 'high' | 'critical';
+  id: number;
+  competitor: string;
+  adCopy: string;
+  url: string;
+  keywords: string[];
+  lastSeen: string;
 }
 
-interface WarmLead {
-  readonly id: string;
-  readonly name: string;
-  readonly email: string;
-  readonly company?: string;
-  readonly location: string;
-  readonly source: string;
-  readonly competitorEngagement: readonly string[];
-  readonly intentScore: number;
-  readonly estimatedValue: number;
-  readonly urgencyLevel: 'low' | 'medium' | 'high' | 'critical';
-  readonly lastActivity: string;
-  readonly recommendedAction: string;
-}
-
-interface MarketSignal {
-  readonly id: string;
-  readonly type: 'budget_increase' | 'new_campaign' | 'keyword_shift' | 'audience_expansion';
-  readonly competitor: string;
-  readonly description: string;
-  readonly impact: 'low' | 'medium' | 'high' | 'critical';
-  readonly detectedAt: string;
-  readonly affectedKeywords?: readonly string[];
-  readonly estimatedBudgetChange?: number;
-}
-
-interface CounterStrike {
-  readonly id: string;
-  readonly triggeredBy: string;
-  readonly strategy: string;
-  readonly description: string;
-  readonly estimatedCost: number;
-  readonly expectedROI: number;
-  readonly urgency: 'low' | 'medium' | 'high' | 'critical';
-  readonly implementation: readonly string[];
-  readonly success_probability: number;
-}
-
-interface AdHijackDashboardProps {
-  readonly userId: string;
-  readonly businessId: string;
-}
-
-export function AdHijackDashboard({ userId, businessId }: AdHijackDashboardProps) {
-  const [adData, setAdData] = useState<AdIntelligenceData | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'overview' | 'ads' | 'leads' | 'strikes'>('overview');
-  const [monitoringKeyword, setMonitoringKeyword] = useState('');
-  const { toast } = useToast();
-
-  useEffect(() => {
-    loadAdIntelligence();
-    
-    // Real-time updates every 30 seconds
-    const interval = setInterval(loadAdIntelligence, 30000);
-    return () => clearInterval(interval);
-  }, [userId, businessId]);
-
-  const loadAdIntelligence = async () => {
-    try {
-      setLoading(true);
-      
-      // Mock data - replace with actual API calls
-      const mockData: AdIntelligenceData = {
-        competitorAds: [
-          {
-            id: 'ad_1',
-            competitor: 'QuickFix Plumbing',
-            adTitle: '24/7 Emergency Plumbing - Call Now!',
-            adDescription: 'Licensed plumbers available 24/7. Same-day service guaranteed. Free estimates on all repairs.',
-            targetKeywords: ['emergency plumbing', 'plumber near me', '24/7 plumbing'],
-            estimatedBudget: 2500,
-            impressions: 45000,
-            ctr: 3.2,
-            adStrength: 78,
-            platform: 'google',
-            isActive: true,
-            firstSeen: '2024-01-15T10:00:00Z',
-            lastSeen: '2024-01-20T15:30:00Z',
-            threatLevel: 'high'
-          },
-          {
-            id: 'ad_2',
-            competitor: 'Metro Plumbing Pro',
-            adTitle: 'Professional Plumbing Services',
-            adDescription: 'Expert plumbing repairs and installations. 20+ years experience. Satisfaction guaranteed.',
-            targetKeywords: ['plumbing services', 'pipe repair', 'water heater'],
-            estimatedBudget: 1800,
-            impressions: 32000,
-            ctr: 2.8,
-            adStrength: 65,
-            platform: 'google',
-            isActive: true,
-            firstSeen: '2024-01-10T08:00:00Z',
-            lastSeen: '2024-01-20T14:00:00Z',
-            threatLevel: 'medium'
-          }
-        ],
-        warmLeads: [
-          {
-            id: 'lead_1',
-            name: 'Sarah Johnson',
-            email: 'sarah@techstartup.com',
-            company: 'TechStartup Inc',
-            location: 'Beverly Hills, CA',
-            source: 'Competitor Ad Click',
-            competitorEngagement: ['QuickFix Plumbing', 'Metro Plumbing Pro'],
-            intentScore: 87,
-            estimatedValue: 4500,
-            urgencyLevel: 'high',
-            lastActivity: '2 hours ago',
-            recommendedAction: 'Immediate outreach with competitive pricing offer'
-          }
-        ],
-        marketSignals: [
-          {
-            id: 'signal_1',
-            type: 'budget_increase',
-            competitor: 'QuickFix Plumbing',
-            description: 'Increased Google Ads spend by 200% in the last 7 days',
-            impact: 'high',
-            detectedAt: '2024-01-20T12:00:00Z',
-            affectedKeywords: ['emergency plumbing', '24/7 plumber'],
-            estimatedBudgetChange: 5000
-          }
-        ],
-        counterStrikes: [
-          {
-            id: 'strike_1',
-            triggeredBy: 'QuickFix budget increase',
-            strategy: 'Keyword Interception',
-            description: 'Launch targeted ads on their high-performing keywords with better offers',
-            estimatedCost: 3000,
-            expectedROI: 450,
-            urgency: 'high',
-            implementation: [
-              'Create ads targeting "emergency plumbing" with 15% discount',
-              'Increase bid on "24/7 plumber" by 30%',
-              'Add negative keywords to avoid wasteful spend'
-            ],
-            success_probability: 78
-          }
-        ]
-      };
-
-      setAdData(mockData);
-    } catch (error) {
-      console.error('Failed to load ad intelligence:', error);
-      toast({
-        title: "Error",
-        description: "Failed to load advertising intelligence data",
-        variant: "destructive"
-      });
-    } finally {
-      setLoading(false);
+export const AdHijackDashboard = () => {
+  const [keywords, setKeywords] = useState<string>('');
+  const [adSignals, setAdSignals] = useState<AdSignal[]>([
+    {
+      id: 1,
+      keyword: 'cloud services',
+      volume: 45000,
+      cpc: 1.25,
+      competition: 0.75,
+      trend: 12,
+      lastUpdated: '2 hours ago'
+    },
+    {
+      id: 2,
+      keyword: 'data analytics',
+      volume: 32000,
+      cpc: 1.50,
+      competition: 0.80,
+      trend: -5,
+      lastUpdated: '4 hours ago'
+    },
+    {
+      id: 3,
+      keyword: 'cybersecurity',
+      volume: 28000,
+      cpc: 1.75,
+      competition: 0.85,
+      trend: 8,
+      lastUpdated: '6 hours ago'
     }
-  };
+  ]);
+  const [competitorAds, setCompetitorAds] = useState<CompetitorAd[]>([
+    {
+      id: 1,
+      competitor: 'TechCorp',
+      adCopy: 'Revolutionize your business with our cloud solutions. Free trial available!',
+      url: 'techcorp.com/cloud',
+      keywords: ['cloud services', 'cloud solutions', 'business cloud'],
+      lastSeen: '1 hour ago'
+    },
+    {
+      id: 2,
+      competitor: 'DataFlow Inc',
+      adCopy: 'Unlock insights with our advanced data analytics platform. Request a demo today.',
+      url: 'dataflow.com/analytics',
+      keywords: ['data analytics', 'analytics platform', 'business intelligence'],
+      lastSeen: '3 hours ago'
+    },
+    {
+      id: 3,
+      competitor: 'SecureNet',
+      adCopy: 'Protect your business with our comprehensive cybersecurity solutions. Contact us for a quote.',
+      url: 'securenet.com/security',
+      keywords: ['cybersecurity', 'security solutions', 'data protection'],
+      lastSeen: '5 hours ago'
+    }
+  ]);
+  const [activeTab, setActiveTab] = useState<string>('signals');
+  const [isAnalyzing, setIsAnalyzing] = useState<boolean>(false);
+  const { user } = useUser();
+  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
-  const addKeywordMonitoring = async () => {
-    if (!monitoringKeyword.trim()) {
+  const handleKeywordAnalysis = async () => {
+    if (!keywords.trim()) {
       toast({
-        title: "Keyword Required",
-        description: "Please enter a keyword to monitor",
-        variant: "destructive"
+        title: "Input Required",
+        description: "Please enter keywords to analyze.",
+        variant: "destructive",
       });
       return;
     }
 
-    try {
-      // Mock API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
+    setIsAnalyzing(true);
+    
+    // Simulate API call
+    setTimeout(() => {
+      const newSignal = {
+        id: Date.now(),
+        keyword: keywords,
+        volume: Math.floor(Math.random() * 50000),
+        cpc: Math.random() * 2,
+        competition: Math.random(),
+        trend: Math.floor(Math.random() * 20) - 10,
+        lastUpdated: "Just now"
+      };
+      
+      setAdSignals([newSignal, ...adSignals]);
+      setKeywords("");
+      setIsAnalyzing(false);
       
       toast({
-        title: "Monitoring Added",
-        description: `Now monitoring "${monitoringKeyword}" for competitive activity`,
+        title: "Analysis Complete",
+        description: `Keyword analysis for ${keywords} has been processed.`,
       });
-      
-      setMonitoringKeyword('');
+    }, 3000);
+  };
+
+  const fetchAdSignals = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('ad-signals', {
+        body: { 
+          userId: user?.id,
+          keywords: ['cloud services', 'data analytics', 'cybersecurity']
+        }
+      });
+
+      if (data && !error) {
+        setAdSignals(data.signals || []);
+      }
     } catch (error) {
-      console.error('Failed to add keyword monitoring:', error);
+      console.error('Error fetching ad signals:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const getThreatColor = (level: string) => {
-    switch (level) {
-      case 'critical': return 'text-red-600';
-      case 'high': return 'text-orange-600';
-      case 'medium': return 'text-yellow-600';
-      default: return 'text-green-600';
+  const fetchCompetitorAds = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('competitor-ads', {
+        body: { 
+          userId: user?.id,
+          competitors: ['TechCorp', 'DataFlow Inc', 'SecureNet']
+        }
+      });
+
+      if (data && !error) {
+        setCompetitorAds(data.ads || []);
+      }
+    } catch (error) {
+      console.error('Error fetching competitor ads:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
-  const getThreatBadgeClass = (level: string) => {
-    switch (level) {
-      case 'critical': return 'bg-red-100 text-red-800';
-      case 'high': return 'bg-orange-100 text-orange-800';
-      case 'medium': return 'bg-yellow-100 text-yellow-800';
-      default: return 'bg-green-100 text-green-800';
-    }
-  };
-
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-96">
-        <div className="text-center">
-          <Activity className="h-8 w-8 animate-spin mx-auto mb-4" />
-          <p>Loading competitive intelligence...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (!adData) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <p className="text-center text-muted-foreground">Failed to load advertising intelligence</p>
-        </CardContent>
-      </Card>
-    );
-  }
+  useEffect(() => {
+    fetchAdSignals();
+    fetchCompetitorAds();
+  }, [user?.id]);
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <Card className="border-red-200 bg-gradient-to-r from-red-50 to-orange-50">
+      <Card className="bg-gradient-to-r from-primary/10 to-secondary/10 border-primary/20">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Target className="h-6 w-6 text-red-600" />
-            Ad Signal Hijack Command Center
-            <Badge className="bg-red-100 text-red-800">ACTIVE</Badge>
+          <CardTitle className="text-2xl flex items-center gap-3">
+            <div className="p-2 rounded-lg bg-primary/20">
+              <Target className="h-6 w-6 text-primary" />
+            </div>
+            Ad Signal Hijack
           </CardTitle>
           <CardDescription>
-            Real-time competitive advertising intelligence and counter-strike operations
+            Real-time competitive intelligence to dominate your market
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <div className="text-center">
-              <div className="text-2xl font-bold text-red-600">{adData.competitorAds.length}</div>
-              <div className="text-sm text-muted-foreground">Competitor Ads</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-orange-600">{adData.warmLeads.length}</div>
-              <div className="text-sm text-muted-foreground">Warm Leads</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-yellow-600">{adData.marketSignals.length}</div>
-              <div className="text-sm text-muted-foreground">Market Signals</div>
-            </div>
-            <div className="text-center">
-              <div className="text-2xl font-bold text-green-600">{adData.counterStrikes.length}</div>
-              <div className="text-sm text-muted-foreground">Counter Strikes</div>
-            </div>
-          </div>
-        </CardContent>
       </Card>
 
-      {/* Quick Actions */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Quick Monitoring Setup</CardTitle>
-          <CardDescription>Add keywords to monitor for competitive activity</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex gap-2">
-            <Input
-              placeholder="Enter keyword to monitor..."
-              value={monitoringKeyword}
-              onChange={(e) => setMonitoringKeyword(e.target.value)}
-              className="flex-1"
-            />
-            <Button onClick={addKeywordMonitoring} className="bg-red-600 hover:bg-red-700 text-white">
-              <Eye className="h-4 w-4 mr-2" />
-              Start Monitoring
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as any)}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">📊 Overview</TabsTrigger>
-          <TabsTrigger value="ads">🎯 Competitor Ads</TabsTrigger>
-          <TabsTrigger value="leads">🔥 Warm Leads</TabsTrigger>
-          <TabsTrigger value="strikes">⚡ Counter Strikes</TabsTrigger>
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+        <TabsList className="bg-secondary/10 border border-secondary/30">
+          <TabsTrigger value="signals" className="data-[state=active]:bg-secondary/20">
+            <TrendingUp className="h-4 w-4 mr-2" />
+            Ad Signals
+          </TabsTrigger>
+          <TabsTrigger value="competitors" className="data-[state=active]:bg-secondary/20">
+            <Shield className="h-4 w-4 mr-2" />
+            Competitor Ads
+          </TabsTrigger>
+          <TabsTrigger value="hijack" className="data-[state=active]:bg-secondary/20">
+            <Zap className="h-4 w-4 mr-2" />
+            Hijack Campaigns
+          </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-2">
-            {/* Market Signals */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5 text-blue-600" />
-                  Market Signals
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {adData.marketSignals.map((signal) => (
-                    <div key={signal.id} className="border-l-4 border-blue-500 pl-4">
-                      <div className="flex items-start justify-between">
-                        <div>
-                          <div className="font-medium">{signal.competitor}</div>
-                          <div className="text-sm text-muted-foreground">{signal.description}</div>
-                          {signal.estimatedBudgetChange && (
-                            <div className="text-xs text-green-600 mt-1">
-                              Budget change: +${signal.estimatedBudgetChange.toLocaleString()}
-                            </div>
-                          )}
-                        </div>
-                        <Badge className={getThreatBadgeClass(signal.impact)}>
-                          {signal.impact.toUpperCase()}
-                        </Badge>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Top Threats */}
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center gap-2">
-                  <AlertTriangle className="h-5 w-5 text-red-600" />
-                  Top Threats
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {adData.competitorAds
-                    .filter(ad => ad.threatLevel === 'high' || ad.threatLevel === 'critical')
-                    .map((ad) => (
-                      <div key={ad.id} className="border rounded-lg p-3">
-                        <div className="flex items-center justify-between mb-2">
-                          <div className="font-medium">{ad.competitor}</div>
-                          <Badge className={getThreatBadgeClass(ad.threatLevel)}>
-                            {ad.threatLevel.toUpperCase()}
-                          </Badge>
-                        </div>
-                        <div className="text-sm text-muted-foreground mb-2">{ad.adTitle}</div>
-                        <div className="flex items-center gap-4 text-xs">
-                          <span>Budget: ${ad.estimatedBudget.toLocaleString()}</span>
-                          <span>CTR: {ad.ctr}%</span>
-                          <span>Strength: {ad.adStrength}%</span>
-                        </div>
-                      </div>
-                    ))}
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
-
-        <TabsContent value="ads" className="space-y-4">
-          <div className="grid gap-4">
-            {adData.competitorAds.map((ad) => (
-              <Card key={ad.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <Target className="h-5 w-5" />
-                      {ad.competitor}
-                    </CardTitle>
+        <TabsContent value="signals" className="space-y-6">
+          <Card className="bg-card/90 backdrop-blur-sm border">
+            <CardHeader>
+              <CardTitle className="text-lg">Keyword Analysis</CardTitle>
+              <CardDescription>
+                Enter keywords to analyze their search volume, CPC, and competition.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Enter keywords..."
+                  value={keywords}
+                  onChange={(e) => setKeywords(e.target.value)}
+                  className="bg-background/80 border-input text-foreground placeholder:text-muted-foreground"
+                  disabled={isAnalyzing}
+                />
+                <Button 
+                  onClick={handleKeywordAnalysis}
+                  disabled={isAnalyzing}
+                  className="bg-primary text-primary-foreground hover:bg-primary/90"
+                >
+                  {isAnalyzing ? (
                     <div className="flex items-center gap-2">
-                      <Badge className={getThreatBadgeClass(ad.threatLevel)}>
-                        {ad.threatLevel.toUpperCase()}
-                      </Badge>
-                      <Badge className={ad.isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}>
-                        {ad.isActive ? 'ACTIVE' : 'INACTIVE'}
-                      </Badge>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary-foreground"></div>
+                      Analyzing...
                     </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="font-medium text-lg">{ad.adTitle}</div>
-                      <div className="text-muted-foreground">{ad.adDescription}</div>
+                  ) : (
+                    <div className="flex items-center gap-2">
+                      <Search className="h-4 w-4" />
+                      Analyze
                     </div>
-                    
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                      <div>
-                        <div className="text-lg font-bold text-green-600">${ad.estimatedBudget.toLocaleString()}</div>
-                        <div className="text-xs text-muted-foreground">Est. Budget</div>
-                      </div>
-                      <div>
-                        <div className="text-lg font-bold">{ad.impressions.toLocaleString()}</div>
-                        <div className="text-xs text-muted-foreground">Impressions</div>
-                      </div>
-                      <div>
-                        <div className="text-lg font-bold">{ad.ctr}%</div>
-                        <div className="text-xs text-muted-foreground">CTR</div>
-                      </div>
-                      <div>
-                        <div className="text-lg font-bold">{ad.adStrength}%</div>
-                        <div className="text-xs text-muted-foreground">Ad Strength</div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <div className="text-sm font-medium mb-2">Target Keywords:</div>
-                      <div className="flex flex-wrap gap-1">
-                        {ad.targetKeywords.map((keyword, idx) => (
-                          <Badge key={idx} className="bg-blue-100 text-blue-800 text-xs">
-                            {keyword}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center gap-2 pt-2">
-                      <Button className="bg-red-600 hover:bg-red-700 text-white">
-                        <Zap className="h-4 w-4 mr-2" />
-                        Launch Counter Strike
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
+                  )}
+                </Button>
+              </div>
+              {isAnalyzing && (
+                <div className="space-y-2">
+                  <Progress value={66} className="h-2" />
+                  <p className="text-sm text-muted-foreground">Processing keyword data...</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
 
-        <TabsContent value="leads" className="space-y-4">
-          <div className="grid gap-4">
-            {adData.warmLeads.map((lead) => (
-              <Card key={lead.id} className="hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <Flame className="h-5 w-5 text-orange-600" />
-                      {lead.name}
-                      {lead.company && <span className="text-sm font-normal">({lead.company})</span>}
-                    </CardTitle>
-                    <Badge className={getThreatBadgeClass(lead.urgencyLevel)}>
-                      {lead.urgencyLevel.toUpperCase()}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <div className="text-sm text-muted-foreground">Location</div>
-                        <div className="flex items-center gap-1">
-                          <MapPin className="h-3 w-3" />
-                          {lead.location}
-                        </div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground">Intent Score</div>
-                        <div className="text-lg font-bold text-green-600">{lead.intentScore}%</div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground">Est. Value</div>
-                        <div className="flex items-center gap-1">
-                          <DollarSign className="h-3 w-3" />
-                          <span className="font-bold">{lead.estimatedValue.toLocaleString()}</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div>
-                      <div className="text-sm text-muted-foreground mb-1">Competitor Engagement:</div>
-                      <div className="flex flex-wrap gap-1">
-                        {lead.competitorEngagement.map((competitor, idx) => (
-                          <Badge key={idx} className="bg-red-100 text-red-800 text-xs">
-                            {competitor}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div className="bg-orange-50 p-3 rounded-lg">
-                      <div className="text-sm font-medium text-orange-800">Recommended Action:</div>
-                      <div className="text-sm text-orange-700">{lead.recommendedAction}</div>
-                    </div>
-                    
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {isLoading ? (
+              <div className="col-span-full flex items-center justify-center">
+                <Activity className="mr-2 h-4 w-4 animate-spin" />
+                Loading signals...
+              </div>
+            ) : (
+              adSignals.map((signal) => (
+                <Card key={signal.id} className="bg-card/90 backdrop-blur-sm border hover:shadow-lg transition-all">
+                  <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
-                      <div className="text-xs text-muted-foreground">
-                        Last activity: {lead.lastActivity}
-                      </div>
-                      <Button className="bg-orange-600 hover:bg-orange-700 text-white">
-                        <Users className="h-4 w-4 mr-2" />
-                        Initiate Contact
-                      </Button>
+                      <CardTitle className="text-lg">{signal.keyword}</CardTitle>
+                      <Badge variant="secondary">
+                        {signal.trend > 0 ? (
+                          <>
+                            <TrendingUp className="h-3 w-3 mr-1" />
+                            {signal.trend}%
+                          </>
+                        ) : (
+                          <>
+                            <AlertTriangle className="h-3 w-3 mr-1" />
+                            {signal.trend}%
+                          </>
+                        )}
+                      </Badge>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    <CardDescription className="text-sm">
+                      Last updated: {signal.lastUpdated}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span>Volume</span>
+                        <span>{signal.volume.toLocaleString()}</span>
+                      </div>
+                      <Progress value={signal.volume / 50000 * 100} className="h-2" />
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>CPC</span>
+                      <span>${signal.cpc.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span>Competition</span>
+                      <span>{signal.competition.toFixed(2)}</span>
+                    </div>
+                    <Button className="w-full">
+                      <Eye className="h-4 w-4 mr-2" />
+                      View Details
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
         </TabsContent>
 
-        <TabsContent value="strikes" className="space-y-4">
-          <div className="grid gap-4">
-            {adData.counterStrikes.map((strike) => (
-              <Card key={strike.id} className="border-purple-200 hover:shadow-lg transition-shadow">
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <Zap className="h-5 w-5 text-purple-600" />
-                      {strike.strategy}
-                    </CardTitle>
-                    <Badge className={getThreatBadgeClass(strike.urgency)}>
-                      {strike.urgency.toUpperCase()}
-                    </Badge>
-                  </div>
-                  <CardDescription>Triggered by: {strike.triggeredBy}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="text-sm">{strike.description}</div>
-                    
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                      <div>
-                        <div className="text-sm text-muted-foreground">Estimated Cost</div>
-                        <div className="text-lg font-bold text-red-600">${strike.estimatedCost.toLocaleString()}</div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground">Expected ROI</div>
-                        <div className="text-lg font-bold text-green-600">{strike.expectedROI}%</div>
-                      </div>
-                      <div>
-                        <div className="text-sm text-muted-foreground">Success Probability</div>
-                        <div className="text-lg font-bold text-blue-600">{strike.success_probability}%</div>
-                      </div>
+        <TabsContent value="competitors" className="space-y-6">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+            {isLoading ? (
+              <div className="col-span-full flex items-center justify-center">
+                <Activity className="mr-2 h-4 w-4 animate-spin" />
+                Loading competitor ads...
+              </div>
+            ) : (
+              competitorAds.map((ad) => (
+                <Card key={ad.id} className="bg-card/90 backdrop-blur-sm border hover:shadow-lg transition-all">
+                  <CardHeader className="pb-3">
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-lg">{ad.competitor}</CardTitle>
+                      <Badge variant="outline">
+                        Last seen: {ad.lastSeen}
+                      </Badge>
                     </div>
-                    
-                    <div>
-                      <div className="text-sm font-medium mb-2">Implementation Steps:</div>
-                      <ul className="text-sm space-y-1">
-                        {strike.implementation.map((step, idx) => (
-                          <li key={idx} className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-purple-400 rounded-full"></div>
-                            {step}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                    
-                    <div className="flex items-center gap-2 pt-2">
-                      <Button className="bg-purple-600 hover:bg-purple-700 text-white">
-                        <Zap className="h-4 w-4 mr-2" />
-                        Execute Strike
-                      </Button>
-                      <Progress value={strike.success_probability} className="flex-1" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
+                    <CardDescription className="text-sm">
+                      Keywords: {ad.keywords.join(', ')}
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent className="space-y-4">
+                    <p className="text-sm">{ad.adCopy}</p>
+                    <Button className="w-full" asChild>
+                      <a href={ad.url} target="_blank" rel="noopener noreferrer" className="flex items-center justify-center">
+                        <Eye className="h-4 w-4 mr-2" />
+                        View Ad
+                      </a>
+                    </Button>
+                  </CardContent>
+                </Card>
+              ))
+            )}
           </div>
+        </TabsContent>
+
+        <TabsContent value="hijack" className="space-y-6">
+          <Card className="bg-card/90 backdrop-blur-sm border">
+            <CardHeader>
+              <CardTitle className="text-lg">Hijack Campaigns</CardTitle>
+              <CardDescription>
+                Automated campaign creation to target competitor keywords and customers.
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <p className="text-sm">
+                This feature is under development. Stay tuned for updates!
+              </p>
+              <Button disabled>
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Generate Campaigns
+              </Button>
+            </CardContent>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
   );
-}
-
-export default AdHijackDashboard;
+};
