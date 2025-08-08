@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -183,9 +184,7 @@ export const DominanceMapDashboard = () => {
                       <Target className="h-4 w-4 mr-2" />
                       Focus Campaign
                     </Button>
-                    <Button variant="outline">
-                      Status
-                    </Button>
+                    <Button>Status</Button>
                   </div>
                   
                   <div className="flex gap-2">

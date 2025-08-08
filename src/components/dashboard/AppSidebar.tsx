@@ -1,3 +1,4 @@
+
 import { useLocation, useNavigate } from "react-router-dom";
 import {
   Target,
@@ -96,7 +97,6 @@ export const AppSidebar = ({ activeView, onViewChange }: AppSidebarProps) => {
                 <span className="animate-fade-in">{item.name}</span>
                 {item.badge && (
                   <Badge 
-                    variant={isActive(item.key) ? "secondary" : "outline"} 
                     className="text-xs px-1.5 py-0.5 animate-scale-in"
                   >
                     {item.badge}
