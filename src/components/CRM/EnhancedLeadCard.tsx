@@ -107,19 +107,6 @@ export function EnhancedLeadCard({ lead, onScheduleFollowUp, onViewFullIntel }: 
     }
   };
 
-  const getStageColor = (stage: string) => {
-    switch (stage) {
-      case 'new': return 'bg-blue-100 text-blue-800';
-      case 'contacted': return 'bg-purple-100 text-purple-800';
-      case 'qualified': return 'bg-green-100 text-green-800';
-      case 'proposal': return 'bg-orange-100 text-orange-800';
-      case 'negotiation': return 'bg-yellow-100 text-yellow-800';
-      case 'closed': return 'bg-emerald-100 text-emerald-800';
-      case 'lost': return 'bg-red-100 text-red-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
-
   return (
     <Card className={`relative overflow-hidden transition-all duration-200 hover:shadow-lg ${
       lead.priority === 'urgent' ? 'border-2 border-red-500 shadow-red-100' : ''
