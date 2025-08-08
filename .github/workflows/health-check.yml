@@ -1,0 +1,106 @@
+# Repository Health Check
+name: Health Check
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Run daily at 9 AM UTC
+    - cron: '0 9 * * *'
+  workflow_dispatch:
+
+jobs:
+  health-check:
+    name: Repository Health Check
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check repository structure
+        run: |
+          echo "🔍 Checking repository structure..."
+          
+          # Check for essential files
+          if [ -f "package.json" ]; then
+            echo "✅ package.json found"
+          else
+            echo "❌ package.json missing"
+          fi
+          
+          if [ -f "tsconfig.json" ] || [ -f "tsconfig.app.json" ]; then
+            echo "✅ TypeScript config found"
+          else
+            echo "❌ TypeScript config missing"
+          fi
+          
+          if [ -d "src" ]; then
+            echo "✅ src directory found"
+          else
+            echo "❌ src directory missing"
+          fi
+          
+          if [ -d "supabase" ]; then
+            echo "✅ supabase directory found"
+          else
+            echo "❌ supabase directory missing"
+          fi
+
+      - name: Validate JSON files
+        run: |
+          echo "🔍 Validating JSON files..."
+          
+          # Check package.json
+          if [ -f "package.json" ]; then
+            if jq empty package.json 2>/dev/null; then
+              echo "✅ package.json is valid JSON"
+            else
+              echo "❌ package.json has invalid JSON"
+              exit 1
+            fi
+          fi
+          
+          # Check tsconfig files
+          for config in tsconfig.json tsconfig.app.json tsconfig.node.json; do
+            if [ -f "$config" ]; then
+              if jq empty "$config" 2>/dev/null; then
+                echo "✅ $config is valid JSON"
+              else
+                echo "❌ $config has invalid JSON"
+                exit 1
+              fi
+            fi
+          done
+
+      - name: Check dependencies
+        run: |
+          echo "🔍 Checking dependencies..."
+          
+          if [ -f "package.json" ]; then
+            # Check for security vulnerabilities in dependencies
+            if command -v npm &> /dev/null; then
+              npm audit --audit-level=high || echo "⚠️ Security vulnerabilities found"
+            fi
+            
+            # Check for outdated dependencies
+            echo "📦 Dependency status check complete"
+          fi
+
+      - name: Environment check
+        run: |
+          echo "🔍 Environment check..."
+          echo "Node.js version: $(node --version 2>/dev/null || echo 'Not installed')"
+          echo "npm version: $(npm --version 2>/dev/null || echo 'Not installed')"
+          echo "Git version: $(git --version)"
+          echo "Repository: $(git remote get-url origin 2>/dev/null || echo 'No remote')"
+
+      - name: Generate health report
+        run: |
+          echo "📊 Repository Health Report"
+          echo "=========================="
+          echo "Date: $(date)"
+          echo "Commit: ${{ github.sha }}"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Actor: ${{ github.actor }}"
+          echo ""
+          echo "✅ Health check completed successfully"

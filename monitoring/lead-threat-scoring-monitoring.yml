@@ -1,0 +1,379 @@
+# Lead Threat Scoring System - Production Monitoring Configuration
+# Comprehensive monitoring, alerting, and observability setup
+
+# Prometheus Metrics Configuration
+prometheus:
+  metrics:
+    # Core Performance Metrics
+    - name: lead_threat_score_calculation_duration_seconds
+      type: histogram
+      help: "Time taken to calculate lead threat scores"
+      buckets: [0.1, 0.5, 1.0, 2.0, 5.0, 10.0]
+      labels: ["organization_id", "threat_level"]
+
+    - name: lead_threat_score_calculations_total
+      type: counter
+      help: "Total number of lead threat score calculations"
+      labels: ["organization_id", "threat_level", "status"]
+
+    - name: lead_threat_score_cache_hits_total
+      type: counter
+      help: "Number of cache hits for threat score requests"
+      labels: ["organization_id"]
+
+    - name: lead_threat_score_cache_misses_total
+      type: counter
+      help: "Number of cache misses for threat score requests"
+      labels: ["organization_id"]
+
+    - name: lead_threat_score_errors_total
+      type: counter
+      help: "Total number of errors in threat score calculations"
+      labels: ["organization_id", "error_type"]
+
+    - name: lead_threat_score_batch_size
+      type: histogram
+      help: "Size of batch processing requests"
+      buckets: [1, 5, 10, 25, 50, 100]
+
+    - name: lead_threat_score_api_requests_total
+      type: counter
+      help: "Total API requests to threat scoring endpoints"
+      labels: ["endpoint", "method", "status_code"]
+
+    - name: lead_threat_score_database_operations_duration_seconds
+      type: histogram
+      help: "Duration of database operations"
+      buckets: [0.01, 0.05, 0.1, 0.5, 1.0, 2.0]
+      labels: ["operation", "table"]
+
+    # Business Metrics
+    - name: lead_threat_scores_by_level
+      type: gauge
+      help: "Current count of leads by threat level"
+      labels: ["organization_id", "threat_level"]
+
+    - name: lead_threat_score_average
+      type: gauge
+      help: "Average threat score across all leads"
+      labels: ["organization_id"]
+
+    - name: high_threat_leads_percentage
+      type: gauge
+      help: "Percentage of leads with high or critical threat levels"
+      labels: ["organization_id"]
+
+# Grafana Dashboard Configuration
+grafana:
+  dashboards:
+    - name: "Lead Threat Scoring - Overview"
+      panels:
+        - title: "Threat Score Calculations per Hour"
+          type: "graph"
+          targets:
+            - expr: "rate(lead_threat_score_calculations_total[1h])"
+            - legend: "{{organization_id}} - {{threat_level}}"
+
+        - title: "Average Calculation Time"
+          type: "stat"
+          targets:
+            - expr: "avg(lead_threat_score_calculation_duration_seconds)"
+
+        - title: "Cache Hit Rate"
+          type: "stat"
+          targets:
+            - expr: "rate(lead_threat_score_cache_hits_total[5m]) / (rate(lead_threat_score_cache_hits_total[5m]) + rate(lead_threat_score_cache_misses_total[5m])) * 100"
+
+        - title: "Error Rate"
+          type: "stat"
+          targets:
+            - expr: "rate(lead_threat_score_errors_total[5m]) / rate(lead_threat_score_calculations_total[5m]) * 100"
+
+        - title: "Threat Level Distribution"
+          type: "pie"
+          targets:
+            - expr: "sum by (threat_level) (lead_threat_scores_by_level)"
+
+        - title: "API Response Times"
+          type: "heatmap"
+          targets:
+            - expr: "rate(lead_threat_score_calculation_duration_seconds_bucket[5m])"
+
+    - name: "Lead Threat Scoring - Performance"
+      panels:
+        - title: "P95 Response Time"
+          type: "graph"
+          targets:
+            - expr: "histogram_quantile(0.95, rate(lead_threat_score_calculation_duration_seconds_bucket[5m]))"
+
+        - title: "Database Operation Times"
+          type: "graph"
+          targets:
+            - expr: "rate(lead_threat_score_database_operations_duration_seconds_bucket[5m])"
+
+        - title: "Batch Processing Performance"
+          type: "graph"
+          targets:
+            - expr: "rate(lead_threat_score_batch_size_bucket[5m])"
+
+# Alerting Rules
+alerting:
+  rules:
+    # Critical Alerts
+    - alert: LeadThreatScoringDown
+      expr: up{job="lead-threat-scoring"} == 0
+      for: 1m
+      severity: critical
+      annotations:
+        summary: "Lead Threat Scoring service is down"
+        description: "The Lead Threat Scoring service has been down for more than 1 minute"
+      actions:
+        - pagerduty
+        - slack_critical
+
+    - alert: HighErrorRate
+      expr: rate(lead_threat_score_errors_total[5m]) / rate(lead_threat_score_calculations_total[5m]) > 0.05
+      for: 2m
+      severity: critical
+      annotations:
+        summary: "High error rate in lead threat scoring"
+        description: "Error rate is {{ $value | humanizePercentage }} over the last 5 minutes"
+      actions:
+        - pagerduty
+        - slack_critical
+
+    - alert: SlowResponseTime
+      expr: histogram_quantile(0.95, rate(lead_threat_score_calculation_duration_seconds_bucket[5m])) > 5
+      for: 3m
+      severity: critical
+      annotations:
+        summary: "Lead threat scoring response time is too slow"
+        description: "95th percentile response time is {{ $value }}s"
+      actions:
+        - pagerduty
+        - slack_critical
+
+    # Warning Alerts
+    - alert: ModerateErrorRate
+      expr: rate(lead_threat_score_errors_total[5m]) / rate(lead_threat_score_calculations_total[5m]) > 0.01
+      for: 5m
+      severity: warning
+      annotations:
+        summary: "Moderate error rate in lead threat scoring"
+        description: "Error rate is {{ $value | humanizePercentage }} over the last 5 minutes"
+      actions:
+        - slack_warning
+
+    - alert: LowCacheHitRate
+      expr: rate(lead_threat_score_cache_hits_total[5m]) / (rate(lead_threat_score_cache_hits_total[5m]) + rate(lead_threat_score_cache_misses_total[5m])) < 0.7
+      for: 10m
+      severity: warning
+      annotations:
+        summary: "Low cache hit rate for lead threat scoring"
+        description: "Cache hit rate is {{ $value | humanizePercentage }}"
+      actions:
+        - slack_warning
+
+    - alert: HighDatabaseLatency
+      expr: histogram_quantile(0.95, rate(lead_threat_score_database_operations_duration_seconds_bucket[5m])) > 1
+      for: 5m
+      severity: warning
+      annotations:
+        summary: "High database latency for lead threat scoring"
+        description: "95th percentile database operation time is {{ $value }}s"
+      actions:
+        - slack_warning
+
+    # Business Logic Alerts
+    - alert: UnusualThreatScoreDistribution
+      expr: |
+        (
+          sum by (organization_id) (lead_threat_scores_by_level{threat_level="critical"}) /
+          sum by (organization_id) (lead_threat_scores_by_level)
+        ) > 0.2
+      for: 15m
+      severity: info
+      annotations:
+        summary: "Unusual threat score distribution detected"
+        description: "Organization {{ $labels.organization_id }} has {{ $value | humanizePercentage }} critical threat leads"
+      actions:
+        - slack_info
+
+    - alert: NoRecentCalculations
+      expr: increase(lead_threat_score_calculations_total[1h]) == 0
+      for: 1h
+      severity: warning
+      annotations:
+        summary: "No lead threat score calculations in the last hour"
+        description: "No threat score calculations have been performed for organization {{ $labels.organization_id }}"
+      actions:
+        - slack_warning
+
+# Health Checks
+health_checks:
+  endpoints:
+    - name: "API Health"
+      url: "/lead-threat-scoring/health"
+      method: GET
+      expected_status: 200
+      timeout: 5s
+      interval: 30s
+
+    - name: "Database Connectivity"
+      url: "/lead-threat-scoring/health/database"
+      method: GET
+      expected_status: 200
+      timeout: 10s
+      interval: 60s
+
+    - name: "Cache Connectivity"
+      url: "/lead-threat-scoring/health/cache"
+      method: GET
+      expected_status: 200
+      timeout: 5s
+      interval: 60s
+
+# Log Monitoring
+logging:
+  patterns:
+    - name: "Error Patterns"
+      pattern: "ERROR.*lead.*threat.*scoring"
+      severity: error
+      action: alert
+
+    - name: "Performance Warnings"
+      pattern: "WARN.*calculation.*took.*[5-9][0-9]{3}ms"
+      severity: warning
+      action: log
+
+    - name: "Database Errors"
+      pattern: "ERROR.*database.*connection"
+      severity: critical
+      action: alert
+
+  structured_logs:
+    required_fields:
+      - timestamp
+      - level
+      - organization_id
+      - lead_id
+      - calculation_duration_ms
+      - threat_score
+      - threat_level
+
+# SLA Monitoring
+sla:
+  targets:
+    - name: "API Availability"
+      target: 99.9%
+      measurement_window: "30d"
+      error_budget: 43.2m # minutes per month
+
+    - name: "Response Time P95"
+      target: "< 2s"
+      measurement_window: "24h"
+
+    - name: "Error Rate"
+      target: "< 0.1%"
+      measurement_window: "24h"
+
+# Capacity Planning
+capacity:
+  metrics:
+    - name: "Requests per Second"
+      current_capacity: 100
+      target_utilization: 70%
+      scale_up_threshold: 80%
+      scale_down_threshold: 30%
+
+    - name: "Database Connections"
+      current_capacity: 50
+      target_utilization: 60%
+      scale_up_threshold: 80%
+
+    - name: "Memory Usage"
+      current_capacity: "2GB"
+      target_utilization: 70%
+      scale_up_threshold: 85%
+
+# Notification Channels
+notifications:
+  slack:
+    critical:
+      webhook_url: "${SLACK_CRITICAL_WEBHOOK}"
+      channel: "#alerts-critical"
+      username: "Threat Scoring Monitor"
+
+    warning:
+      webhook_url: "${SLACK_WARNING_WEBHOOK}"
+      channel: "#alerts-warning"
+      username: "Threat Scoring Monitor"
+
+    info:
+      webhook_url: "${SLACK_INFO_WEBHOOK}"
+      channel: "#alerts-info"
+      username: "Threat Scoring Monitor"
+
+  pagerduty:
+    integration_key: "${PAGERDUTY_INTEGRATION_KEY}"
+    severity_mapping:
+      critical: "critical"
+      warning: "warning"
+      info: "info"
+
+  email:
+    smtp_server: "${SMTP_SERVER}"
+    from: "alerts@company.com"
+    recipients:
+      critical: ["oncall@company.com", "engineering-leads@company.com"]
+      warning: ["engineering@company.com"]
+
+# Runbook Links
+runbooks:
+  - alert: "LeadThreatScoringDown"
+    url: "https://wiki.company.com/runbooks/lead-threat-scoring-down"
+
+  - alert: "HighErrorRate"
+    url: "https://wiki.company.com/runbooks/lead-threat-scoring-errors"
+
+  - alert: "SlowResponseTime"
+    url: "https://wiki.company.com/runbooks/lead-threat-scoring-performance"
+
+# Testing and Validation
+testing:
+  synthetic_tests:
+    - name: "Basic Calculation Test"
+      endpoint: "/lead-threat-scoring/calculate"
+      method: POST
+      payload: |
+        {
+          "lead_data": {
+            "id": "synthetic_test_lead",
+            "first_name": "Test",
+            "last_name": "User",
+            "email": "test@example.com",
+            "company_name": "Test Corp"
+          }
+        }
+      expected_response:
+        status: 200
+        contains: ["overall_score", "threat_level"]
+      frequency: "5m"
+
+    - name: "Batch Processing Test"
+      endpoint: "/lead-threat-scoring/batch"
+      method: POST
+      payload_template: "batch_test_payload.json"
+      expected_response:
+        status: 200
+        max_duration: "10s"
+      frequency: "15m"
+
+# Performance Baselines
+baselines:
+  response_time_p50: "200ms"
+  response_time_p95: "1s"
+  response_time_p99: "2s"
+  error_rate: "0.01%"
+  cache_hit_rate: "85%"
+  throughput: "50 rps"
