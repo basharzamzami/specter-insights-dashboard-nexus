@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -5,25 +6,15 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
-  Target,
   TrendingUp,
   AlertTriangle,
   Users,
-  DollarSign,
   Phone,
   Mail,
-  Calendar,
-  Star,
   Shield,
   Eye,
-  Clock,
-  Activity,
-  BarChart3,
-  Zap
+  BarChart3
 } from 'lucide-react';
-import { useUser } from '@clerk/clerk-react';
-import { supabase } from '@/integrations/supabase/client';
-import { useToast } from '@/hooks/use-toast';
 
 interface CompetitiveLead {
   id: number;
@@ -53,7 +44,7 @@ interface Insight {
 }
 
 export const CompetitiveSalesDashboard = () => {
-  const [competitiveLeads, setCompetitiveLeads] = useState<CompetitiveLead[]>([
+  const [competitiveLeads] = useState<CompetitiveLead[]>([
     {
       id: 1,
       company: "TechCorp",
@@ -83,7 +74,7 @@ export const CompetitiveSalesDashboard = () => {
     },
   ]);
 
-  const [competitiveThreats, setCompetitiveThreats] = useState<CompetitiveThreat[]>([
+  const [competitiveThreats] = useState<CompetitiveThreat[]>([
     {
       id: 1,
       competitor: "TechCorp",
@@ -102,7 +93,7 @@ export const CompetitiveSalesDashboard = () => {
     },
   ]);
 
-  const [insights, setInsights] = useState<Insight[]>([
+  const [insights] = useState<Insight[]>([
     {
       id: 1,
       title: "Market Shift",
@@ -119,16 +110,12 @@ export const CompetitiveSalesDashboard = () => {
     },
   ]);
 
-  const { toast } = useToast();
-  const { user } = useUser();
-  const [isLoading, setIsLoading] = useState(false);
-
   useEffect(() => {
     // Simulate fetching data from an API
-    setIsLoading(true);
-    setTimeout(() => {
-      setIsLoading(false);
+    const timer = setTimeout(() => {
+      console.log('Data loaded');
     }, 1500);
+    return () => clearTimeout(timer);
   }, []);
 
   return (
@@ -145,7 +132,7 @@ export const CompetitiveSalesDashboard = () => {
                 Track competitive leads, threats, and market insights
               </CardDescription>
             </div>
-            <Badge variant="outline">
+            <Badge>
               Updated 5m ago
             </Badge>
           </div>
@@ -206,7 +193,7 @@ export const CompetitiveSalesDashboard = () => {
                 <CardHeader className="pb-3">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-lg">{lead.company}</CardTitle>
-                    <Badge className="text-xs">
+                    <Badge>
                       ${lead.value.toLocaleString()}
                     </Badge>
                   </div>
@@ -228,7 +215,7 @@ export const CompetitiveSalesDashboard = () => {
                       <Phone className="h-4 w-4 mr-2" />
                       Call
                     </Button>
-                    <Button variant="outline" className="flex-1">
+                    <Button className="flex-1">
                       <Mail className="h-4 w-4 mr-2" />
                       Email
                     </Button>
@@ -243,7 +230,7 @@ export const CompetitiveSalesDashboard = () => {
                         <Shield className="h-4 w-4 text-blue-400" />
                         <span className="text-sm">Market Position</span>
                       </div>
-                      <Badge variant="secondary">#2</Badge>
+                      <Badge>#2</Badge>
                     </div>
                   </div>
                 </CardContent>
@@ -268,7 +255,7 @@ export const CompetitiveSalesDashboard = () => {
                     <p className="text-sm text-muted-foreground">{insight.description}</p>
                     <div className="flex items-center justify-between mt-2">
                       <span className="text-xs text-muted-foreground">Category: {insight.category}</span>
-                      <Badge variant="secondary">Relevance: {insight.relevance}%</Badge>
+                      <Badge>Relevance: {insight.relevance}%</Badge>
                     </div>
                   </li>
                 ))}

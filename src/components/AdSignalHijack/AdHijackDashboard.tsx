@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -270,7 +271,7 @@ export const AdHijackDashboard = () => {
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg">{signal.keyword}</CardTitle>
-                      <Badge variant="secondary">
+                      <Badge>
                         {signal.trend > 0 ? (
                           <>
                             <TrendingUp className="h-3 w-3 mr-1" />
@@ -328,7 +329,7 @@ export const AdHijackDashboard = () => {
                   <CardHeader className="pb-3">
                     <div className="flex items-center justify-between">
                       <CardTitle className="text-lg">{ad.competitor}</CardTitle>
-                      <Badge variant="outline">
+                      <Badge>
                         Last seen: {ad.lastSeen}
                       </Badge>
                     </div>

@@ -1,4 +1,5 @@
-import { useState, useEffect } from 'react';
+
+import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -8,20 +9,10 @@ import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { 
   Brain,
-  Target,
-  TrendingUp,
-  Users,
-  DollarSign,
-  MessageSquare,
   Star,
-  Phone,
-  Mail,
-  Calendar,
-  AlertTriangle,
-  CheckCircle,
-  Zap,
   BarChart3,
-  Bot
+  Bot,
+  Lightbulb
 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
@@ -47,7 +38,7 @@ export const AISalesCoach = () => {
   const [query, setQuery] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [analysisResults, setAnalysisResults] = useState('');
-  const [salesInsights, setSalesInsights] = useState<SalesInsight[]>([
+  const [salesInsights] = useState<SalesInsight[]>([
     {
       id: 1,
       type: 'Market Trend',
@@ -73,7 +64,7 @@ export const AISalesCoach = () => {
       impact: 9
     }
   ]);
-  const [salesTips, setSalesTips] = useState<SalesTip[]>([
+  const [salesTips] = useState<SalesTip[]>([
     {
       id: 1,
       tip: 'Focus on building rapport with potential clients.',
@@ -159,7 +150,7 @@ export const AISalesCoach = () => {
                     <CardTitle className="text-lg flex items-center gap-2">
                       {insight.type}
                     </CardTitle>
-                    <Badge variant="secondary">
+                    <Badge>
                       {insight.confidence}% Confidence
                     </Badge>
                   </div>

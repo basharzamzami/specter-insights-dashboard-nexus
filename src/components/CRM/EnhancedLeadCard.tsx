@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -7,15 +8,10 @@ import {
   User,
   Phone,
   Mail,
-  Calendar,
   Star,
-  TrendingUp,
-  AlertTriangle,
   Eye,
   MessageSquare,
-  Target,
-  Activity,
-  DollarSign
+  Activity
 } from 'lucide-react';
 
 interface Lead {
@@ -43,16 +39,8 @@ interface EnhancedLeadCardProps {
   onScheduleMeeting: (leadId: number) => void;
 }
 
-export const EnhancedLeadCard = ({ lead, onUpdateStage, onScheduleMeeting }: EnhancedLeadCardProps) => {
+export const EnhancedLeadCard = ({ lead }: EnhancedLeadCardProps) => {
   const [showDetails, setShowDetails] = useState(false);
-
-  const handleUpdateStage = (newStage: string) => {
-    onUpdateStage(lead.id, newStage);
-  };
-
-  const handleScheduleMeeting = () => {
-    onScheduleMeeting(lead.id);
-  };
 
   return (
     <Card className="bg-card/90 backdrop-blur-sm border hover:shadow-lg transition-all">
@@ -93,23 +81,23 @@ export const EnhancedLeadCard = ({ lead, onUpdateStage, onScheduleMeeting }: Enh
         </div>
         
         <div className="grid grid-cols-2 gap-2">
-          <Button className="text-xs">
+          <Button className="text-xs" onClick={() => console.log('Call lead')}>
             <Phone className="h-3 w-3 mr-1" />
             Call
           </Button>
-          <Button variant="outline" onClick={() => console.log('Email lead')}>
+          <Button onClick={() => console.log('Email lead')}>
             <Mail className="h-3 w-3 mr-1" />
             Email
           </Button>
-          <Button variant="outline" className="col-span-2">
-            <Calendar className="h-3 w-3 mr-1" />
+          <Button className="col-span-2">
+            <MessageSquare className="h-3 w-3 mr-1" />
             Schedule Meeting
           </Button>
-          <Button variant="outline" className="col-span-2">
+          <Button className="col-span-2">
             <Eye className="h-3 w-3 mr-1" />
             View Details
           </Button>
-          <Button variant="outline" className="col-span-2">
+          <Button className="col-span-2">
             <MessageSquare className="h-3 w-3 mr-1" />
             Add Note
           </Button>
@@ -129,7 +117,6 @@ export const EnhancedLeadCard = ({ lead, onUpdateStage, onScheduleMeeting }: Enh
         <div className="pt-3 border-t">
           <Button
             onClick={() => setShowDetails(!showDetails)}
-            variant="ghost"
             className="w-full text-sm"
           >
             {showDetails ? 'Hide' : 'Show'} Advanced Insights
