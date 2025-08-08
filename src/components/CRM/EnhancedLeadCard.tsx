@@ -1,39 +1,41 @@
+
 /**
- * 🔥 ENHANCED LEAD CARD - COMPETITIVE INTELLIGENCE INTEGRATED
+ * 🎯 ENHANCED LEAD CARD
  * 
- * Each lead card shows real-time competitive intelligence, threat scores,
- * and AI-powered insights for maximum conversion potential
+ * Advanced lead management card with competitive intelligence, behavioral analysis,
+ * and AI-powered recommendations for maximum conversion potential
  */
 
 import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { 
   User, 
   MapPin, 
-  Clock, 
-  AlertTriangle,
+  Phone, 
+  Mail, 
+  Calendar, 
+  TrendingUp, 
+  AlertTriangle, 
+  Brain, 
   Target,
   Eye,
-  Phone,
-  Mail,
-  Calendar,
-  Flame,
-  Shield,
-  Brain,
-  Zap
+  Clock,
+  DollarSign,
+  Activity
 } from 'lucide-react';
 
-interface LeadThreatScore {
-  readonly score: number; // 0-100
+interface ThreatScore {
+  readonly score: number;
   readonly factors: readonly string[];
   readonly competitorActivity: number;
   readonly localSEOMomentum: number;
   readonly urgencyLevel: 'low' | 'medium' | 'high' | 'critical';
 }
 
-interface LeadBehaviorIntel {
+interface BehaviorIntel {
   readonly lastSeen: string;
   readonly lastActivity: string;
   readonly source: string;
@@ -41,7 +43,7 @@ interface LeadBehaviorIntel {
   readonly timeOnSite: number;
   readonly emailOpens: number;
   readonly adClicks: number;
-  readonly sentimentScore: number; // 0-100
+  readonly sentimentScore: number;
   readonly intentSignals: readonly string[];
 }
 
@@ -60,19 +62,19 @@ interface PredictedValue {
   readonly conversionProbability: number;
 }
 
-interface EnhancedLead {
+interface Lead {
   readonly id: string;
   readonly name: string;
   readonly email: string;
-  readonly phone?: string;
+  readonly phone: string;
   readonly company?: string;
   readonly location: string;
   readonly zipCode: string;
-  readonly stage: 'new' | 'contacted' | 'qualified' | 'proposal' | 'negotiation' | 'closed' | 'lost';
+  readonly stage: string;
   readonly source: string;
   readonly createdAt: string;
-  readonly threatScore: LeadThreatScore;
-  readonly behaviorIntel: LeadBehaviorIntel;
+  readonly threatScore: ThreatScore;
+  readonly behaviorIntel: BehaviorIntel;
   readonly competitorContext: CompetitorContext;
   readonly predictedValue: PredictedValue;
   readonly nextAction: string;
@@ -80,23 +82,14 @@ interface EnhancedLead {
 }
 
 interface EnhancedLeadCardProps {
-  readonly lead: EnhancedLead;
+  readonly lead: Lead;
   readonly onUpdateStage: (leadId: string, stage: string) => void;
   readonly onScheduleFollowUp: (leadId: string) => void;
   readonly onViewFullIntel: (leadId: string) => void;
 }
 
-export function EnhancedLeadCard({ lead, onScheduleFollowUp, onViewFullIntel }: EnhancedLeadCardProps) {
+export function EnhancedLeadCard({ lead, onUpdateStage, onScheduleFollowUp, onViewFullIntel }: EnhancedLeadCardProps) {
   const [expanded, setExpanded] = useState(false);
-
-  const getThreatColor = (urgency: string) => {
-    switch (urgency) {
-      case 'critical': return 'text-red-600 bg-red-100 border-red-200';
-      case 'high': return 'text-orange-600 bg-orange-100 border-orange-200';
-      case 'medium': return 'text-yellow-600 bg-yellow-100 border-yellow-200';
-      default: return 'text-green-600 bg-green-100 border-green-200';
-    }
-  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -107,184 +100,237 @@ export function EnhancedLeadCard({ lead, onScheduleFollowUp, onViewFullIntel }: 
     }
   };
 
+  const getThreatColor = (level: string) => {
+    switch (level) {
+      case 'critical': return 'text-red-600';
+      case 'high': return 'text-orange-600';
+      case 'medium': return 'text-yellow-600';
+      default: return 'text-green-600';
+    }
+  };
+
+  const formatTimeAgo = (timestamp: string) => {
+    const date = new Date(timestamp);
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 1) return 'Less than 1 hour ago';
+    if (diffInHours < 24) return `${diffInHours} hours ago`;
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `${diffInDays} days ago`;
+  };
+
   return (
-    <Card className={`relative overflow-hidden transition-all duration-200 hover:shadow-lg ${
-      lead.priority === 'urgent' ? 'border-2 border-red-500 shadow-red-100' : ''
-    }`}>
-      {/* Priority Indicator */}
-      <div className={`absolute top-0 left-0 w-1 h-full ${getPriorityColor(lead.priority)}`}></div>
-      
+    <Card className={`hover:shadow-lg transition-all duration-300 border-l-4 ${getPriorityColor(lead.priority)}`}>
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between">
-          <div className="flex-1">
-            <CardTitle className="flex items-center gap-2 text-lg">
+          <div>
+            <CardTitle className="flex items-center gap-2">
               <User className="h-5 w-5" />
               {lead.name}
-              {lead.priority === 'urgent' && <Flame className="h-4 w-4 text-red-500 animate-pulse" />}
+              {lead.company && <span className="text-sm font-normal text-muted-foreground">• {lead.company}</span>}
             </CardTitle>
-            <CardDescription className="flex items-center gap-4 mt-1">
-              <span className="flex items-center gap-1">
-                <MapPin className="h-3 w-3" />
-                {lead.location} ({lead.zipCode})
-              </span>
-              <span className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                {new Date(lead.createdAt).toLocaleDateString()}
-              </span>
+            <CardDescription className="mt-1">
+              <div className="flex items-center gap-4 text-sm">
+                <span className="flex items-center gap-1">
+                  <MapPin className="h-3 w-3" />
+                  {lead.location}
+                </span>
+                <span className="flex items-center gap-1">
+                  <Calendar className="h-3 w-3" />
+                  {formatTimeAgo(lead.createdAt)}
+                </span>
+              </div>
             </CardDescription>
           </div>
-          <div className="flex flex-col items-end gap-2">
-            <Badge variant="outline">
-              {lead.stage.charAt(0).toUpperCase() + lead.stage.slice(1)}
+          <div className="flex items-center gap-2">
+            <Badge className="bg-blue-100 text-blue-800">{lead.stage.toUpperCase()}</Badge>
+            <Badge className={`${getThreatColor(lead.threatScore.urgencyLevel)} bg-opacity-10`}>
+              THREAT: {lead.threatScore.score}%
             </Badge>
-            <div className="text-right">
-              <div className="text-lg font-bold text-green-600">
-                ${(lead.predictedValue.estimatedValue / 1000).toFixed(1)}K
-              </div>
-              <div className="text-xs text-muted-foreground">
-                {lead.predictedValue.confidence}% confidence
-              </div>
-            </div>
           </div>
         </div>
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {/* Threat Score Alert */}
-        <div className={`p-3 rounded-lg border ${getThreatColor(lead.threatScore.urgencyLevel)}`}>
-          <div className="flex items-center justify-between mb-2">
-            <div className="flex items-center gap-2">
-              <AlertTriangle className="h-4 w-4" />
-              <span className="font-medium text-sm">Threat Level: {lead.threatScore.urgencyLevel.toUpperCase()}</span>
+        {/* Quick Stats Row */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="text-center">
+            <div className="text-lg font-bold text-green-600">
+              ${lead.predictedValue.estimatedValue.toLocaleString()}
             </div>
-            <Badge variant="outline">{lead.threatScore.score}/100</Badge>
+            <div className="text-xs text-muted-foreground">Est. Value</div>
           </div>
-          <div className="text-xs">
-            {lead.threatScore.competitorActivity} competitors active • {lead.threatScore.localSEOMomentum}% SEO momentum
+          <div className="text-center">
+            <div className="text-lg font-bold text-blue-600">
+              {lead.predictedValue.conversionProbability}%
+            </div>
+            <div className="text-xs text-muted-foreground">Conversion</div>
           </div>
-        </div>
-
-        {/* Last Seen Intelligence */}
-        <div className="flex items-center justify-between p-2 bg-blue-50 rounded-lg">
-          <div className="flex items-center gap-2">
-            <Eye className="h-4 w-4 text-blue-600" />
-            <span className="text-sm font-medium">Last Seen</span>
+          <div className="text-center">
+            <div className="text-lg font-bold text-purple-600">
+              {lead.behaviorIntel.sentimentScore}%
+            </div>
+            <div className="text-xs text-muted-foreground">Intent</div>
           </div>
-          <div className="text-right">
-            <div className="text-sm font-medium">{lead.behaviorIntel.lastActivity}</div>
-            <div className="text-xs text-muted-foreground">{lead.behaviorIntel.lastSeen}</div>
-          </div>
-        </div>
-
-        {/* Behavior Metrics */}
-        <div className="grid grid-cols-3 gap-3 text-center">
-          <div className="p-2 bg-gray-50 rounded">
-            <div className="text-lg font-bold">{lead.behaviorIntel.emailOpens}</div>
-            <div className="text-xs text-muted-foreground">Email Opens</div>
-          </div>
-          <div className="p-2 bg-gray-50 rounded">
-            <div className="text-lg font-bold">{Math.round(lead.behaviorIntel.timeOnSite / 60)}m</div>
-            <div className="text-xs text-muted-foreground">Time on Site</div>
-          </div>
-          <div className="p-2 bg-gray-50 rounded">
-            <div className="text-lg font-bold">{lead.behaviorIntel.sentimentScore}%</div>
-            <div className="text-xs text-muted-foreground">Intent Score</div>
+          <div className="text-center">
+            <div className="text-lg font-bold text-orange-600">
+              {lead.competitorContext.nearbyCompetitors}
+            </div>
+            <div className="text-xs text-muted-foreground">Competitors</div>
           </div>
         </div>
 
-        {/* Competitive Context */}
-        <div className="p-3 bg-orange-50 rounded-lg border border-orange-200">
+        {/* Threat Assessment */}
+        <div className="bg-gradient-to-r from-red-50 to-orange-50 p-3 rounded-lg border border-red-100">
           <div className="flex items-center gap-2 mb-2">
-            <Target className="h-4 w-4 text-orange-600" />
-            <span className="font-medium text-sm text-orange-800">Market Context</span>
+            <AlertTriangle className="h-4 w-4 text-red-600" />
+            <span className="font-medium text-red-900">Competitive Threat Analysis</span>
           </div>
-          <div className="text-xs text-orange-700">
-            {lead.competitorContext.nearbyCompetitors} competitors in area • 
-            Avg price: ${lead.competitorContext.averageServicePrice} • 
-            {lead.competitorContext.marketSaturation}% market saturation
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <span className="text-sm">Threat Score</span>
+              <span className="font-bold text-red-600">{lead.threatScore.score}%</span>
+            </div>
+            <Progress value={lead.threatScore.score} className="h-2" />
+            <div className="text-xs text-red-700">
+              <strong>Key Factors:</strong> {lead.threatScore.factors.slice(0, 2).join(', ')}
+              {lead.threatScore.factors.length > 2 && '...'}
+            </div>
           </div>
-        </div>
-
-        {/* AI Recommended Action */}
-        <div className="p-3 bg-purple-50 rounded-lg border border-purple-200">
-          <div className="flex items-center gap-2 mb-2">
-            <Brain className="h-4 w-4 text-purple-600" />
-            <span className="font-medium text-sm text-purple-800">AI Recommendation</span>
-          </div>
-          <div className="text-sm text-purple-700">{lead.nextAction}</div>
         </div>
 
         {/* Action Buttons */}
-        <div className="flex gap-2">
-          <Button size="sm" className="flex-1" onClick={() => onScheduleFollowUp(lead.id)}>
-            <Calendar className="h-4 w-4 mr-1" />
-            Follow Up
-          </Button>
-          <Button size="sm" variant="outline" onClick={() => onViewFullIntel(lead.id)}>
-            <Shield className="h-4 w-4 mr-1" />
-            Full Intel
-          </Button>
-        </div>
-
-        {/* Contact Actions */}
-        <div className="flex gap-2">
-          <Button size="sm" variant="outline" className="flex-1">
+        <div className="flex flex-wrap gap-2">
+          <Button onClick={() => window.location.href = `tel:${lead.phone}`} className="bg-green-600 hover:bg-green-700">
             <Phone className="h-4 w-4 mr-1" />
-            Call
+            Call Now
           </Button>
-          <Button size="sm" variant="outline" className="flex-1">
+          <Button onClick={() => onScheduleFollowUp(lead.id)} className="bg-blue-600 hover:bg-blue-700">
+            <Calendar className="h-4 w-4 mr-1" />
+            Schedule
+          </Button>
+          <Button 
+            onClick={() => setExpanded(!expanded)} 
+            className="bg-purple-600 hover:bg-purple-700"
+          >
+            <Brain className="h-4 w-4 mr-1" />
+            {expanded ? 'Hide' : 'Show'} Intel
+          </Button>
+          <Button 
+            onClick={() => onViewFullIntel(lead.id)} 
+            className="bg-gray-600 hover:bg-gray-700"
+          >
+            <Eye className="h-4 w-4 mr-1" />
+            Full Report
+          </Button>
+          <Button 
+            onClick={() => window.location.href = `mailto:${lead.email}`} 
+            className="bg-indigo-600 hover:bg-indigo-700"
+          >
             <Mail className="h-4 w-4 mr-1" />
             Email
           </Button>
-          <Button size="sm" variant="outline" className="flex-1">
-            <Zap className="h-4 w-4 mr-1" />
-            Auto-Sequence
-          </Button>
         </div>
 
-        {/* Expandable Details */}
+        {/* Expanded Intelligence */}
         {expanded && (
-          <div className="space-y-3 pt-3 border-t">
+          <div className="space-y-4 border-t pt-4">
+            {/* Behavioral Intelligence */}
             <div>
-              <div className="text-sm font-medium mb-1">Intent Signals</div>
-              <div className="flex flex-wrap gap-1">
-                {lead.behaviorIntel.intentSignals.map((signal, idx) => (
-                  <Badge key={idx} variant="outline" className="text-xs">
-                    {signal}
-                  </Badge>
-                ))}
+              <h4 className="font-medium flex items-center gap-2 mb-2">
+                <Activity className="h-4 w-4 text-blue-600" />
+                Behavioral Intelligence
+              </h4>
+              <div className="bg-blue-50 p-3 rounded-lg space-y-2">
+                <div className="grid md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <strong>Last Activity:</strong> {lead.behaviorIntel.lastActivity}
+                  </div>
+                  <div>
+                    <strong>Source:</strong> {lead.behaviorIntel.source}
+                  </div>
+                  <div>
+                    <strong>Time on Site:</strong> {Math.floor(lead.behaviorIntel.timeOnSite / 60)}m {lead.behaviorIntel.timeOnSite % 60}s
+                  </div>
+                  <div>
+                    <strong>Email Opens:</strong> {lead.behaviorIntel.emailOpens}
+                  </div>
+                </div>
+                <div>
+                  <strong className="text-sm">Intent Signals:</strong>
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {lead.behaviorIntel.intentSignals.map((signal, idx) => (
+                      <Badge key={idx} className="bg-blue-100 text-blue-800 text-xs">{signal}</Badge>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
-            
-            <div>
-              <div className="text-sm font-medium mb-1">Recent Competitor Activity</div>
-              <ul className="text-xs text-muted-foreground space-y-1">
-                {lead.competitorContext.recentCompetitorActivity.map((activity, idx) => (
-                  <li key={idx}>• {activity}</li>
-                ))}
-              </ul>
+
+            {/* Next Action */}
+            <div className="bg-green-50 p-3 rounded-lg border border-green-200">
+              <div className="flex items-center gap-2 mb-1">
+                <Target className="h-4 w-4 text-green-600" />
+                <span className="font-medium text-green-900">Recommended Next Action</span>
+              </div>
+              <div className="text-sm text-green-800">{lead.nextAction}</div>
             </div>
 
+            {/* Competitive Context */}
             <div>
-              <div className="text-sm font-medium mb-1">Value Prediction Factors</div>
-              <ul className="text-xs text-muted-foreground space-y-1">
-                {lead.predictedValue.basedOnFactors.map((factor, idx) => (
-                  <li key={idx}>• {factor}</li>
-                ))}
-              </ul>
+              <h4 className="font-medium flex items-center gap-2 mb-2">
+                <TrendingUp className="h-4 w-4 text-orange-600" />
+                Market Context
+              </h4>
+              <div className="bg-orange-50 p-3 rounded-lg">
+                <div className="grid md:grid-cols-2 gap-4 text-sm mb-2">
+                  <div>
+                    <strong>Market Saturation:</strong> {lead.competitorContext.marketSaturation}%
+                  </div>
+                  <div>
+                    <strong>Avg. Service Price:</strong> ${lead.competitorContext.averageServicePrice}
+                  </div>
+                </div>
+                {lead.competitorContext.recentCompetitorActivity.length > 0 && (
+                  <div>
+                    <strong className="text-sm">Recent Activity:</strong>
+                    <ul className="text-xs mt-1 space-y-1">
+                      {lead.competitorContext.recentCompetitorActivity.slice(0, 2).map((activity, idx) => (
+                        <li key={idx} className="flex items-center gap-1">
+                          <div className="w-1 h-1 bg-orange-400 rounded-full"></div>
+                          {activity}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Value Prediction */}
+            <div>
+              <h4 className="font-medium flex items-center gap-2 mb-2">
+                <DollarSign className="h-4 w-4 text-green-600" />
+                Value Prediction
+              </h4>
+              <div className="bg-green-50 p-3 rounded-lg">
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm">Confidence Level</span>
+                  <span className="font-bold text-green-600">{lead.predictedValue.confidence}%</span>
+                </div>
+                <Progress value={lead.predictedValue.confidence} className="h-2 mb-2" />
+                <div className="text-xs text-green-700">
+                  <strong>Based on:</strong> {lead.predictedValue.basedOnFactors.slice(0, 2).join(', ')}
+                  {lead.predictedValue.basedOnFactors.length > 2 && '...'}
+                </div>
+              </div>
             </div>
           </div>
         )}
-
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          className="w-full"
-          onClick={() => setExpanded(!expanded)}
-        >
-          {expanded ? 'Show Less' : 'Show More Intelligence'}
-        </Button>
       </CardContent>
     </Card>
   );
 }
+
+export default EnhancedLeadCard;

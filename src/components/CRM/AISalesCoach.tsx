@@ -1,215 +1,219 @@
+
 /**
- * 🧠 AI SALES COACH SYSTEM
+ * 🧠 AI SALES COACH
  * 
- * Real-time AI coaching that analyzes calls, suggests responses,
- * and provides competitive intelligence during sales conversations
+ * Intelligent sales coaching system that provides real-time guidance,
+ * competitive insights, and performance optimization recommendations
  */
 
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Textarea } from "@/components/ui/textarea";
 import { Progress } from "@/components/ui/progress";
+import { useToast } from "@/hooks/use-toast";
 import { 
-  Brain, 
-  Mic, 
+  Brain,
+  TrendingUp,
+  Target,
+  Lightbulb,
+  MessageSquare,
+  Trophy,
+  AlertCircle,
   CheckCircle,
-  Phone,
-  FileText,
-  Zap,
-  TrendingUp
+  Clock,
+  Zap
 } from 'lucide-react';
 
-interface CallAnalysis {
+interface CoachingInsight {
   readonly id: string;
-  readonly leadName: string;
-  readonly duration: number; // seconds
-  readonly sentiment: 'positive' | 'neutral' | 'negative';
-  readonly keyTopics: readonly string[];
-  readonly objections: readonly string[];
-  readonly buyingSignals: readonly string[];
-  readonly competitorMentions: readonly string[];
-  readonly nextSteps: readonly string[];
-  readonly coachingTips: readonly string[];
-  readonly dealProbability: number; // 0-100
-}
-
-interface RealTimeCoaching {
-  readonly id: string;
-  readonly trigger: string;
-  readonly suggestion: string;
-  readonly type: 'objection_handler' | 'closing_technique' | 'competitive_response' | 'value_prop';
+  readonly type: 'performance' | 'competitive' | 'opportunity' | 'warning';
+  readonly title: string;
+  readonly description: string;
+  readonly actionItems: readonly string[];
+  readonly impact: 'low' | 'medium' | 'high';
   readonly urgency: 'low' | 'medium' | 'high';
   readonly confidence: number;
 }
 
-interface SalesPlaybook {
-  readonly id: string;
-  readonly scenario: string;
-  readonly title: string;
-  readonly description: string;
-  readonly talkingPoints: readonly string[];
-  readonly objectionHandlers: readonly { objection: string; response: string }[];
-  readonly competitiveAdvantages: readonly string[];
-  readonly closingTechniques: readonly string[];
+interface PerformanceMetrics {
+  readonly callsToday: number;
+  readonly conversationQuality: number;
+  readonly objectionHandling: number;
+  readonly closingEffectiveness: number;
+  readonly competitivePositioning: number;
+  readonly overallScore: number;
 }
 
-interface PerformanceInsight {
-  readonly metric: string;
-  readonly current: number;
-  readonly target: number;
-  readonly trend: 'up' | 'down' | 'stable';
-  readonly insight: string;
-  readonly actionable: string;
+interface SalesContext {
+  readonly leadName: string;
+  readonly company: string;
+  readonly stage: string;
+  readonly value: number;
+  readonly competitorThreats: readonly string[];
+  readonly lastInteraction: string;
 }
 
 interface AISalesCoachProps {
   readonly userId: string;
-  readonly leadId?: string;
+  readonly currentLead?: SalesContext;
 }
 
-export function AISalesCoach({ userId, leadId }: AISalesCoachProps) {
-  const [coachData, setCoachData] = useState<{
-    recentCalls: readonly CallAnalysis[];
-    realTimeCoaching: readonly RealTimeCoaching[];
-    playbooks: readonly SalesPlaybook[];
-    insights: readonly PerformanceInsight[];
-  } | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<'coaching' | 'analysis' | 'playbooks' | 'insights'>('coaching');
-  const [isListening, setIsListening] = useState(false);
+export function AISalesCoach({ userId, currentLead }: AISalesCoachProps) {
+  const [insights, setInsights] = useState<readonly CoachingInsight[]>([]);
+  const [metrics, setMetrics] = useState<PerformanceMetrics | null>(null);
+  const [question, setQuestion] = useState('');
+  const [chatHistory, setChatHistory] = useState<Array<{type: 'user' | 'coach', message: string}>>([]);
+  const [loading, setLoading] = useState(false);
+  const { toast } = useToast();
 
   useEffect(() => {
-    loadCoachData();
-  }, [userId, leadId]);
+    loadCoachingData();
+  }, [userId, currentLead]);
 
-  const loadCoachData = async () => {
+  const loadCoachingData = async () => {
     try {
       setLoading(true);
       
-      const mockData = {
-        recentCalls: [
-          {
-            id: 'call_1',
-            leadName: 'Sarah Johnson',
-            duration: 1247, // ~20 minutes
-            sentiment: 'positive' as const,
-            keyTopics: ['Pricing', 'Timeline', 'Service guarantees', 'Emergency availability'],
-            objections: ['Price seems high', 'Need to check with spouse'],
-            buyingSignals: ['Asked about scheduling', 'Mentioned urgency', 'Discussed payment options'],
-            competitorMentions: ['Metro Plumbing Pro', 'Quick Fix Solutions'],
-            nextSteps: ['Send detailed quote', 'Schedule follow-up in 2 days', 'Provide references'],
-            coachingTips: [
-              'Great job addressing price objection with value proposition',
-              'Consider mentioning 24/7 guarantee earlier in future calls',
-              'Follow up on spouse decision timeline'
-            ],
-            dealProbability: 78
-          }
-        ] as readonly CallAnalysis[],
-        realTimeCoaching: [
-          {
-            id: 'coach_1',
-            trigger: 'Lead mentioned competitor pricing',
-            suggestion: 'Emphasize your 24/7 guarantee and licensed technician advantage. Say: "While price is important, what matters most when you have a plumbing emergency at 2 AM is having licensed professionals who answer the phone and arrive within 30 minutes."',
-            type: 'competitive_response' as const,
-            urgency: 'high' as const,
-            confidence: 92
-          },
-          {
-            id: 'coach_2',
-            trigger: 'Lead asked about timeline',
-            suggestion: 'This is a buying signal! Ask: "How soon would you like to get this resolved?" Then offer immediate scheduling options.',
-            type: 'closing_technique' as const,
-            urgency: 'medium' as const,
-            confidence: 87
-          }
-        ] as readonly RealTimeCoaching[],
-        playbooks: [
-          {
-            id: 'playbook_1',
-            scenario: 'Emergency Plumbing Call',
-            title: 'Emergency Response Playbook',
-            description: 'Handle urgent plumbing emergencies with confidence and speed',
-            talkingPoints: [
-              'Acknowledge urgency immediately',
-              'Confirm licensed and insured status',
-              'Provide realistic arrival time',
-              'Explain emergency pricing upfront',
-              'Offer temporary solutions while en route'
-            ],
-            objectionHandlers: [
-              {
-                objection: 'Your emergency rate is too high',
-                response: 'I understand cost is a concern. Our emergency rate reflects the fact that we have licensed technicians available 24/7, fully stocked trucks, and we guarantee to fix it right the first time. What would it cost you if this problem gets worse overnight?'
-              }
-            ],
-            competitiveAdvantages: [
-              '24/7 licensed technician availability',
-              'Fully stocked emergency vehicles',
-              'No overtime charges',
-              'Same-day service guarantee'
-            ],
-            closingTechniques: [
-              'Urgency close: "I can have a technician there in 30 minutes"',
-              'Risk close: "The longer we wait, the more damage and cost"',
-              'Guarantee close: "We guarantee to fix it right or you don\'t pay"'
-            ]
-          }
-        ] as readonly SalesPlaybook[],
-        insights: [
-          {
-            metric: 'Call-to-Close Rate',
-            current: 34.2,
-            target: 40.0,
-            trend: 'up' as const,
-            insight: 'Your close rate improved 8% this month, mainly due to better objection handling',
-            actionable: 'Focus on asking for the sale earlier in conversations - you\'re building great rapport but waiting too long to close'
-          },
-          {
-            metric: 'Average Deal Value',
-            current: 4500,
-            target: 5000,
-            trend: 'stable' as const,
-            insight: 'Deal values are consistent but could be higher with better upselling',
-            actionable: 'When quoting basic service, always mention premium options and extended warranties'
-          }
-        ] as readonly PerformanceInsight[]
+      // Mock coaching data
+      const mockInsights: readonly CoachingInsight[] = [
+        {
+          id: 'insight_1',
+          type: 'competitive',
+          title: 'Competitor Threat Detected',
+          description: 'Your lead Sarah Johnson has been engaging with QuickFix Plumbing. Their 24/7 guarantee is a strong differentiator.',
+          actionItems: [
+            'Emphasize your same-day response guarantee',
+            'Mention your superior review ratings (4.8 vs their 4.2)',
+            'Offer price matching with additional value-adds'
+          ],
+          impact: 'high',
+          urgency: 'high',
+          confidence: 87
+        },
+        {
+          id: 'insight_2',
+          type: 'opportunity',
+          title: 'Perfect Timing Window',
+          description: 'Based on weather patterns and seasonal trends, emergency plumbing requests spike 40% in the next 3 days.',
+          actionItems: [
+            'Increase follow-up frequency on warm leads',
+            'Prepare emergency service messaging',
+            'Ensure technician availability for rush calls'
+          ],
+          impact: 'high',
+          urgency: 'medium',
+          confidence: 92
+        },
+        {
+          id: 'insight_3',
+          type: 'performance',
+          title: 'Objection Handling Improvement',
+          description: 'Your price objection responses could be stronger. Success rate drops 23% when price is mentioned first.',
+          actionItems: [
+            'Lead with value proposition before pricing',
+            'Use social proof to justify pricing',
+            'Offer flexible payment options upfront'
+          ],
+          impact: 'medium',
+          urgency: 'low',
+          confidence: 78
+        }
+      ];
+
+      const mockMetrics: PerformanceMetrics = {
+        callsToday: 12,
+        conversationQuality: 84,
+        objectionHandling: 72,
+        closingEffectiveness: 89,
+        competitivePositioning: 76,
+        overallScore: 80
       };
 
-      setCoachData(mockData);
+      setInsights(mockInsights);
+      setMetrics(mockMetrics);
+      
     } catch (error) {
-      console.error('Failed to load coach data:', error);
+      console.error('Failed to load coaching data:', error);
     } finally {
       setLoading(false);
     }
   };
 
-  const startListening = () => {
-    setIsListening(true);
-    // Implement real-time call listening
-    console.log('Starting real-time call coaching...');
+  const askCoach = async () => {
+    if (!question.trim()) {
+      toast({
+        title: "Question Required",
+        description: "Please enter a question for your AI coach",
+      });
+      return;
+    }
+
+    const userMessage = question;
+    setQuestion('');
+    
+    // Add user message to chat
+    setChatHistory(prev => [...prev, { type: 'user', message: userMessage }]);
+    
+    try {
+      // Mock AI response
+      await new Promise(resolve => setTimeout(resolve, 1500));
+      
+      const mockResponse = generateCoachResponse(userMessage);
+      setChatHistory(prev => [...prev, { type: 'coach', message: mockResponse }]);
+      
+    } catch (error) {
+      console.error('Failed to get coach response:', error);
+      toast({
+        title: "Error",
+        description: "Failed to get response from AI coach",
+        variant: "destructive"
+      });
+    }
   };
 
-  const stopListening = () => {
-    setIsListening(false);
-    console.log('Stopping real-time call coaching...');
+  const generateCoachResponse = (userQuestion: string): string => {
+    const question = userQuestion.toLowerCase();
+    
+    if (question.includes('price') || question.includes('cost')) {
+      return "Great question about pricing! Here's my recommendation: Start by establishing value first. Say something like 'Before we discuss investment, let me understand your situation better.' Then highlight your unique value props - faster response time, better reviews, or additional guarantees. When you do mention price, always frame it as an investment in their peace of mind.";
+    }
+    
+    if (question.includes('competitor') || question.includes('competition')) {
+      return "When handling competitor objections, never badmouth them directly. Instead, focus on your differentiators. For example: 'I respect that company - they do good work. Here's what makes us unique...' Then emphasize your strengths like response time, guarantees, or customer service. Always redirect to value you provide.";
+    }
+    
+    if (question.includes('objection')) {
+      return "Objection handling is about listening first, then reframing. Use the 'Feel, Felt, Found' technique: 'I understand how you feel. Other customers have felt the same way. Here's what they found...' This validates their concern while introducing new information to overcome it.";
+    }
+    
+    return "That's a thoughtful question. Based on your recent performance data and the specific context of your current leads, I recommend focusing on building stronger rapport early in the conversation. This increases trust and makes later objection handling much easier. Would you like specific techniques for your current lead situation?";
   };
 
-  const getSentimentColor = (sentiment: string) => {
-    switch (sentiment) {
-      case 'positive': return 'text-green-600 bg-green-100';
-      case 'negative': return 'text-red-600 bg-red-100';
-      default: return 'text-yellow-600 bg-yellow-100';
+  const getInsightIcon = (type: string) => {
+    switch (type) {
+      case 'competitive': return <Target className="h-5 w-5 text-red-600" />;
+      case 'opportunity': return <Lightbulb className="h-5 w-5 text-yellow-600" />;
+      case 'performance': return <TrendingUp className="h-5 w-5 text-blue-600" />;
+      case 'warning': return <AlertCircle className="h-5 w-5 text-orange-600" />;
+      default: return <Brain className="h-5 w-5 text-purple-600" />;
+    }
+  };
+
+  const getImpactColor = (impact: string) => {
+    switch (impact) {
+      case 'high': return 'bg-red-100 text-red-800';
+      case 'medium': return 'bg-yellow-100 text-yellow-800';
+      default: return 'bg-green-100 text-green-800';
     }
   };
 
   const getUrgencyColor = (urgency: string) => {
     switch (urgency) {
-      case 'high': return 'border-red-500 bg-red-50';
-      case 'medium': return 'border-orange-500 bg-orange-50';
-      default: return 'border-blue-500 bg-blue-50';
+      case 'high': return 'bg-red-100 text-red-800';
+      case 'medium': return 'bg-yellow-100 text-yellow-800';
+      default: return 'bg-green-100 text-green-800';
     }
   };
 
@@ -218,291 +222,228 @@ export function AISalesCoach({ userId, leadId }: AISalesCoachProps) {
       <div className="flex items-center justify-center h-96">
         <div className="text-center">
           <Brain className="h-8 w-8 animate-pulse mx-auto mb-4" />
-          <p>Loading AI sales coach...</p>
+          <p>Loading AI coaching insights...</p>
         </div>
       </div>
     );
   }
 
-  if (!coachData) {
-    return (
-      <Card>
-        <CardContent className="p-6">
-          <p className="text-center text-muted-foreground">Failed to load coaching data</p>
-        </CardContent>
-      </Card>
-    );
-  }
-
   return (
     <div className="space-y-6">
-      {/* Header with Real-Time Controls */}
+      {/* Header */}
       <Card className="border-purple-200 bg-gradient-to-r from-purple-50 to-blue-50">
         <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <Brain className="h-6 w-6 text-purple-600" />
-                AI Sales Coach
-              </CardTitle>
-              <CardDescription>
-                Real-time coaching and performance optimization
-              </CardDescription>
-            </div>
-            <div className="flex items-center gap-2">
-              {isListening ? (
-                <Button onClick={stopListening} variant="destructive">
-                  <Mic className="h-4 w-4 mr-2" />
-                  Stop Coaching
-                </Button>
-              ) : (
-                <Button onClick={startListening} className="bg-green-600 hover:bg-green-700">
-                  <Mic className="h-4 w-4 mr-2" />
-                  Start Live Coaching
-                </Button>
-              )}
-            </div>
-          </div>
+          <CardTitle className="flex items-center gap-2">
+            <Brain className="h-6 w-6 text-purple-600" />
+            AI Sales Coach
+            <Badge className="bg-purple-100 text-purple-800">ACTIVE</Badge>
+          </CardTitle>
+          <CardDescription>
+            Real-time coaching insights powered by competitive intelligence and performance analytics
+          </CardDescription>
         </CardHeader>
+        {metrics && (
+          <CardContent>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="text-center">
+                <div className="text-2xl font-bold text-purple-600">{metrics.overallScore}%</div>
+                <div className="text-sm text-muted-foreground">Overall Score</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold">{metrics.callsToday}</div>
+                <div className="text-sm text-muted-foreground">Calls Today</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold text-green-600">{metrics.closingEffectiveness}%</div>
+                <div className="text-sm text-muted-foreground">Closing Rate</div>
+              </div>
+            </div>
+          </CardContent>
+        )}
       </Card>
 
-      {/* Real-Time Coaching Alerts */}
-      {isListening && (
-        <Card className="border-green-200 bg-green-50">
+      {/* Current Lead Context */}
+      {currentLead && (
+        <Card>
           <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-green-800">
-              <Zap className="h-5 w-5 animate-pulse" />
-              Live Coaching Active
+            <CardTitle className="flex items-center gap-2">
+              <Target className="h-5 w-5 text-blue-600" />
+              Current Lead Context
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-3">
-              {coachData.realTimeCoaching.map((coaching) => (
-                <div key={coaching.id} className={`p-3 rounded-lg border-l-4 ${getUrgencyColor(coaching.urgency)}`}>
-                  <div className="flex items-start justify-between mb-2">
-                    <div className="font-medium text-sm">{coaching.trigger}</div>
-                    <Badge variant="outline">{coaching.confidence}% confidence</Badge>
-                  </div>
-                  <div className="text-sm text-gray-700 mb-2">{coaching.suggestion}</div>
-                  <Badge variant="secondary" className="text-xs">
-                    {coaching.type.replace('_', ' ').toUpperCase()}
-                  </Badge>
+            <div className="grid md:grid-cols-2 gap-4">
+              <div>
+                <div className="font-medium">{currentLead.leadName}</div>
+                <div className="text-sm text-muted-foreground">{currentLead.company}</div>
+                <div className="flex items-center gap-2 mt-2">
+                  <Badge className="bg-blue-100 text-blue-800">{currentLead.stage}</Badge>
+                  <Badge className="bg-green-100 text-green-800">${currentLead.value.toLocaleString()}</Badge>
                 </div>
-              ))}
+              </div>
+              <div>
+                <div className="text-sm text-muted-foreground mb-1">Competitor Threats:</div>
+                <div className="flex flex-wrap gap-1">
+                  {currentLead.competitorThreats.map((threat, idx) => (
+                    <Badge key={idx} className="bg-red-100 text-red-800 text-xs">{threat}</Badge>
+                  ))}
+                </div>
+              </div>
             </div>
           </CardContent>
         </Card>
       )}
 
-      <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as any)}>
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="coaching">🧠 Live Coaching</TabsTrigger>
-          <TabsTrigger value="analysis">📞 Call Analysis</TabsTrigger>
-          <TabsTrigger value="playbooks">📚 Playbooks</TabsTrigger>
-          <TabsTrigger value="insights">📊 Performance</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="coaching" className="space-y-4">
-          <div className="grid gap-4">
-            {coachData.realTimeCoaching.map((coaching) => (
-              <Card key={coaching.id} className={`border-l-4 ${getUrgencyColor(coaching.urgency)}`}>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="text-lg">{coaching.trigger}</CardTitle>
-                    <div className="flex items-center gap-2">
-                      <Badge variant="outline">{coaching.confidence}% confidence</Badge>
-                      <Badge variant="secondary">{coaching.type.replace('_', ' ')}</Badge>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="p-4 bg-blue-50 rounded-lg border border-blue-200 mb-4">
-                    <div className="text-sm font-medium text-blue-800 mb-2">💡 AI Suggestion</div>
-                    <p className="text-sm text-blue-700">{coaching.suggestion}</p>
-                  </div>
-                  <Button size="sm">
-                    <CheckCircle className="h-4 w-4 mr-1" />
-                    Mark as Used
-                  </Button>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="analysis" className="space-y-4">
-          <div className="grid gap-4">
-            {coachData.recentCalls.map((call) => (
-              <Card key={call.id}>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <Phone className="h-5 w-5" />
-                      {call.leadName}
-                    </CardTitle>
-                    <div className="flex items-center gap-2">
-                      <Badge className={getSentimentColor(call.sentiment)}>
-                        {call.sentiment}
-                      </Badge>
-                      <Badge variant="outline">
-                        {Math.floor(call.duration / 60)}m {call.duration % 60}s
-                      </Badge>
-                    </div>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-green-600">{call.dealProbability}%</div>
-                        <div className="text-xs text-muted-foreground">Deal Probability</div>
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Coaching Insights */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Lightbulb className="h-5 w-5 text-yellow-600" />
+              Real-time Insights
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4 max-h-96 overflow-y-auto">
+              {insights.map((insight) => (
+                <div key={insight.id} className="border rounded-lg p-4 hover:bg-accent/50 transition-colors">
+                  <div className="flex items-start gap-3">
+                    {getInsightIcon(insight.type)}
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        <div className="font-medium">{insight.title}</div>
+                        <Badge className={getImpactColor(insight.impact)}>
+                          {insight.impact.toUpperCase()}
+                        </Badge>
+                        <Badge className={getUrgencyColor(insight.urgency)}>
+                          {insight.urgency.toUpperCase()}
+                        </Badge>
                       </div>
-                      <Progress value={call.dealProbability} className="flex-1" />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
-                      <div>
-                        <div className="text-sm font-medium text-green-600 mb-2">✅ Buying Signals</div>
-                        <ul className="text-xs space-y-1">
-                          {call.buyingSignals.map((signal, idx) => (
-                            <li key={idx} className="text-muted-foreground">• {signal}</li>
-                          ))}
-                        </ul>
+                      <div className="text-sm text-muted-foreground mb-3">
+                        {insight.description}
                       </div>
-                      <div>
-                        <div className="text-sm font-medium text-red-600 mb-2">⚠️ Objections</div>
-                        <ul className="text-xs space-y-1">
-                          {call.objections.map((objection, idx) => (
-                            <li key={idx} className="text-muted-foreground">• {objection}</li>
-                          ))}
-                        </ul>
-                      </div>
-                    </div>
-
-                    <div>
-                      <div className="text-sm font-medium text-blue-600 mb-2">🧠 Coaching Tips</div>
-                      <ul className="text-sm space-y-1">
-                        {call.coachingTips.map((tip, idx) => (
-                          <li key={idx} className="text-muted-foreground">• {tip}</li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <div>
-                      <div className="text-sm font-medium text-purple-600 mb-2">📋 Next Steps</div>
-                      <ul className="text-sm space-y-1">
-                        {call.nextSteps.map((step, idx) => (
-                          <li key={idx} className="text-muted-foreground">• {step}</li>
-                        ))}
-                      </ul>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="playbooks" className="space-y-4">
-          <div className="grid gap-4">
-            {coachData.playbooks.map((playbook) => (
-              <Card key={playbook.id}>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <FileText className="h-5 w-5 text-blue-600" />
-                    {playbook.title}
-                  </CardTitle>
-                  <CardDescription>{playbook.description}</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div>
-                      <div className="text-sm font-medium mb-2">🎯 Key Talking Points</div>
-                      <ul className="text-sm space-y-1">
-                        {playbook.talkingPoints.map((point, idx) => (
-                          <li key={idx} className="text-muted-foreground">• {point}</li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <div>
-                      <div className="text-sm font-medium mb-2">🛡️ Competitive Advantages</div>
-                      <ul className="text-sm space-y-1">
-                        {playbook.competitiveAdvantages.map((advantage, idx) => (
-                          <li key={idx} className="text-muted-foreground">• {advantage}</li>
-                        ))}
-                      </ul>
-                    </div>
-
-                    <div>
-                      <div className="text-sm font-medium mb-2">💬 Objection Handlers</div>
-                      <div className="space-y-2">
-                        {playbook.objectionHandlers.map((handler, idx) => (
-                          <div key={idx} className="p-3 bg-gray-50 rounded-lg">
-                            <div className="text-sm font-medium text-red-600 mb-1">
-                              Objection: "{handler.objection}"
-                            </div>
-                            <div className="text-sm text-gray-700">
-                              Response: {handler.response}
-                            </div>
+                      <div className="space-y-1">
+                        <div className="text-xs font-medium">Action Items:</div>
+                        {insight.actionItems.map((action, idx) => (
+                          <div key={idx} className="text-xs flex items-center gap-2">
+                            <CheckCircle className="h-3 w-3 text-green-500" />
+                            {action}
                           </div>
                         ))}
                       </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="insights" className="space-y-4">
-          <div className="grid gap-4">
-            {coachData.insights.map((insight, idx) => (
-              <Card key={idx}>
-                <CardHeader>
-                  <div className="flex items-center justify-between">
-                    <CardTitle className="flex items-center gap-2">
-                      <TrendingUp className="h-5 w-5 text-blue-600" />
-                      {insight.metric}
-                    </CardTitle>
-                    <Badge variant={insight.trend === 'up' ? 'default' : insight.trend === 'down' ? 'destructive' : 'secondary'}>
-                      {insight.trend === 'up' ? '📈' : insight.trend === 'down' ? '📉' : '➡️'} {insight.trend}
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-4">
-                      <div className="text-center">
-                        <div className="text-2xl font-bold">{insight.current}</div>
-                        <div className="text-xs text-muted-foreground">Current</div>
-                      </div>
-                      <div className="flex-1">
-                        <Progress value={(insight.current / insight.target) * 100} />
-                      </div>
-                      <div className="text-center">
-                        <div className="text-2xl font-bold text-green-600">{insight.target}</div>
-                        <div className="text-xs text-muted-foreground">Target</div>
+                      <div className="mt-2 flex items-center gap-2">
+                        <div className="text-xs text-muted-foreground">Confidence:</div>
+                        <Progress value={insight.confidence} className="flex-1 h-2" />
+                        <div className="text-xs">{insight.confidence}%</div>
                       </div>
                     </div>
-
-                    <div className="p-3 bg-blue-50 rounded-lg border border-blue-200">
-                      <div className="text-sm font-medium text-blue-800 mb-1">💡 Insight</div>
-                      <p className="text-sm text-blue-700">{insight.insight}</p>
-                    </div>
-
-                    <div className="p-3 bg-green-50 rounded-lg border border-green-200">
-                      <div className="text-sm font-medium text-green-800 mb-1">🎯 Action Item</div>
-                      <p className="text-sm text-green-700">{insight.actionable}</p>
-                    </div>
                   </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* AI Coach Chat */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <MessageSquare className="h-5 w-5 text-green-600" />
+              Ask Your Coach
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {/* Chat History */}
+              <div className="max-h-64 overflow-y-auto space-y-2 border rounded-lg p-2">
+                {chatHistory.length === 0 ? (
+                  <div className="text-center text-muted-foreground text-sm py-4">
+                    Ask me anything about sales strategy, objection handling, or competitive positioning!
+                  </div>
+                ) : (
+                  chatHistory.map((msg, idx) => (
+                    <div key={idx} className={`p-2 rounded-lg ${
+                      msg.type === 'user' 
+                        ? 'bg-blue-100 text-blue-900 ml-8' 
+                        : 'bg-green-100 text-green-900 mr-8'
+                    }`}>
+                      <div className="text-xs font-medium mb-1">
+                        {msg.type === 'user' ? 'You' : 'AI Coach'}
+                      </div>
+                      <div className="text-sm">{msg.message}</div>
+                    </div>
+                  ))
+                )}
+              </div>
+
+              {/* Question Input */}
+              <div className="space-y-2">
+                <Textarea
+                  placeholder="Ask about objection handling, competitive positioning, closing techniques..."
+                  value={question}
+                  onChange={(e) => setQuestion(e.target.value)}
+                  className="min-h-[80px]"
+                />
+                <Button onClick={askCoach} className="w-full">
+                  <Brain className="h-4 w-4 mr-2" />
+                  Get Coaching
+                </Button>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Performance Breakdown */}
+      {metrics && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Trophy className="h-5 w-5 text-gold-600" />
+              Performance Breakdown
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm">Conversation Quality</span>
+                    <span className="text-sm font-medium">{metrics.conversationQuality}%</span>
+                  </div>
+                  <Progress value={metrics.conversationQuality} />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm">Objection Handling</span>
+                    <span className="text-sm font-medium">{metrics.objectionHandling}%</span>
+                  </div>
+                  <Progress value={metrics.objectionHandling} />
+                </div>
+                <div>
+                  <div className="flex items-center justify-between mb-1">
+                    <span className="text-sm">Competitive Positioning</span>
+                    <span className="text-sm font-medium">{metrics.competitivePositioning}%</span>
+                  </div>
+                  <Progress value={metrics.competitivePositioning} />
+                </div>
+              </div>
+              
+              <div className="bg-blue-50 p-4 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Zap className="h-4 w-4 text-blue-600" />
+                  <span className="font-medium text-blue-900">Quick Win Opportunity</span>
+                </div>
+                <div className="text-sm text-blue-800">
+                  Focus on improving objection handling this week. A 10-point improvement could increase your closing rate by 15%.
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
+
+export default AISalesCoach;
