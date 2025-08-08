@@ -2,7 +2,7 @@
 
 ## Project info
 
-**URL**: https://lovable.dev/projects/a63c6116-c6ac-4c9b-b150-573b2dd21fc6
+**URL*** https://lovable.dev/projects/a63c6116-c6ac-4c9b-b150-573b2dd21fc6
 
 ## How can I edit this code?
 
@@ -14,7 +14,11 @@ Simply visit the [Lovable Project](https://lovable.dev/projects/a63c6116-c6ac-4c
 
 Changes made via Lovable will be committed automatically to this repo.
 
-**Use your preferred IDE**
+---
+-* Note: Lovable changes are made on the *labs* branch.
+---
+
+**Use your preferred IDE**.
 
 If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
