@@ -95,7 +95,6 @@ export function CompetitiveSalesDashboard({ userId }: CompetitiveSalesDashboardP
     try {
       setLoading(true);
       
-      // Mock data - replace with actual API calls
       const mockData = {
         metrics: {
           totalLeads: 247,
@@ -348,7 +347,7 @@ export function CompetitiveSalesDashboard({ userId }: CompetitiveSalesDashboardP
         </CardContent>
       </Card>
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
+      <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as any)}>
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="pipeline">🎯 Smart Pipeline</TabsTrigger>
           <TabsTrigger value="intelligence">🧠 Market Intel</TabsTrigger>

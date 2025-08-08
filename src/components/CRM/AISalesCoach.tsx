@@ -88,7 +88,6 @@ export function AISalesCoach({ userId, leadId }: AISalesCoachProps) {
     try {
       setLoading(true);
       
-      // Mock data - replace with actual API calls
       const mockData = {
         recentCalls: [
           {
@@ -295,7 +294,7 @@ export function AISalesCoach({ userId, leadId }: AISalesCoachProps) {
         </Card>
       )}
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
+      <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as any)}>
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="coaching">🧠 Live Coaching</TabsTrigger>
           <TabsTrigger value="analysis">📞 Call Analysis</TabsTrigger>

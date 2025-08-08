@@ -82,7 +82,6 @@ export function AdHijackDashboard({ userId, businessId }: AdHijackProps) {
     try {
       setLoading(true);
       
-      // Mock data - replace with actual API call
       const mockData = {
         competitorAds: [
           {
@@ -207,7 +206,7 @@ export function AdHijackDashboard({ userId, businessId }: AdHijackProps) {
         </CardHeader>
       </Card>
 
-      <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as any)}>
+      <Tabs value={activeTab} onValueChange={(value: string) => setActiveTab(value as any)}>
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="intel">🕵️ Ad Intel</TabsTrigger>
           <TabsTrigger value="opportunities">🎯 Hijack Ops</TabsTrigger>
