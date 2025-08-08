@@ -46,10 +46,13 @@ jobs:
             echo "❌ supabase directory missing"
           fi
 
+      - name: Install jq
+        run: sudo apt-get update && sudo apt-get install -y jq
+
       - name: Validate JSON files
         run: |
           echo "🔍 Validating JSON files..."
-          
+
           # Check package.json
           if [ -f "package.json" ]; then
             if jq empty package.json 2>/dev/null; then
@@ -59,7 +62,7 @@ jobs:
               exit 1
             fi
           fi
-          
+
           # Check tsconfig files
           for config in tsconfig.json tsconfig.app.json tsconfig.node.json; do
             if [ -f "$config" ]; then
