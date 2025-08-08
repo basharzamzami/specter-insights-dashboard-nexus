@@ -3,7 +3,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { 
   Bell, 
   AlertTriangle, 
-  TrendingUp, 
   Target, 
   Clock, 
   CheckCircle,
@@ -106,10 +105,6 @@ export const NotificationCenter = () => {
     setNotifications(prev => prev.filter(notif => notif.id !== id));
   };
 
-  const addRandomNotification = () => {
-    // Implementation for adding random notifications
-  };
-
   return (
     <Card className="bg-background/90 backdrop-blur-md border-border">
       <CardHeader>
@@ -146,7 +141,7 @@ export const NotificationCenter = () => {
                 </div>
                 <div className="flex items-center space-x-2">
                   {!notification.read && (
-                    <Badge variant="secondary">NEW</Badge>
+                    <Badge>NEW</Badge>
                   )}
                   <Button 
                     variant="ghost" 

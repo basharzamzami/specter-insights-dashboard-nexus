@@ -1,18 +1,16 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { 
   AlertTriangle, 
-  TrendingUp, 
   Eye, 
   Clock, 
   Target, 
-  Zap,
   Bell
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -155,11 +153,6 @@ export const IntelligenceFeed = () => {
     }
   };
 
-  const handleExecuteResponse = async (feedId: number, action: string) => {
-    console.log(`Executing ${action} for feed item ${feedId}`);
-    // Implementation would handle different response actions
-  };
-
   useEffect(() => {
     fetchIntelligenceFeed();
   }, [user?.id]);
@@ -206,8 +199,8 @@ export const IntelligenceFeed = () => {
                     </div>
                     <CardDescription className="text-sm mt-1">{item.description}</CardDescription>
                     <div className="mt-2 flex flex-wrap space-x-2">
-                      <Badge variant="secondary">{item.source}</Badge>
-                      {item.metric && <Badge variant="outline">Metric: {item.metric}</Badge>}
+                      <Badge>{item.source}</Badge>
+                      {item.metric && <Badge>{item.metric}</Badge>}
                       {item.actionable && (
                         <Button variant="ghost" size="sm">
                           <Eye className="h-4 w-4 mr-2" />

@@ -28,7 +28,7 @@ const mockMessages: Message[] = [
     timestamp: new Date(),
     suggestions: [
       "Analyze TechCorp's recent changes",
-      "Find keyword opportunities",
+      "Find keyword opportunities", 
       "Review campaign performance",
       "Competitor sentiment analysis"
     ]
