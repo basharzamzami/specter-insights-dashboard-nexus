@@ -4,21 +4,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
 import { 
   MapPin,
   Target,
-  TrendingUp,
-  Activity,
   Search,
-  Eye,
-  RefreshCw,
-  Shield,
-  Zap,
-  BarChart3
+  Eye
 } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface DominanceData {
@@ -36,7 +28,7 @@ interface DominanceData {
 }
 
 export const DominanceMapDashboard = () => {
-  const [dominanceData, setDominanceData] = useState<DominanceData[]>([
+  const [dominanceData] = useState<DominanceData[]>([
     {
       id: 1,
       region: 'North America',
@@ -86,13 +78,10 @@ export const DominanceMapDashboard = () => {
       threats: ['Intense price competition', 'Supply chain disruptions'],
     },
   ]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview');
   const { user } = useUser();
   const { toast } = useToast();
 
   const fetchDominanceData = async () => {
-    setIsLoading(true);
     try {
       // Simulate API call
       await new Promise((resolve) => setTimeout(resolve, 1500));
@@ -106,8 +95,6 @@ export const DominanceMapDashboard = () => {
         description: "Failed to fetch dominance data. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -138,7 +125,7 @@ export const DominanceMapDashboard = () => {
         </CardHeader>
       </Card>
 
-      <Tabs defaultValue="overview" className="space-y-4" onValueChange={setActiveTab}>
+      <Tabs defaultValue="overview" className="space-y-4">
         <TabsList>
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="analysis">Regional Analysis</TabsTrigger>
@@ -196,13 +183,13 @@ export const DominanceMapDashboard = () => {
                       <Target className="h-4 w-4 mr-2" />
                       Focus Campaign
                     </Button>
-                    <Button variant="outline" size="sm">
+                    <Button variant="outline">
                       Status
                     </Button>
                   </div>
                   
                   <div className="flex gap-2">
-                    <Button size="sm">
+                    <Button>
                       <Search className="h-4 w-4 mr-2" />
                       Analyze
                     </Button>
@@ -211,7 +198,7 @@ export const DominanceMapDashboard = () => {
                     </Badge>
                   </div>
 
-                  <Button className="w-full" size="sm">
+                  <Button className="w-full">
                     <Eye className="h-4 w-4 mr-2" />
                     View Details
                   </Button>

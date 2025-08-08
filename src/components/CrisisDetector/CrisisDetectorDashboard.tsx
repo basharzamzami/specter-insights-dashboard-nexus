@@ -4,21 +4,14 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
 import { 
   AlertTriangle,
   Shield,
   TrendingDown,
   Activity,
-  Clock,
-  Eye,
-  RefreshCw,
-  Target,
-  Bell,
-  Zap
+  Eye
 } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface CrisisAlert {
@@ -34,7 +27,7 @@ interface CrisisAlert {
 }
 
 export const CrisisDetectorDashboard = () => {
-  const [crisisAlerts, setCrisisAlerts] = useState<CrisisAlert[]>([
+  const [crisisAlerts] = useState<CrisisAlert[]>([
     {
       id: 1,
       title: 'Supply Chain Disruption',
@@ -146,16 +139,13 @@ export const CrisisDetectorDashboard = () => {
       category: 'External'
     }
   ]);
-  const [isLoading, setIsLoading] = useState(false);
   const { user } = useUser();
   const { toast } = useToast();
 
   useEffect(() => {
     // Simulate fetching crisis alerts from an API
     const fetchCrisisAlerts = async () => {
-      setIsLoading(true);
       await new Promise((resolve) => setTimeout(resolve, 1500)); // Simulate delay
-      setIsLoading(false);
     };
 
     fetchCrisisAlerts();

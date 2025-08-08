@@ -2,23 +2,13 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
 import { 
   Radar,
   MapPin,
-  Target,
-  TrendingUp,
-  Activity,
-  Search,
-  Eye,
-  RefreshCw,
-  AlertTriangle,
-  Shield
+  AlertTriangle
 } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface GeoLocation {
@@ -45,7 +35,7 @@ interface Threat {
 }
 
 export const GeoRadarDashboard = () => {
-  const [geoData, setGeoData] = useState<GeoLocation[]>([
+  const [geoData] = useState<GeoLocation[]>([
     {
       id: 1,
       location: 'New York City',
@@ -113,13 +103,10 @@ export const GeoRadarDashboard = () => {
       ]
     }
   ]);
-  const [isLoading, setIsLoading] = useState(false);
-  const [activeTab, setActiveTab] = useState('radar');
   const { user } = useUser();
   const { toast } = useToast();
 
   const fetchGeoData = async () => {
-    setIsLoading(true);
     try {
       // Simulate API call
       await new Promise(resolve => setTimeout(resolve, 1500));
@@ -133,21 +120,12 @@ export const GeoRadarDashboard = () => {
         title: "Uh oh! Something went wrong.",
         description: error.message,
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
   useEffect(() => {
     fetchGeoData();
   }, [user?.id, toast]);
-
-  const getOpportunityColor = (value: number) => {
-    if (value >= 80) return 'bg-green-500/20 text-green-400 border-green-500/30';
-    if (value >= 60) return 'bg-blue-500/20 text-blue-400 border-blue-500/30';
-    if (value >= 40) return 'bg-yellow-500/20 text-yellow-400 border-yellow-500/30';
-    return 'bg-red-500/20 text-red-400 border-red-500/30';
-  };
 
   return (
     <div className="space-y-6">

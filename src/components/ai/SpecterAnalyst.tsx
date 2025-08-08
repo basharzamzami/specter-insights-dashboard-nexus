@@ -1,24 +1,15 @@
+
 import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Progress } from '@/components/ui/progress';
 import { 
   Bot,
   Brain,
-  Zap,
-  Target,
-  TrendingUp,
-  AlertTriangle,
-  Eye,
-  Clock,
-  Activity,
   MessageSquare,
   Send,
-  Lightbulb,
-  BarChart3
+  Lightbulb
 } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
 import { supabase } from '@/integrations/supabase/client';
@@ -54,7 +45,7 @@ export const SpecterAnalyst = () => {
   const { user } = useUser();
   const { toast } = useToast();
 
-  const [quickInsights, setQuickInsights] = useState<QuickInsight[]>([
+  const [quickInsights] = useState<QuickInsight[]>([
     {
       id: 1,
       type: 'Market Trend',
@@ -237,7 +228,7 @@ export const SpecterAnalyst = () => {
                   <Badge className="bg-primary/20 text-primary">
                     {insight.type}
                   </Badge>
-                  <Badge variant="secondary">
+                  <Badge>
                     {insight.confidence}% Confidence
                   </Badge>
                 </div>

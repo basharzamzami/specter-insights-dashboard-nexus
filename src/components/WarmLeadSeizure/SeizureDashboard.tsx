@@ -4,23 +4,11 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Input } from '@/components/ui/input';
 import { 
   Target,
-  Flame,
-  Users,
-  TrendingUp,
-  Activity,
-  Search,
-  Eye,
-  RefreshCw,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
-  Zap
+  Flame
 } from 'lucide-react';
 import { useUser } from '@clerk/clerk-react';
-import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 
 interface WarmLead {
@@ -44,7 +32,7 @@ interface SeizureCampaign {
 }
 
 export const SeizureDashboard = () => {
-  const [warmLeads, setWarmLeads] = useState<WarmLead[]>([
+  const [warmLeads] = useState<WarmLead[]>([
     {
       id: 1,
       company: 'TechCorp',
@@ -77,7 +65,7 @@ export const SeizureDashboard = () => {
     }
   ]);
 
-  const [activeSeizures, setActiveSeizures] = useState<SeizureCampaign[]>([
+  const [activeSeizures] = useState<SeizureCampaign[]>([
     {
       id: 1,
       name: 'Q3 Seizure Campaign',
@@ -88,16 +76,13 @@ export const SeizureDashboard = () => {
     }
   ]);
 
-  const [isLoading, setIsLoading] = useState(false);
   const { user } = useUser();
   const { toast } = useToast();
 
   const fetchWarmLeads = async () => {
-    setIsLoading(true);
     try {
       // Simulate API call
       setTimeout(() => {
-        setIsLoading(false);
       }, 1000);
     } catch (error) {
       console.error('Error fetching warm leads:', error);
@@ -106,8 +91,6 @@ export const SeizureDashboard = () => {
         description: "Failed to fetch warm leads.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -202,7 +185,7 @@ export const SeizureDashboard = () => {
                         <Badge className={`${temp.bg} ${temp.color} ${temp.border} text-xs`}>
                           {temp.label}
                         </Badge>
-                        <Badge variant="outline">
+                        <Badge>
                           {lead.temperature}°
                         </Badge>
                       </div>
@@ -228,7 +211,7 @@ export const SeizureDashboard = () => {
                       <span className="text-xs text-muted-foreground">
                         Last Activity: {lead.lastActivity}
                       </span>
-                      <Badge variant="secondary">
+                      <Badge>
                         {lead.signals}
                       </Badge>
                     </div>
