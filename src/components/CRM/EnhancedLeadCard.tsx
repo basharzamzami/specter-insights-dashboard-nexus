@@ -147,7 +147,7 @@ export function EnhancedLeadCard({ lead, onScheduleFollowUp, onViewFullIntel }: 
             </CardDescription>
           </div>
           <div className="flex flex-col items-end gap-2">
-            <Badge className={getStageColor(lead.stage)}>
+            <Badge variant="outline">
               {lead.stage.charAt(0).toUpperCase() + lead.stage.slice(1)}
             </Badge>
             <div className="text-right">
